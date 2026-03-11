@@ -82,10 +82,10 @@ Os papéis abaixo são apenas para organização do time.
 
 ##  Definição dos Papéis – Sprint 1
 
-- 👨‍💻 Tech Lead:
-- 🗄️ Arquiteto de Dados:
-- 🧪 Gerente de Qualidade:
-- 📋 Facilitador Ágil:
+- 👨‍💻 Tech Lead: Samuel
+- 🗄️ Arquiteto de Dados: Vitor
+- 🧪 Gerente de Qualidade: Bruna
+- 📋 Facilitador Ágil: Ricardo
 
 > Caso os papéis mudem nas próximas Sprints, atualizar neste documento.
 
@@ -135,10 +135,10 @@ O projeto pode utilizar a aba **Projects** do GitHub, porém é **OBRIGATÓRIO p
 
 | Responsável | Papel | Tarefa | Início | Prazo | Status |
 |-------------|--------|--------|--------|--------|--------|
-|             |        | Preencher Visão do Produto, ODS e Backlog no README | 12/03 | 15/03 | ❌ |
-|             |        | Criar instância do Banco de Dados | 12/03 | 16/03 | ❌ |
-|             |        | Criar repositório e estruturar pastas | 12/03 | 18/03 | ❌ |
-|             |        | Criar tela Hello World conectada à API | 15/03 | 20/03 | ❌ |
+| Ricardo     |Facilitador Ágil        | Preencher Visão do Produto, ODS e Backlog no README | 10/03 | 12/03 | 📝 |
+| Vitor       |Arquiteto de Dados        | Criar instância do Banco de Dados | 11/03 | 12/03 | 📝 |
+| Samuel      |Tech Lead        | Criar repositório e estruturar pastas | 10/03 | 11/03 | 📝 |
+| Bruna       |Gerente de Qualidade        | Criar tela Hello World conectada à API | 11/03 | 12/03 | ❌ |
 
 ---
 
