@@ -6,9 +6,11 @@
 
 `SEMESTRE`: 5° Semestre
 
-Descrever resumidamente, em um ou dois parágrafos, o projeto que está sendo desenvolvido.
+O Nimbly é uma plataforma digital para monitorar chuvas intensas e prevenir desastres em áreas vulneráveis. O sistema centraliza dados climáticos e mapas em um único painel, permitindo que autoridades e moradores acompanhem o risco de enchentes em tempo real e recebam alertas rápidos para evacuação.
 
 ODS Alinhados:
+ODS 11: Cidades e Comunidades Sustentáveis.
+ODS 13: Ação Contra a Mudança Global do Clima.
 
 ## Integrantes
 
