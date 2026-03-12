@@ -1,10 +1,16 @@
-## Arquivo .sql
+# Banco de Dados - Nimbly
 
+## Criar banco de dados
 
---Criar banco
-CREATE DATABASE Nimbly-database;
+```sql
+CREATE DATABASE "Nimbly-database";
+```
 
---Criar tabela de usuario
+---
+
+## Criar tabela de usuários
+
+```sql
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -17,8 +23,13 @@ CREATE TABLE "User" (
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
+```
 
---Criar tabela de endereço
+---
+
+## Criar tabela de endereços
+
+```sql
 CREATE TABLE "Address" (
     "id" TEXT NOT NULL,
     "cep" TEXT NOT NULL,
@@ -31,8 +42,14 @@ CREATE TABLE "Address" (
 
     CONSTRAINT "Address_pkey" PRIMARY KEY ("id")
 );
+```
 
--- Buscar usuario por Id
-SELECT * 
+---
+
+## Buscar usuário por ID
+
+```sql
+SELECT *
 FROM "User"
 WHERE "id" = '123';
+```
