@@ -1,5 +1,7 @@
 import Input from "../../components/Input/Input"
 import Button from "../../components/Button/Button"
+import { Link } from "react-router-dom"
+
 import {createUser} from "../../services/userService"
 import { useCadastro } from "../../hooks/useCadastro"
 
@@ -61,6 +63,7 @@ export default function Cadastro(){
                 
                 <Button text="Registrar" onClick={handleSubmit}/>
             </div>
+            <Link to="/login">Já tem conta? Faça login</Link>
         </div>
     )
 }
