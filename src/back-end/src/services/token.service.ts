@@ -10,7 +10,7 @@ export class TokenService {
     return jwt.sign(
       payload,
       this.secret,
-      { expiresIn: '15m' }
+      { expiresIn: '1d' }
     )
   }
 

@@ -33,16 +33,45 @@ export class UserRepository {
     })
   }
 
+  async findByCpf(cpf: string) {
+    return prisma.user.findUnique({
+      where: { cpf },
+      include: { address: true }
+    })
+  }
+
   async findById(id: string) {
     return prisma.user.findUnique({
       where: { id },
-      include: { address: true }
+      select: {
+        id: true,
+        name: true,
+        lastName: true,
+        email: true,
+        cpf: true,
+        phone: true,
+        address: true
+      }
     })
   }
 
   async delete(id: string) {
     return prisma.user.delete({
       where: { id }
+    })
+  }
+
+  async findAll() {
+    return prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        lastName: true,
+        email: true,
+        cpf: true,
+        phone: true,
+        address: true
+      }
     })
   }
 }

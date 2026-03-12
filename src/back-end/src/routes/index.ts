@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { userRoutes } from "./user.routes";
-import { authRoutes } from "./auth.routes";
+import { publicRoutes } from "./public.routes";
+import { privateRoutes } from "./private.routes";
 
 const routes = Router();
 
-routes.use("/auth", authRoutes);
-routes.use("/users", userRoutes);
+routes.use(publicRoutes);
+routes.use(privateRoutes);
 
 routes.get("/", (req, res) => {
     return res.json({ message: "Hello World!" });
