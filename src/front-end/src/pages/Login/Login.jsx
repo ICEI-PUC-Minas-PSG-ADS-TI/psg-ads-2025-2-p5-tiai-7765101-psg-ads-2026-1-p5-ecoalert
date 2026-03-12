@@ -27,8 +27,8 @@ function Login(){
             <h1>Login</h1>
 
             <div className="form">
-                <Input title="Usuário" onChange={handleChange}/>
-                <Input title="Senha" onChange={handleChange}/>
+                <Input title="Usuário" onChange={handleChange} name={'email'}/>
+                <Input title="Senha" onChange={handleChange} name={'password'}/>
                 
                 <Button text="Entrar" onClick={handleSubmit}/>
             </div>

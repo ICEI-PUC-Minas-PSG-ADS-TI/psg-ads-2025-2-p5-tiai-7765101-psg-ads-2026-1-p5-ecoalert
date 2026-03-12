@@ -6,6 +6,6 @@ export async function createUser(user){
 }
 
 export async function login(user){
-    const response = await api.post("/api/users/login", user)
+    const response = await api.post("/api/auth/login", user)
     return response.data
 }
