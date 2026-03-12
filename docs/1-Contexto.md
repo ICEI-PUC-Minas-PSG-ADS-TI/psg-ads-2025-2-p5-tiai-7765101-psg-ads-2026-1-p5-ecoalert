@@ -6,6 +6,7 @@ Nesta seção, você vai apresentar **o contexto e a motivação do seu projeto*
 
 ## 1.1 Problema  
 Moradores de áreas de risco e autoridades de defesa civil enfrentam dificuldades para agir a tempo contra enchentes, pois as informações meteorológicas são fragmentadas e chegam tarde demais. Essa demora na comunicação de emergência atrasa evacuações e resulta em perdas materiais e de vidas.
+
 ---
 
 ## 1.2 Objetivos  
@@ -24,6 +25,7 @@ Objetivos Específicos:
 
 ## 1.3 Justificativa  
 Segundo dados do Centro Nacional de Monitoramento e Alertas de Desastres Naturais (CEMADEN), mais de 8 milhões de brasileiros vivem em áreas de risco propensas a desastres naturais. O projeto vale a pena pois transforma dados brutos em alertas rápidos, agilizando o resgate por parte das autoridades e dando à população o tempo necessário para se proteger, salvando vidas e reduzindo prejuízos.
+
 ---
 
 ## 1.4 Público-Alvo  
