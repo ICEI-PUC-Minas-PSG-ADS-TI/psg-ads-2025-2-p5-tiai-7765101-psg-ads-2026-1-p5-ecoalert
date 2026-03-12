@@ -136,9 +136,9 @@ O projeto pode utilizar a aba **Projects** do GitHub, porém é **OBRIGATÓRIO p
 | Responsável | Papel | Tarefa | Início | Prazo | Status |
 |-------------|--------|--------|--------|--------|--------|
 | Ricardo     |Facilitador Ágil        | Preencher Visão do Produto, ODS e Backlog no README | 10/03 | 12/03 | ✔️ |
-| Vitor       |Arquiteto de Dados        | Criar instância do Banco de Dados | 11/03 | 12/03 | 📝 |
+| Vitor       |Arquiteto de Dados        | Criar instância do Banco de Dados | 11/03 | 12/03 | ✔️ |
 | Samuel      |Tech Lead        | Criar repositório e estruturar pastas | 10/03 | 11/03 | ✔️ |
-| Bruna       |Gerente de Qualidade        | Criar tela Hello World conectada à API | 11/03 | 12/03 | 📝 |
+| Bruna       |Gerente de Qualidade        | Criar tela Hello World conectada à API | 11/03 | 12/03 | ✔️ |
 
 ---
 
