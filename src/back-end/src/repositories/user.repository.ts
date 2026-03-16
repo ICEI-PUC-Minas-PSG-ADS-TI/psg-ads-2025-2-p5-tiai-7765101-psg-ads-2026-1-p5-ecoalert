@@ -1,5 +1,6 @@
 import { prisma } from "@/config/database"
 import { CreateUserDto } from "@/models/user.model"
+import { parsePhone } from "@/utils/formatter";
 
 export class UserRepository {
 
@@ -41,7 +42,7 @@ export class UserRepository {
   }
 
   async findById(id: string) {
-    return prisma.user.findUnique({
+    const userEntity = await prisma.user.findUnique({
       where: { id },
       select: {
         id: true,
@@ -50,9 +51,16 @@ export class UserRepository {
         email: true,
         cpf: true,
         phone: true,
-        address: true
+        address: true,
       }
     })
+
+    if (!userEntity) 
+      return null
+
+    const user = {...userEntity, phone: parsePhone(userEntity.phone), address: userEntity.address ?? undefined};
+
+    return user;
   }
 
   async delete(id: string) {

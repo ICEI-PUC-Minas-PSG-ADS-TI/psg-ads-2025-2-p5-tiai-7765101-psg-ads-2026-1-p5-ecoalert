@@ -54,5 +54,15 @@ export class UserService {
     static async findAll() {
         return repository.findAll();
     }
+
+    static async findById(id: string) {
+        const user = await repository.findById(id);
+
+        if (!user) {
+            throw new AppError("Usuário não encontrado", 404, "User not found");
+        }
+
+        return user;
+    }
 }
 
