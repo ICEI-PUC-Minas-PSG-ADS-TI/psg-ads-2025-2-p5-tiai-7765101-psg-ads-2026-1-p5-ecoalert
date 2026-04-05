@@ -13,7 +13,6 @@ export interface Community {
 }
 
 export interface CreateCommunityDto {
-  id: string
   name: string
   city: string
   state: string
