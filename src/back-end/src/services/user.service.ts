@@ -20,5 +20,24 @@ export class UserService {
             address: address || undefined
         };
     }
+
+    async login(email: string, password: string) {
+
+        console.log(email)
+
+        const user = await repository.findByEmail(email);
+
+        console.log('usuário encontrado', user)
+        
+        if (!user) {
+            throw new Error('Usuário não encontrado');
+        }
+
+        if (user.password !== password) {
+            throw new Error('Senha incorreta');
+        }
+
+        console.log('Login bem sucedido', user)
+    }
 }
 
