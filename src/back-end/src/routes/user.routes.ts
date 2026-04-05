@@ -1,10 +1,10 @@
-import { createUser, getUsers, login } from "@/controllers/user.controller";
+import { getUserById, getUsers } from "@/controllers/user.controller";
+import { errorHandler } from "@/utils/errorHandler";
 import { Router } from "express";
 
 const userRoutes = Router();
 
-userRoutes.get("/", getUsers);
-userRoutes.post("/", createUser);
-userRoutes.post("/login", login);
- 
+userRoutes.get("/", errorHandler(getUsers));
+userRoutes.get("/:id", errorHandler(getUserById));
+
 export { userRoutes };

@@ -1,5 +1,6 @@
 import { prisma } from "@/config/database"
 import { CreateUserDto } from "@/models/user.model"
+import { parsePhone } from "@/utils/formatter";
 
 export class UserRepository {
 
@@ -33,16 +34,52 @@ export class UserRepository {
     })
   }
 
-  async findById(id: string) {
+  async findByCpf(cpf: string) {
     return prisma.user.findUnique({
-      where: { id },
+      where: { cpf },
       include: { address: true }
     })
+  }
+
+  async findById(id: string) {
+    const userEntity = await prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        lastName: true,
+        email: true,
+        cpf: true,
+        phone: true,
+        address: true,
+      }
+    })
+
+    if (!userEntity) 
+      return null
+
+    const user = {...userEntity, phone: parsePhone(userEntity.phone), address: userEntity.address ?? undefined};
+
+    return user;
   }
 
   async delete(id: string) {
     return prisma.user.delete({
       where: { id }
+    })
+  }
+
+  async findAll() {
+    return prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        lastName: true,
+        email: true,
+        cpf: true,
+        phone: true,
+        address: true
+      }
     })
   }
 }

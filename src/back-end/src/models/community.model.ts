@@ -1,4 +1,4 @@
-export interface Comunidade {
+export interface Community {
   id: string
   name: string
   city: string
@@ -12,7 +12,7 @@ export interface Comunidade {
   updatedAt?: Date
 }
 
-export interface CreateComunidadeDto {
+export interface CreateCommunityDto {
   name: string
   city: string
   state: string

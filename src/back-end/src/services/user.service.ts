@@ -1,10 +1,36 @@
 import { CreateUserDto, User } from "@/models/user.model";
 import { UserRepository } from "@/repositories/user.repository";
+import { CryptoService } from "./crypto.service";
+import { AppError } from "@/types/error";
 
 const repository = new UserRepository();
 
 export class UserService {
-    async create(data: CreateUserDto): Promise<Omit<User, "password">> {
+    static async create(data: CreateUserDto): Promise<Omit<User, "password">> {
+        const errorFields: Record<string, string> = {};
+
+        const userByEmail = await repository.findByEmail(data.email);
+
+        if (userByEmail) {
+            errorFields.email = "Já existe um usuário cadastrado com este e-mail";
+        }
+
+        const userByCpf = await repository.findByCpf(data.cpf);
+
+        if (userByCpf) {
+            errorFields.cpf = "Já existe um usuário cadastrado com este CPF";
+        }
+
+        const userExists = Object.keys(errorFields).length > 0;
+
+        if (userExists) {
+            throw new AppError("Usuário já cadastrado", 400, "User already exists", errorFields);
+        }
+
+        const hashedPassword = await CryptoService.hashPassword(data.password);
+
+        data.password = hashedPassword;
+
         const createdUser = await repository.create(data);
 
         const { password, phone, address, ...restOfUser } = createdUser;
@@ -21,23 +47,22 @@ export class UserService {
         };
     }
 
-    async login(email: string, password: string) {
+    static async findByEmail(email: string) {
+        return repository.findByEmail(email);
+    }
 
-        console.log(email)
+    static async findAll() {
+        return repository.findAll();
+    }
 
-        const user = await repository.findByEmail(email);
+    static async findById(id: string) {
+        const user = await repository.findById(id);
 
-        console.log('usuário encontrado', user)
-        
         if (!user) {
-            throw new Error('Usuário não encontrado');
+            throw new AppError("Usuário não encontrado", 404, "User not found");
         }
 
-        if (user.password !== password) {
-            throw new Error('Senha incorreta');
-        }
-
-        console.log('Login bem sucedido', user)
+        return user;
     }
 }
 
