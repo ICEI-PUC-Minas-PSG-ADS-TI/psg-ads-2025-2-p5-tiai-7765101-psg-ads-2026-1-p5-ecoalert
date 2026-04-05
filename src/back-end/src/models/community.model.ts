@@ -3,11 +3,11 @@ export interface Community {
   name: string
   city: string
   state: string
-  latitude?: number
-  longitude?: number
+  latitude?: number | null
+  longitude?: number | null
   riskLevel: string
-  approximatePopulation?: number
-  description?: string
+  population?: number | null
+  description?: string | null
   createdAt?: Date
   updatedAt?: Date
 }
@@ -16,9 +16,9 @@ export interface CreateCommunityDto {
   name: string
   city: string
   state: string
-  latitude?: number
-  longitude?: number
+  latitude?: number | null
+  longitude?: number | null
   riskLevel: string
-  approximatePopulation?: number
-  description?: string
+  population?: number | null
+  description?: string | null
 }

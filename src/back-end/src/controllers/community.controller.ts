@@ -28,7 +28,7 @@ export async function getCommunities(req: Request, res: Response) {
     }
 }
 
-export async function getCommunityById(req: Request, res: Response){
+export async function getCommunityById(req: Request<Params>, res: Response){
     try {
         const { id } = req.params;
         const community = await CommunityService.findById(id);
@@ -40,7 +40,7 @@ export async function getCommunityById(req: Request, res: Response){
     }
 }
 
-export async function updateCommunity(req: Request, res: Response){
+export async function updateCommunity(req: Request<Params>, res: Response){
     try {
         const { id } = req.params;
         const community = await CommunityService.update(id, req.body);
@@ -52,7 +52,7 @@ export async function updateCommunity(req: Request, res: Response){
     }
 }
 
-export async function deleteCommunity(req: Request, res: Response){
+export async function deleteCommunity(req: Request<Params>, res: Response){
     try {
         const { id } = req.params;
         await CommunityService.delete(id);
