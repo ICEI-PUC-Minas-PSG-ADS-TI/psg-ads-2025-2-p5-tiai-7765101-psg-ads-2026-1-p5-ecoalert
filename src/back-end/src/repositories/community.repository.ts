@@ -19,6 +19,12 @@ export class CommunityRepository {
     })
   }
 
+  async findByName(name: string) {
+    return prisma.community.findFirst({
+      where: { name }
+    })
+  }
+
   async update(id: string, data: Partial<CreateCommunityDto>) {
     return prisma.community.update({
       where: { id },
