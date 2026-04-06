@@ -38,3 +38,18 @@ model Address {
   userId String @unique
   user   User   @relation(fields: [userId], references: [id])
 }
+
+model Community {
+  id                   String   @id @default(uuid())
+  name                 String
+  city                 String
+  state                String
+  latitude             Float?
+  longitude            Float?
+  riskLevel            String
+  population           Int?
+  description          String?
+
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
