@@ -22,8 +22,8 @@ export class AuthService {
 
         if (await CryptoService.verifyPassword(password, user.password)) {
             return { 
-                token: TokenService.generateAccessToken({userId: user.id, email: user.email}),
-                refreshToken: TokenService.generateRefreshToken({userId: user.id, email: user.email}),
+                token: TokenService.generateAccessToken({userId: user.id, email: user.email, role: user.role}),
+                refreshToken: TokenService.generateRefreshToken({userId: user.id, email: user.email, role: user.role}),
                 user: {
                     id: user.id,
                     name: user.name,
@@ -31,6 +31,7 @@ export class AuthService {
                     email: user.email,
                     cpf: user.cpf,
                     phone: parsePhone(user.phone),
+                    role: user.role,
                     address: user.address ?? undefined
                 }
             }

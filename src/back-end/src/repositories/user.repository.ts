@@ -1,10 +1,15 @@
 import { prisma } from "@/config/database"
-import { CreateUserDto } from "@/models/user.model"
+import {
+  CreateUserDto,
+  UserEntity,
+  UserEntityWithoutPassword,
+  UserWithoutPassword
+} from "@/models/user.model"
 import { parsePhone } from "@/utils/formatter";
 
 export class UserRepository {
 
-  async create(data: CreateUserDto) {
+  async create(data: CreateUserDto): Promise<UserEntity> {
     const formattedPhone = `${data.phone.ddd}${data.phone.number}`;
 
     return prisma.user.create({
@@ -15,6 +20,7 @@ export class UserRepository {
         cpf: data.cpf,
         phone: formattedPhone,
         password: data.password,
+        role: data.role ?? "USER",
         address: data.address
           ? {
               create: data.address
@@ -27,21 +33,21 @@ export class UserRepository {
     })
   }
 
-  async findByEmail(email: string) {
+  async findByEmail(email: string): Promise<UserEntity | null> {
     return prisma.user.findUnique({
       where: { email },
       include: { address: true }
     })
   }
 
-  async findByCpf(cpf: string) {
+  async findByCpf(cpf: string): Promise<UserEntity | null> {
     return prisma.user.findUnique({
       where: { cpf },
       include: { address: true }
     })
   }
 
-  async findById(id: string) {
+  async findById(id: string): Promise<UserWithoutPassword | null> {
     const userEntity = await prisma.user.findUnique({
       where: { id },
       select: {
@@ -51,6 +57,7 @@ export class UserRepository {
         email: true,
         cpf: true,
         phone: true,
+        role: true,
         address: true,
       }
     })
@@ -58,7 +65,11 @@ export class UserRepository {
     if (!userEntity) 
       return null
 
-    const user = {...userEntity, phone: parsePhone(userEntity.phone), address: userEntity.address ?? undefined};
+    const user = {
+      ...userEntity,
+      phone: parsePhone(userEntity.phone),
+      address: userEntity.address ?? undefined
+    };
 
     return user;
   }
@@ -69,8 +80,8 @@ export class UserRepository {
     })
   }
 
-  async findAll() {
-    return prisma.user.findMany({
+  async findAll(): Promise<UserWithoutPassword[]> {
+    const users = await prisma.user.findMany({
       select: {
         id: true,
         name: true,
@@ -78,8 +89,15 @@ export class UserRepository {
         email: true,
         cpf: true,
         phone: true,
+        role: true,
         address: true
       }
     })
+
+    return users.map((user) => ({
+      ...user,
+      phone: parsePhone(user.phone),
+      address: user.address ?? undefined
+    }))
   }
 }

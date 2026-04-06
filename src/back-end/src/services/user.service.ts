@@ -1,4 +1,9 @@
-import { CreateUserDto, User } from "@/models/user.model";
+import {
+    CreateUserDto,
+    User,
+    UserEntity,
+    UserWithoutPassword
+} from "@/models/user.model";
 import { UserRepository } from "@/repositories/user.repository";
 import { CryptoService } from "./crypto.service";
 import { AppError } from "@/types/error";
@@ -47,15 +52,15 @@ export class UserService {
         };
     }
 
-    static async findByEmail(email: string) {
+    static async findByEmail(email: string): Promise<UserEntity | null> {
         return repository.findByEmail(email);
     }
 
-    static async findAll() {
+    static async findAll(): Promise<UserWithoutPassword[]> {
         return repository.findAll();
     }
 
-    static async findById(id: string) {
+    static async findById(id: string): Promise<UserWithoutPassword> {
         const user = await repository.findById(id);
 
         if (!user) {
@@ -65,4 +70,3 @@ export class UserService {
         return user;
     }
 }
-
