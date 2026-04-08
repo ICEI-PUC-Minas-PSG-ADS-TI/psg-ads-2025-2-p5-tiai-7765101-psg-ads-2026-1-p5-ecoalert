@@ -1,9 +1,9 @@
-import Input from "../../components/Input/Input"
-import Button from "../../components/Button/Button"
+import Input from "@/components/Input/Input"
+import Button from "@/components/Button/Button"
 import { Link } from "react-router-dom"
 
-import {createUser} from "../../services/userService"
-import { useCadastro } from "../../hooks/useCadastro"
+import { createUser } from "@/services/userService"
+import { useCadastro } from "@/hooks/useCadastro"
 
 export default function Cadastro(){
 
@@ -67,5 +67,4 @@ export default function Cadastro(){
         </div>
     )
 }
-
 

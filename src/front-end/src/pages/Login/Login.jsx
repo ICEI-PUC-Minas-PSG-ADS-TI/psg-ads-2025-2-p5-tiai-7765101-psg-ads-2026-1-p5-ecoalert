@@ -1,12 +1,17 @@
-import Input from "../../components/Input/Input"
-import Button from "../../components/Button/Button"
-import { Link } from "react-router-dom"
+import Input from "@/components/Input/Input"
+import Button from "@/components/Button/Button"
+import { Link, useNavigate } from "react-router-dom"
 
-import { login } from "../../services/userService"
-import { useLogin } from "../../hooks/useLogin"
+import { login } from "@/services/userService"
+import { useLogin } from "@/hooks/useLogin"
+import { persistAuthSession } from "@/utils/auth"
+import { useTheme } from "@mui/material"
 
 function Login(){
+    const theme = useTheme();
+    console.log("Tema atual:", theme.palette);
     const {form, handleChange} = useLogin();
+    const navigate = useNavigate();
 
     async function handleSubmit(){
         const user = {
@@ -15,8 +20,10 @@ function Login(){
         }
 
         try {
-            await login(user);
+            const response = await login(user);
+            persistAuthSession(response);
             alert("Usuário logado")
+            navigate("/home");
         }catch (error){
             console.log(error)
         }
