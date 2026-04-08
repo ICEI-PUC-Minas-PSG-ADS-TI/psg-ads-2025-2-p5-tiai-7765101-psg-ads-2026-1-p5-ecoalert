@@ -29,16 +29,10 @@ Os **Requisitos Funcionais (RF)** descrevem o que o sistema deve fazer.
 
 | ID    | Descrição do Requisito | Prioridade |
 |-------|------------------------|------------|
-| RF-01 | O sistema deve permitir que os usuários criem uma conta informando nome, e-mail, senha e endereço. | 🔴 ALTA |
-| RF-02 | O sistema deve permitir que os usuários adicionem produtos ao carrinho de compras. | 🟡 MÉDIA |
-| RF-03 | (Descreva aqui o requisito funcional 3 do seu sistema) | (Alta/Média/Baixa) |
-| RF-04 | (Descreva aqui o requisito funcional 4 do seu sistema) | (Alta/Média/Baixa) |
-| RF-05 | (Descreva aqui o requisito funcional 5 do seu sistema) | (Alta/Média/Baixa) |
-| RF-06 | (Descreva aqui o requisito funcional 6 do seu sistema) | (Alta/Média/Baixa) |
-| RF-07 | (Descreva aqui o requisito funcional 7 do seu sistema) | (Alta/Média/Baixa) |
-| RF-08 | (Descreva aqui o requisito funcional 8 do seu sistema) | (Alta/Média/Baixa) |
-| RF-09 | (Descreva aqui o requisito funcional 9 do seu sistema) | (Alta/Média/Baixa) |
-| RF-10 | (Descreva aqui o requisito funcional 10 do seu sistema) | (Alta/Média/Baixa) |
+| RF-01 | O sistema deve permitir o cadastro de novos usuários com nome, CPF, telefone e endereço completo. | 🔴 ALTA |
+| RF-02 | O sistema deve permitir que o usuário faça login usando e-mail e senha. | 🔴 ALTA |
+| RF-03 | O sistema deve ter um CRUD de comunidades de risco, salvando a localização e o nível de perigo. | 🔴 ALTA |
+| RF-04 | O sistema deve diferenciar os tipos de usuário (comum e administrador), restringindo o acesso a certas funções. | 🔴 ALTA |
 
 ---
 
@@ -69,19 +63,23 @@ Como administrador, quero alterar permissões para controlar o acesso ao sistema
 
 ---
 
-### História 1 (relacionada ao RF-01)
+### História 1 (relacionada ao RF-01 e RF-02)
 
-Como __________________________________________  
-Eu quero _______________________________________  
-Para que _______________________________________
+**Como** morador de uma área de risco,
+
+**Eu quero** criar uma conta e fazer login,
+
+**Para que** eu possa acessar o sistema.
 
 ---
 
-### História 2 (relacionada ao RF-02)
+### História 2 (relacionada ao RF-03 e RF-04)
 
-Como __________________________________________  
-Eu quero _______________________________________  
-Para que _______________________________________
+**Como** administrador (Defesa Civil),
+
+**Eu quero** cadastrar e editar os dados das comunidades,
+
+**Para que** eu consiga manter o mapa de risco atualizado no sistema.
 
 ---
 
@@ -115,12 +113,10 @@ Eles garantem a qualidade da solução.
 
 | ID     | Descrição do Requisito | Prioridade |
 |--------|------------------------|------------|
-| RNF-01 | O sistema deve carregar as páginas em até 3 segundos. | 🟡 MÉDIA |
-| RNF-02 | O sistema deve proteger as informações dos clientes por meio de criptografia. | 🔴 ALTA |
-| RNF-03 | (Descreva aqui o requisito não funcional 3 do seu sistema) | (Alta/Média/Baixa) |
-| RNF-04 | (Descreva aqui o requisito não funcional 4 do seu sistema) | (Alta/Média/Baixa) |
-| RNF-05 | (Descreva aqui o requisito não funcional 5 do seu sistema) | (Alta/Média/Baixa) |
-| RNF-06 | (Descreva aqui o requisito não funcional 6 do seu sistema) | (Alta/Média/Baixa) |
+| RNF-01 | O sistema deve salvar as senhas no banco de forma criptografada usando bcrypt. | 🔴 ALTA |
+| RNF-02 | A autenticação deve usar tokens JWT salvos em cookies HTTP-Only por segurança. | 🔴 ALTA |
+| RNF-03 | O banco de dados utilizado será o PostgreSQL, gerenciado através do Prisma ORM. | 🔴 ALTA |
+| RNF-04 | O front-end precisa ser responsivo e construído usando os componentes do Material UI (MUI). | 🟡 MÉDIA |
 
 ---
 
@@ -143,14 +139,10 @@ Elas podem envolver:
 
 | ID  | Restrição |
 |-----|-----------|
-| R-01 | O projeto deverá ser entregue até o final do semestre. |
-| R-02 | O sistema deve funcionar apenas dentro da rede interna da empresa. |
-| R-03 | O software deve ser compatível com Windows e Linux. |
-| R-04 | (Descreva aqui a restrição 4 do seu projeto) |
-| R-05 | (Descreva aqui a restrição 5 do seu projeto) |
-| R-06 | (Descreva aqui a restrição 6 do seu projeto) |
-| R-07 | (Descreva aqui a restrição 7 do seu projeto) |
-| R-08 | (Descreva aqui a restrição 8 do seu projeto) |
+| R-01 | O projeto precisa ser entregue funcionando até o final do semestre letivo. |
+| R-02 | A hospedagem da API e do banco de dados (Neon) deve usar apenas serviços com planos gratuitos, já que o grupo não tem orçamento. |
+| R-03 | O front-end só pode usar a API desenvolvida pelo próprio grupo, sem depender de serviços prontos como o Firebase para o back-end. |
+| R-04 | O tema do projeto precisa seguir o que foi proposto nas ODS 11 e ODS 13. |
 
 ---
 ## 3.5 Regras de Negócio
@@ -173,11 +165,9 @@ Elas podem envolver:
 
 |ID    | Regra de Negócio                                                       |
 |-------|-----------------------------------------------------------------------|
-|RN-01 | Usuário só pode cadastrar até 10 tarefas por dia.                      |
-|RN-02 | Apenas administradores podem alterar permissões de usuários.           |
-|RN-03 | Tarefas vencidas devem ser destacadas em vermelho no sistema.          |
-|RN-04 | *(Descreva aqui a restrição 4 do seu projeto)*                         |
-|RN-05 | *(Descreva aqui a restrição 5 do seu projeto)*                         |
+|RN-01 | O sistema não pode deixar cadastrar duas contas com o mesmo e-mail ou CPF.|
+|RN-02 | Cada usuário só pode ter um único endereço cadastrado no perfil.          |
+|RN-03 | Apenas usuários logados com perfil de administrador podem adicionar ou alterar os dados das comunidades.          |
 
 💡 **Dica:** Explique sempre o motivo ou impacto da regra no sistema.
 
