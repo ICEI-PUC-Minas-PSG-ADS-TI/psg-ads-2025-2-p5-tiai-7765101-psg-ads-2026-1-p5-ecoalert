@@ -137,8 +137,8 @@ Elas podem envolver:
 
 ## Tabela de Restrições
 
-| ID  | Restrição |
-|-----|-----------|
+| ID   | Restrição |
+|------|-----------|
 | R-01 | O projeto precisa ser entregue funcionando até o final do semestre letivo. |
 | R-02 | A hospedagem da API e do banco de dados (Neon) deve usar apenas serviços com planos gratuitos, já que o grupo não tem orçamento. |
 | R-03 | O front-end só pode usar a API desenvolvida pelo próprio grupo, sem depender de serviços prontos como o Firebase para o back-end. |
