@@ -1,32 +1,20 @@
 # Banco de Dados - Nimbly
 
-## Criar banco de dados
+Este diretório contém a documentação e o script de modelagem física do banco de dados (PostgreSQL) utilizado no projeto. O arquivo consolidado para execução encontra-se em [`schema.sql`](./schema.sql).
 
-```sql
-CREATE DATABASE "Nimbly-database";
-```
-
----
-
-## Estrutura do banco de dados
-
-A estrutura abaixo representa o banco de dados atual do sistema.
-
-Para a Sprint 2, a funcionalidade implementada (cadastro e autenticação de usuários) utiliza diretamente as tabelas `User` e `Address`.  
-As demais estruturas fazem parte da evolução do sistema e já estão presentes no banco.
+## 📌 Escopo da Sprint 2
+A estrutura abaixo representa o banco de dados atual, com foco nas funcionalidades implementadas de ponta a ponta nesta Sprint (Cadastro, Autenticação e Gestão de Comunidades). 
 
 ---
 
-## Criar enum de perfil de usuário
+## Estrutura do Banco (DDL)
 
+### 1. Enum de Perfil de Usuário
 ```sql
 CREATE TYPE "UserRole" AS ENUM ('ADMIN', 'USER');
 ```
 
----
-
-## Criar tabela de usuários
-
+### 2. Tabela de Usuários
 ```sql
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
@@ -46,10 +34,7 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 CREATE UNIQUE INDEX "User_cpf_key" ON "User"("cpf");
 ```
 
----
-
-## Criar tabela de endereços
-
+### 3. Tabela de Endereços (Relacionamento 1:1)
 ```sql
 CREATE TABLE "Address" (
     "id" TEXT NOT NULL,
@@ -73,10 +58,7 @@ ON DELETE RESTRICT
 ON UPDATE CASCADE;
 ```
 
----
-
-## Criar tabela de comunidades
-
+### 4. Tabela de Comunidades
 ```sql
 CREATE TABLE "Community" (
     "id" TEXT NOT NULL,
@@ -97,45 +79,8 @@ CREATE TABLE "Community" (
 
 ---
 
-
-## Criar tabela sensors
-
-```sql
-CREATE TABLE sensors (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-
-    name VARCHAR(100) NOT NULL,
-    description TEXT,
-
-    type VARCHAR(50) NOT NULL,
-
-    status VARCHAR(20) DEFAULT 'ACTIVE',
-
-    latitude DOUBLE PRECISION NOT NULL,
-    longitude DOUBLE PRECISION NOT NULL,
-
-    location GEOGRAPHY(Point, 4326),
-
-    metadata JSONB,
-
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW()
-);
-```
-## Observações
-
-- A tabela `User` armazena os dados principais do usuário, incluindo autenticação e controle de perfil.
-- A tabela `Address` possui relação 1:1 com `User`, garantindo que cada usuário tenha apenas um endereço.
-- A tabela `Community` representa regiões monitoradas pelo sistema, sendo parte inicial do domínio da aplicação.
-- O campo `role` permite controle de acesso (ADMIN ou USER).
-- Os índices `UNIQUE` garantem integridade para email, CPF e vínculo de endereço.
-
----
-
-## Buscar usuário por ID
-
-```sql
-SELECT *
-FROM "User"
-WHERE "id" = '123';
-```
+## 🏗️ Observações Arquiteturais
+* **User:** Armazena os dados principais, incluindo credenciais de autenticação (senhas hasheadas) e o nível de acesso ao sistema (`role`).
+* **Address:** Possui relação estrita de 1:1 com `User`, garantindo que cada conta tenha apenas um endereço geográfico válido associado.
+* **Community:** Representa as regiões e áreas de risco monitoradas, formando o domínio principal para os alertas de desastres.
+* **Integridade:** Os índices `UNIQUE` no banco garantem que não ocorram cadastros com CPFs e e-mails duplicados.
