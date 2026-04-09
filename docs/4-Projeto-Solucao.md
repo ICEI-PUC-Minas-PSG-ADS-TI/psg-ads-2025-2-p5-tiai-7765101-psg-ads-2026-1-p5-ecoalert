@@ -86,9 +86,23 @@ Representação simplificada do Wireframe:
 
 🚨 O grupo deverá inserir aqui a imagem
 
+#### Tela de Cadastro (RF-01)
 
+**História associada:** Como morador de uma área de risco, eu quero criar uma conta fornecendo meus dados básicos e de localização para acessar o sistema de alertas.
+
+<img src="images/cadastro_TIAI.jpeg" width="80%">
+
+**Descrição:** A interface contempla todos os campos exigidos pelo RF-01 (Nome, Sobrenome, Email, CPF, Telefone e Endereço completo) e permite a persistência no banco de dados nas tabelas `User` e `Address` após validação no backend.
 
 ---
+
+#### Tela de Login (RF-02)
+
+**História associada:** Como morador de uma área de risco, eu quero fazer login com minhas credenciais para acessar o painel do sistema de forma segura.
+
+<img src="images/login_TIAI.jpeg" width="80%">
+
+**Descrição:** A interface contempla os campos exigidos pelo RF-02 (Usuário/Email e Senha) e permite a autenticação, conectada à rota de login da API REST que valida as credenciais via Bcrypt.
 
 ## 4.4 Modelagem de Dados (Sprint 2 e 3)
 
