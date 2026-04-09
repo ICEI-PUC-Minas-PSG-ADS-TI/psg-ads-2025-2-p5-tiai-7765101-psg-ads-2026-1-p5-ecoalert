@@ -1,5 +1,5 @@
+import { WeatherChart } from '@/components/WeatherChart/WeatherChart';
 import { Box, Container } from '@mui/material';
-import { WeatherChart } from '../../components/WeatherChart/WeatherChart';
 
 export default function Home() {
   return (

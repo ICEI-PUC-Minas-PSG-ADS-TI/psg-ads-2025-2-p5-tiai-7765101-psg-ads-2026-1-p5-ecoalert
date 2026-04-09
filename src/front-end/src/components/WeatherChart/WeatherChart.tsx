@@ -1,5 +1,5 @@
 import { useTheme } from '@mui/material/styles';
-import { Box, CircularProgress, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import {
   LineChart,
   Line,
@@ -8,10 +8,14 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer
+  ResponsiveContainer,
+  AreaChart,
+  Area
 } from 'recharts';
 import { useWeather } from '../../hooks/useWeather';
+import { Text } from '../Text/Text';
 import './style.css';
+import { LoadingSpinner } from '../LoadingSpinner/LoadingSpinner';
 
 export function WeatherChart() {
   const theme = useTheme();
@@ -19,18 +23,17 @@ export function WeatherChart() {
 
   const isDarkMode = theme.palette.mode === 'dark';
 
-  // Cores baseadas no tema
   const chartColors = {
-    text: isDarkMode ? '#F2F2F2' : '#000000',
-    grid: isDarkMode ? '#2a3f5f' : '#e0e0e0',
-    line: isDarkMode ? '#60A5FA' : '#3B82F6',
-    background: isDarkMode ? '#181E25' : '#F5F5F5'
+    text: theme.palette.text.primary,
+    grid: theme.palette.text.secondary,
+    line: theme.palette.primary.main,
+    background: theme.palette.background.paper
   };
 
   if (loading && data.length === 0) {
     return (
       <Box className="weather-chart-container" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
-        <CircularProgress />
+        <LoadingSpinner />
       </Box>
     );
   }
@@ -48,25 +51,32 @@ export function WeatherChart() {
     );
   }
 
-  // Pega apenas os últimos 24 dados
   const displayData = data.slice(-24);
 
   return (
     <Box className="weather-chart-container">
       <Box className="weather-chart-header">
-        <Typography variant="h5" className="weather-chart-title">
+        <Text variant="h5" className="weather-chart-title">
           Temperatura em Belo Horizonte (Últimas 24 horas)
-        </Typography>
-        <Typography variant="caption" className="weather-chart-subtitle">
+        </Text>
+        <Text variant="caption" className="weather-chart-subtitle">
           Atualiza automaticamente a cada 1 hora
-        </Typography>
+        </Text>
       </Box>
 
       <ResponsiveContainer width="100%" height={400}>
-        <LineChart
+        <AreaChart
           data={displayData}
           margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
         >
+
+          <defs>
+            <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor={chartColors.line} stopOpacity={0.3} />
+              <stop offset="95%" stopColor={chartColors.line} stopOpacity={0} />
+            </linearGradient>
+          </defs>
+
           <CartesianGrid 
             strokeDasharray="3 3" 
             stroke={chartColors.grid}
@@ -95,22 +105,22 @@ export function WeatherChart() {
           <Legend
             wrapperStyle={{ paddingTop: '20px', color: chartColors.text }}
           />
-          <Line
+          <Area
             type="monotone"
             dataKey="temperature"
             stroke={chartColors.line}
-            dot={false}
+            fill="url(#revenueGradient)"
             strokeWidth={2}
+            dot={false}
             name="Temperatura"
-            isAnimationActive={true}
           />
-        </LineChart>
+        </AreaChart>
       </ResponsiveContainer>
 
       <Box className="weather-chart-footer">
-        <Typography variant="caption" className="weather-chart-update-time">
+        <Text variant="caption" className="weather-chart-update-time">
           Próxima atualização: dentro de 1 hora
-        </Typography>
+        </Text>
       </Box>
     </Box>
   );

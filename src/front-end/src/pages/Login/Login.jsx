@@ -1,10 +1,10 @@
-import Input from "@/components/Input/Input"
-import Button from "@/components/Button/Button"
 import { Link, useNavigate } from "react-router-dom"
 
 import { login } from "@/services/userService"
 import { useLogin } from "@/hooks/useLogin"
 import { persistAuthSession } from "@/utils/auth"
+import { Button } from "@/components/Button/Button";
+import { Input } from "@/components/Input/Input";
 
 function Login(){
     const {form, handleChange} = useLogin();
@@ -32,10 +32,10 @@ function Login(){
             <h1>Login</h1>
 
             <div className="form">
-                <Input title="Usuário" onChange={handleChange} name={'email'}/>
-                <Input title="Senha" onChange={handleChange} name={'password'}/>
+                <Input label="Usuário" onChange={handleChange} name={'email'}/>
+                <Input label="Senha" onChange={handleChange} name={'password'}/>
                 
-                <Button text="Entrar" onClick={handleSubmit}/>
+                <Button onClick={handleSubmit} shape="square">Entrar</Button>
             </div>
             <Link to="/cadastro">Não tem conta? Faça cadastro</Link>
         </div>

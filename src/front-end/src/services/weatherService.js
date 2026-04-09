@@ -1,15 +1,10 @@
 import { api } from '../api/api';
 
-// Coordenadas de Belo Horizonte
 const BELO_HORIZONTE = {
   latitude: -19.8267,
   longitude: -43.9445
 };
 
-/**
- * Calcula as datas para o intervalo de 24 horas
- * @returns {Object} { startDate, endDate }
- */
 function getLast24HoursDates() {
   const endDate = new Date();
   const startDate = new Date(endDate.getTime() - 24 * 60 * 60 * 1000);

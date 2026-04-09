@@ -1,9 +1,9 @@
-import Input from "@/components/Input/Input"
-import Button from "@/components/Button/Button"
 import { Link } from "react-router-dom"
 
 import { createUser } from "@/services/userService"
 import { useCadastro } from "@/hooks/useCadastro"
+import { Button } from "@/components/Button/Button";
+import { Input } from "@/components/Input/Input";
 
 export default function Cadastro(){
 
@@ -61,7 +61,7 @@ export default function Cadastro(){
                 <Input title="Número" type="number" name="number" onChange={handleChange}/>
                 <Input title="Senha" type="password" name="password" onChange={handleChange}/>
                 
-                <Button text="Registrar" onClick={handleSubmit}/>
+                <Button onClick={handleSubmit}>Registrar</Button>
             </div>
             <Link to="/login">Já tem conta? Faça login</Link>
         </div>
