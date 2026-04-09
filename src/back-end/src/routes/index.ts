@@ -4,11 +4,11 @@ import { privateRoutes } from "./private.routes";
 
 const routes = Router();
 
-routes.use(publicRoutes);
-routes.use(privateRoutes);
-
 routes.get("/", (req, res) => {
     return res.json({ message: "Hello World!" });
 });
+
+routes.use(publicRoutes);
+routes.use(privateRoutes);
 
 export { routes };

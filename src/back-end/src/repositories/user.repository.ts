@@ -94,7 +94,7 @@ export class UserRepository {
       }
     })
 
-    return users.map((user) => ({
+    return users.map((user: any) => ({
       ...user,
       phone: parsePhone(user.phone),
       address: user.address ?? undefined

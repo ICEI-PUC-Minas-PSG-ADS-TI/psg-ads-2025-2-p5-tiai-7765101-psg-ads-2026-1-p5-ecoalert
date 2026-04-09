@@ -5,11 +5,8 @@ import { Link, useNavigate } from "react-router-dom"
 import { login } from "@/services/userService"
 import { useLogin } from "@/hooks/useLogin"
 import { persistAuthSession } from "@/utils/auth"
-import { useTheme } from "@mui/material"
 
 function Login(){
-    const theme = useTheme();
-    console.log("Tema atual:", theme.palette);
     const {form, handleChange} = useLogin();
     const navigate = useNavigate();
 
@@ -21,6 +18,7 @@ function Login(){
 
         try {
             const response = await login(user);
+            console.log(response);
             persistAuthSession(response);
             alert("Usuário logado")
             navigate("/home");
