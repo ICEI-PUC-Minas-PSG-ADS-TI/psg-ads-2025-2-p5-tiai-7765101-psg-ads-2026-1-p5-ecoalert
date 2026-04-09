@@ -27,7 +27,7 @@ Semelhante à imagem abaixo:
  ### 📎 Inserir o Diagrama de Arquitetura do Projeto do Grupo
 🚨 O grupo deverá inserir aqui a imagem
 
-<img src="images/diagrama arquitetura tiai.jpg" width="100%">
+<img src="images/diagramaArquiteturaTiai.jpg" width="100%">
 
 ---
 🔧**Ferramentas recomendadas:**
