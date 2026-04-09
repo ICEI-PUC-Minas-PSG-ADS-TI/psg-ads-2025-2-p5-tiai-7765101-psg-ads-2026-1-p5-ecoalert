@@ -20,7 +20,7 @@ export async function fetchWeatherData() {
   try {
     const { startDate, endDate } = getLast24HoursDates();
 
-    const response = await api.get('/api/weather/archive', {
+    const response = await api.get(`${import.meta.env.VITE_API_BASE_URL}/weather/archive`, {
       params: {
         latitude: BELO_HORIZONTE.latitude,
         longitude: BELO_HORIZONTE.longitude,
@@ -46,7 +46,7 @@ export async function fetchWeatherData() {
 
     return formattedData;
   } catch (error) {
-    console.error('Erro ao buscar dados climáticos:', error);
+    console.error('Erro ao buscar dados climáticos:', error.data);
     throw error;
   }
 }

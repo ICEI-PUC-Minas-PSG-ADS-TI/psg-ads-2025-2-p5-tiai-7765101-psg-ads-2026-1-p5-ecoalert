@@ -11,44 +11,63 @@ const lightTheme = createTheme({
       xl: 1536,
     },
   },
-  
+
   palette: {
     mode: "light",
 
     background: {
-      default: "#FFFFFF", 
-      paper: "#F5F5F5",  
+      default: "#F8FAFC",
+      paper: "#FFFFFF",
     },
 
     text: {
-      primary: "#000000",  
-      secondary: "#525252", 
+      primary: "#0F1419",
+      secondary: "#64748B",
     },
 
     primary: {
-      main: "#000000",     
+      main: "#3B82F6",
+      light: "#60A5FA",
+      dark: "#2563EB",
+      contrastText: "#FFFFFF",
+    },
+
+    secondary: {
+      main: "#0891B2",
+      light: "#22D3EE",
+      dark: "#0E7490",
       contrastText: "#FFFFFF",
     },
 
     success: {
-      main: "#16A34A", 
-      contrastText: "#FFFFFF"  
+      main: "#16A34A",
+      light: "#22C55E",
+      dark: "#15803D",
+      contrastText: "#FFFFFF",
     },
 
     error: {
-      main: "#EF4444",
-      contrastText: "#FFFFFF",   
+      main: "#DC2626",
+      light: "#EF4444",
+      dark: "#B91C1C",
+      contrastText: "#FFFFFF",
     },
 
     info: {
-      main: "#3B82F6",   
+      main: "#3B82F6",
+      light: "#60A5FA",
+      dark: "#2563EB",
       contrastText: "#FFFFFF",
     },
 
     warning: {
-      main: "#F57C01",   
-      contrastText: "#FFFFFF",
-    }
+      main: "#EAB308",
+      light: "#FACC15",
+      dark: "#CA8A04",
+      contrastText: "#0F1419",
+    },
+
+    divider: "#E2E8F0",
   },
 
   typography: {
@@ -72,6 +91,35 @@ const lightTheme = createTheme({
     h4: {
       fontFamily: "'Poppins', sans-serif",
       fontWeight: 600,
+    },
+  },
+
+  components: {
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          backgroundImage: "none",
+          borderRadius: 12,
+          border: "1px solid #E2E8F0",
+          boxShadow: "0 1px 3px 0 rgb(0 0 0 / 0.1)",
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+          textTransform: "none",
+          fontWeight: 500,
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundImage: "none",
+        },
+      },
     },
   },
 });

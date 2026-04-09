@@ -25,6 +25,7 @@ export async function getWeatherForecast(req: Request, res: Response) {
 }
 
 export async function getWeatherArchive(req: Request, res: Response) {
+  console.log("Received request for weather archive with query:", req.query);
   const query = normalizeQuery(req.query);
 
   if (!query.latitude || !query.longitude) {

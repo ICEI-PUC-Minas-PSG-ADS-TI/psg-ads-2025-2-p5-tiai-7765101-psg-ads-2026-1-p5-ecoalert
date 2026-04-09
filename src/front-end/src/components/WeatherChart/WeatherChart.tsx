@@ -21,8 +21,6 @@ export function WeatherChart() {
   const theme = useTheme();
   const { data, loading, error, refetch } = useWeather();
 
-  const isDarkMode = theme.palette.mode === 'dark';
-
   const chartColors = {
     text: theme.palette.text.primary,
     grid: theme.palette.text.secondary,

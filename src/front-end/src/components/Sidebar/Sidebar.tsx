@@ -8,13 +8,9 @@ import { Icon } from "@/components/Icon/Icon";
 
 import {
   StyledDrawer,
-  LogoContainer,
   SectionTitle,
   StyledListItemButton,
-  Logo,
 } from "./style";
-import { CustomImage } from "@/components/CustomImage/CustomImage";
-import { Text } from "@/components/Text/Text";
 
 interface SidebarProps {
   mobileOpen: boolean;
@@ -37,37 +33,23 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
             onClick={onClose}
           />
           <NavItem
-            href="/orders"
-            iconName="shopping-cart"
-            label="Pedidos"
+            href="/regioes"
+            iconName="map-pin"
+            label="Regiões"
             currentPath={pathname}
             onClick={onClose}
           />
           <NavItem
-            href="/products"
-            iconName="package"
-            label="Produtos"
+            href="/alertas"
+            iconName="bell"
+            label="Alertas"
             currentPath={pathname}
             onClick={onClose}
           />
           <NavItem
-            href="/costumers"
-            iconName="users"
-            label="Clientes"
-            currentPath={pathname}
-            onClick={onClose}
-          />
-          <NavItem
-            href="/contracts"
-            iconName="file-text"
-            label="Contratos"
-            currentPath={pathname}
-            onClick={onClose}
-          />
-          <NavItem
-            href="/rents"
-            iconName="refresh-cw"
-            label="Aluguéis"
+            href="/sensores"
+            iconName="radio"
+            label="Sensores"
             currentPath={pathname}
             onClick={onClose}
           />

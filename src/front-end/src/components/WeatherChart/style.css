@@ -29,7 +29,6 @@
   font-style: italic;
 }
 
-/* Responsividade */
 @media (max-width: 600px) {
   .weather-chart-container {
     padding: 1rem;

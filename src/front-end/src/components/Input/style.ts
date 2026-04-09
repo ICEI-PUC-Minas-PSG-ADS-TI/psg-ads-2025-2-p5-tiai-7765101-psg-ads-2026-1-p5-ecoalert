@@ -28,7 +28,7 @@ export const StyledTextField = styled(TextField)<TextFieldProps>(({ theme }) => 
     },
 
     "&.Mui-focused fieldset": {
-      borderColor: theme.palette.text.primary,
+      borderColor: theme.palette.primary.main,
       borderWidth: 1,
     },
 
