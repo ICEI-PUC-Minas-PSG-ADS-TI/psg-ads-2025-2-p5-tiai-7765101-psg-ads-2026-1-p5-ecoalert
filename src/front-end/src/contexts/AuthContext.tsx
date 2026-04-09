@@ -53,7 +53,7 @@ export const AuthContextProvider = ({ children }: AuthProviderProps) => {
       const response = await api.post(routes.auth.login, { email, password });
       const userData: LoggedUser = response.data.user;
       setUser(userData);
-      navigate("/dashboard?login=true");
+      navigate("/home?login=true");
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.data) {
         throw new ApiError(error.response.data);
