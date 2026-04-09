@@ -1,45 +1,37 @@
-import { Link, useNavigate } from "react-router-dom"
+"use client";
 
-import { login } from "@/services/userService"
-import { useLogin } from "@/hooks/useLogin"
-import { persistAuthSession } from "@/utils/auth"
-import { Button } from "@/components/Button/Button";
-import { Input } from "@/components/Input/Input";
+import LoginForm from "./LoginForm";
+import { Container } from "./style";
+import { Text } from "@/components/Text/Text";
+import { Box } from "@mui/material";
+import { useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useFlashMessage } from "@/contexts/FlashMessageContext";
 
-function Login(){
-    const {form, handleChange} = useLogin();
-    const navigate = useNavigate();
+export default function Login() {
+  const {showMessage} = useFlashMessage();
 
-    async function handleSubmit(){
-        const user = {
-            email: form.email,
-            password: form.password
-        }
+  const [searchParams] = useSearchParams();
 
-        try {
-            const response = await login(user);
-            console.log(response);
-            persistAuthSession(response);
-            alert("Usuário logado")
-            navigate("/home");
-        }catch (error){
-            console.log(error)
-        }
+  useEffect(() => {
+    if (searchParams.get("logout") === "true") {
+      showMessage("Logout realizado com sucesso!", "success");
     }
+  }, []);
 
-    return(
-        <div>
-            <h1>Login</h1>
-
-            <div className="form">
-                <Input label="Usuário" onChange={handleChange} name={'email'}/>
-                <Input label="Senha" onChange={handleChange} name={'password'}/>
-                
-                <Button onClick={handleSubmit} shape="square">Entrar</Button>
-            </div>
-            <Link to="/cadastro">Não tem conta? Faça cadastro</Link>
-        </div>
-    )
+  return (
+    <Container>
+      <Box>
+        <Text variant="h4" color="primary" fontWeight={600} sx={{ marginBottom: 4 }} align="center">
+          Bem-vindo de volta.
+        </Text>
+        
+        <Text variant="body1" color="textSecondary" mb={4} sx={{ marginBottom: 4 }}>
+          Faça login para acessar seu painel de controle.
+        </Text>
+        <LoginForm />
+      </Box>
+      
+    </Container>
+  );
 }
-
-export default Login

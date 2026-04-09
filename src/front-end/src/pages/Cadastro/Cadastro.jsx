@@ -36,7 +36,6 @@ export default function Cadastro(){
         }
         catch (error){
             alert("Erro ao cadastrar usuário")
-            console.log(error)
         }
         
     }

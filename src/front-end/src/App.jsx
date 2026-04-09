@@ -1,11 +1,14 @@
 import './App.css'
 import { Outlet } from 'react-router-dom'
+import { AuthContextProvider } from '@/contexts/AuthContext'
 
 function App() {
   return (
-    <main>
-      <Outlet />
-    </main>
+    <AuthContextProvider>
+      <main>
+        <Outlet />
+      </main>
+    </AuthContextProvider>
   )
 }
 
