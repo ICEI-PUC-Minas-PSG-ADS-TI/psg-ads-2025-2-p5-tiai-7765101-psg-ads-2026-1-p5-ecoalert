@@ -27,6 +27,7 @@ Semelhante à imagem abaixo:
  ### 📎 Inserir o Diagrama de Arquitetura do Projeto do Grupo
 🚨 O grupo deverá inserir aqui a imagem
 
+<img src="images/diagramaArquiteturaTiai.png" width="100%">
 
 ---
 🔧**Ferramentas recomendadas:**
@@ -42,11 +43,11 @@ Descreva as tecnologias, linguagens, frameworks, bibliotecas e serviços escolhi
 
 | Dimensão | Tecnologia Escolhida |
 |----------|----------------------|
-| Banco de Dados (SGBD) | Ex: SQL Server, PostgreSQL ou MongoDB |
-| Back-end (API) | Ex: C# (.NET Core) |
-| Front-end / Mobile | Ex: HTML + CSS + JavaScript, React ou Flutter |
-| Hospedagem / Deploy | Ex: Azure, AWS, Render ou Railway |
-| Gestão e Versionamento | GitHub e GitHub Projects (Kanban) |
+| Banco de Dados (SGBD) | PostgreSQL e Prisma ORM |
+| Back-end (API) | Node.js com TypeScript, Express 5, JWT e Bcrypt |
+| Front-end / Mobile | React 19, Vite, Axios e Material UI (MUI) |
+| Hospedagem / Deploy | Neon (Banco de Dados em nuvem) |
+| Gestão e Versionamento | Git e GitHub |
 
  ⚠️ **Observação:**
  - GitHub Pages não executa back-end.
@@ -119,7 +120,71 @@ CREATE TABLE Usuario (
     Senha VARCHAR(200)
 );
 ```
+O código abaixo é o DDL gerado para estruturar nossa base de dados relacional (PostgreSQL) para a Sprint 2. 
 
+*(O arquivo consolidado para execução `.sql` encontra-se na pasta `src/bd/schema.sql` do repositório).*
+
+```sql
+-- Criação do Enum
+CREATE TYPE "UserRole" AS ENUM ('ADMIN', 'USER');
+
+-- Tabela de Usuários
+CREATE TABLE "User" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "lastName" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "cpf" TEXT NOT NULL,
+    "phone" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "role" "UserRole" NOT NULL DEFAULT 'USER',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
+
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+CREATE UNIQUE INDEX "User_cpf_key" ON "User"("cpf");
+
+-- Tabela de Endereços
+CREATE TABLE "Address" (
+    "id" TEXT NOT NULL,
+    "cep" TEXT NOT NULL,
+    "street" TEXT NOT NULL,
+    "neighborhood" TEXT NOT NULL,
+    "city" TEXT NOT NULL,
+    "state" TEXT NOT NULL,
+    "number" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+
+    CONSTRAINT "Address_pkey" PRIMARY KEY ("id")
+);
+
+CREATE UNIQUE INDEX "Address_userId_key" ON "Address"("userId");
+
+ALTER TABLE "Address"
+ADD CONSTRAINT "Address_userId_fkey"
+FOREIGN KEY ("userId") REFERENCES "User"("id")
+ON DELETE RESTRICT
+ON UPDATE CASCADE;
+
+-- Tabela de Comunidades
+CREATE TABLE "Community" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "city" TEXT NOT NULL,
+    "state" TEXT NOT NULL,
+    "latitude" DOUBLE PRECISION,
+    "longitude" DOUBLE PRECISION,
+    "riskLevel" TEXT NOT NULL,
+    "population" INTEGER,
+    "description" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Community_pkey" PRIMARY KEY ("id")
+);
+```
 ---
 
 ### Para Banco NoSQL
@@ -141,7 +206,8 @@ Incluir a estrutura dos documentos JSON (Schema).
 O arquivo .sql ou .js deve ser salvo na pasta: src/bd
 
  - É permitido colar um trecho do script no README apenas para visualização rápida.
- 
+
+
 ---
 ### 4.4.2 Representação do Modelo Físico de Dados (Entrega na Sprint 3 - Core)
 

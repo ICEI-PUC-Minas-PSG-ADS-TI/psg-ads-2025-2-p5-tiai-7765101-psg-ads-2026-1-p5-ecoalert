@@ -1,21 +1,7 @@
-# Banco de Dados - Nimbly
-
-Este diretório contém a documentação e o script de modelagem física do banco de dados (PostgreSQL) utilizado no projeto. O arquivo consolidado para execução encontra-se em [`schema.sql`](./schema.sql).
-
-## 📌 Escopo da Sprint 2
-A estrutura abaixo representa o banco de dados atual, com foco nas funcionalidades implementadas de ponta a ponta nesta Sprint (Cadastro, Autenticação e Gestão de Comunidades). 
-
----
-
-## Estrutura do Banco (DDL)
-
-### 1. Enum de Perfil de Usuário
-```sql
+-- 1. Enum de Perfil de Usuário
 CREATE TYPE "UserRole" AS ENUM ('ADMIN', 'USER');
-```
 
-### 2. Tabela de Usuários
-```sql
+-- 2. Tabela de Usuários
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -32,10 +18,8 @@ CREATE TABLE "User" (
 
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 CREATE UNIQUE INDEX "User_cpf_key" ON "User"("cpf");
-```
 
-### 3. Tabela de Endereços (Relacionamento 1:1)
-```sql
+-- 3. Tabela de Endereços (Relacionamento 1:1)
 CREATE TABLE "Address" (
     "id" TEXT NOT NULL,
     "cep" TEXT NOT NULL,
@@ -56,10 +40,8 @@ ADD CONSTRAINT "Address_userId_fkey"
 FOREIGN KEY ("userId") REFERENCES "User"("id")
 ON DELETE RESTRICT
 ON UPDATE CASCADE;
-```
 
-### 4. Tabela de Comunidades
-```sql
+-- 4. Tabela de Comunidades
 CREATE TABLE "Community" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -75,12 +57,3 @@ CREATE TABLE "Community" (
 
     CONSTRAINT "Community_pkey" PRIMARY KEY ("id")
 );
-```
-
----
-
-## 🏗️ Observações Arquiteturais
-* **User:** Armazena os dados principais, incluindo credenciais de autenticação (senhas hasheadas) e o nível de acesso ao sistema (`role`).
-* **Address:** Possui relação estrita de 1:1 com `User`, garantindo que cada conta tenha apenas um endereço geográfico válido associado.
-* **Community:** Representa as regiões e áreas de risco monitoradas, formando o domínio principal para os alertas de desastres.
-* **Integridade:** Os índices `UNIQUE` no banco garantem que não ocorram cadastros com CPFs e e-mails duplicados.
