@@ -97,6 +97,31 @@ CREATE TABLE "Community" (
 
 ---
 
+
+## Criar tabela sensors
+
+```sql
+CREATE TABLE sensors (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+
+    type VARCHAR(50) NOT NULL,
+
+    status VARCHAR(20) DEFAULT 'ACTIVE',
+
+    latitude DOUBLE PRECISION NOT NULL,
+    longitude DOUBLE PRECISION NOT NULL,
+
+    location GEOGRAPHY(Point, 4326),
+
+    metadata JSONB,
+
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+```
 ## Observações
 
 - A tabela `User` armazena os dados principais do usuário, incluindo autenticação e controle de perfil.
