@@ -1,0 +1,41 @@
+.weather-chart-container {
+  padding: 2rem;
+  border-radius: 8px;
+  background: inherit;
+  margin: 1rem 0;
+}
+
+.weather-chart-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+}
+
+.weather-chart-title {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.weather-chart-subtitle {
+  opacity: 0.7;
+}
+
+.weather-chart-footer {
+  margin-top: 1rem;
+  text-align: right;
+}
+
+.weather-chart-update-time {
+  opacity: 0.6;
+  font-style: italic;
+}
+
+/* Responsividade */
+@media (max-width: 600px) {
+  .weather-chart-container {
+    padding: 1rem;
+  }
+
+  .weather-chart-header {
+    margin-bottom: 1.5rem;
+  }
+}
