@@ -4,6 +4,7 @@ import { createUser } from "@/services/userService"
 import { useCadastro } from "@/hooks/useCadastro"
 import { Button } from "@/components/Button/Button";
 import { Input } from "@/components/Input/Input";
+import { RegisterForm } from "@/components/RegisterForm/RegisterForm";
 
 export default function Cadastro(){
 
@@ -42,27 +43,7 @@ export default function Cadastro(){
 
     return(
         <div>
-            <h1>Cadastro</h1>
-
-            <div className="form">
-                <Input title="Nome" type="text" name="name" onChange={handleChange}/>
-                <Input title="Sobrenome" type="text" name="lastName" onChange={handleChange}/>
-                <Input title="Email" type="email" name="email" onChange={handleChange}/>
-                <Input title="CPF" type="text" name="cpf" onChange={handleChange}/>
-                <Input title="Telefone" name="phone" onChange={handleChange}/>
-
-                <label htmlFor="">Endereço</label>
-                <Input title="CEP" name="cep" onChange={handleChange}/>
-                <Input title="Rua" name="street" onChange={handleChange}/>
-                <Input title="Bairro" name="neighborhood" onChange={handleChange}/>
-                <Input title="Cidade" name="city" onChange={handleChange}/>
-                <Input title="Estado" name="state" onChange={handleChange}/>
-                <Input title="Número" type="number" name="number" onChange={handleChange}/>
-                <Input title="Senha" type="password" name="password" onChange={handleChange}/>
-                
-                <Button onClick={handleSubmit}>Registrar</Button>
-            </div>
-            <Link to="/login">Já tem conta? Faça login</Link>
+           <RegisterForm />
         </div>
     )
 }

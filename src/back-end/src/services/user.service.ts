@@ -12,6 +12,7 @@ const repository = new UserRepository();
 
 export class UserService {
     static async create(data: CreateUserDto): Promise<Omit<User, "password">> {
+        console.log("Creating user with data:", data);
         const errorFields: Record<string, string> = {};
 
         const userByEmail = await repository.findByEmail(data.email);

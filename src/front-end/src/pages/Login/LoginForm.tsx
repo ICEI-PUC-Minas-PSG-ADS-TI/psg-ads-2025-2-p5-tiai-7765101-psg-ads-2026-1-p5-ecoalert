@@ -105,7 +105,7 @@ export default function LoginForm() {
         variant="filled"
         color="primary"
         fullWidth
-        shape="square"
+        shape="rounded"
         icon="arrow-right"
         loading={loadingAuth}
       >

@@ -25,7 +25,12 @@ export function PublicHeader() {
           icon={isDark ? "moon" : "sun"}
           onClick={toggleTheme}
         />
-        <Button onClick={() => navigate(pathname === "/login" ? "/cadastro" : "/login")} shape="square">
+        <Button
+          onClick={() =>
+            navigate(pathname === "/login" ? "/cadastro" : "/login")
+          }
+          shape="rounded"
+        >
           {pathname === "/login" ? "Cadastre-se" : "Entrar"}
         </Button>
       </ButtonsContainer>

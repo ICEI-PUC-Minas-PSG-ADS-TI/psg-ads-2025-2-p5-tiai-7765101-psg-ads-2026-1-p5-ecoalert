@@ -26,10 +26,10 @@ export async function fetchWeatherData() {
         longitude: BELO_HORIZONTE.longitude,
         start_date: startDate,
         end_date: endDate,
-        hourly: 'temperature_2m'
+        hourly: 'temperature_2m,precipitation'
       },
       headers: {
-    Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI0ZjhlYjhhOC1mYmI3LTRkZTMtYTZhYi0yZmMxNWZiZWRkYmQiLCJlbWFpbCI6InNhbXVlbC5tYWlhM0BlbWFpbC5jb20iLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc3NTY5OTQ4NywiZXhwIjoxNzc1Nzg1ODg3fQ.vUWqMeBeBIZR0LXuVz_aIAqOtHwIazlkGFmKvLuF5KI"
+    Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI0ZjhlYjhhOC1mYmI3LTRkZTMtYTZhYi0yZmMxNWZiZWRkYmQiLCJlbWFpbCI6InNhbXVlbC5tYWlhM0BlbWFpbC5jb20iLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc3NTk2MTI3MSwiZXhwIjoxNzc2MDQ3NjcxfQ.JoFOhsF6AGY7lUoob5KRa3MZsrV-torpeHW0P-XGpVk"
   }
     });
 
@@ -41,7 +41,8 @@ export async function fetchWeatherData() {
         hour12: false 
       }),
       fullTime: time,
-      temperature: hourly.temperature_2m[index]
+      temperature: hourly.temperature_2m[index],
+      precipitation: hourly.precipitation[index] || 0
     }));
 
     return formattedData;

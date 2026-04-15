@@ -1,32 +1,35 @@
 import { useTheme } from "@mui/material/styles";
 import { Box, Typography } from "@mui/material";
 import {
-  LineChart,
-  Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   Legend,
   ResponsiveContainer,
-  AreaChart,
-  Area,
+  ReferenceLine,
 } from "recharts";
-import { useWeather } from "../../hooks/useWeather";
+import { usePrecipitation } from "../../hooks/usePrecipitation";
 import { Text } from "../Text/Text";
-import "./style.css";
 import { LoadingSpinner } from "../LoadingSpinner/LoadingSpinner";
 
-export function WeatherChart() {
+export function PrecipitationChart() {
   const theme = useTheme();
-  const { data, loading, error, refetch } = useWeather();
+  const { data, loading, error, refetch } = usePrecipitation();
 
   const chartColors = {
     text: theme.palette.text.primary,
     grid: theme.palette.text.secondary,
-    line: theme.palette.primary.main,
+    bar: theme.palette.info.main,
     background: theme.palette.background.paper,
+    warning: theme.palette.warning.main,
+    error: theme.palette.error.main,
   };
+
+  const ALERT_LEVEL = 0.5;
+  const DANGER_LEVEL = 0.8;
 
   if (loading && data.length === 0) {
     return (
@@ -62,7 +65,7 @@ export function WeatherChart() {
     <Box>
       <Box sx={{ mb: 3 }}>
         <Text variant="h5" sx={{ fontWeight: 600 }}>
-          Temperatura em Belo Horizonte (Últimas 24 horas)
+          Precipitação em Belo Horizonte (Últimas 24 horas)
         </Text>
         <Text variant="caption" sx={{ color: "text.secondary" }}>
           Atualiza automaticamente a cada 1 hora
@@ -70,21 +73,10 @@ export function WeatherChart() {
       </Box>
 
       <ResponsiveContainer width="100%" height={400}>
-        <AreaChart
+        <BarChart
           data={displayData}
           margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
         >
-          <defs>
-            <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop
-                offset="5%"
-                stopColor={chartColors.line}
-                stopOpacity={0.3}
-              />
-              <stop offset="95%" stopColor={chartColors.line} stopOpacity={0} />
-            </linearGradient>
-          </defs>
-
           <CartesianGrid
             strokeDasharray="3 3"
             stroke={chartColors.grid}
@@ -97,7 +89,7 @@ export function WeatherChart() {
           />
           <YAxis
             label={{
-              value: "Temperatura (°C)",
+              value: "Precipitação (mm)",
               angle: -90,
               position: "insideLeft",
               fill: chartColors.text,
@@ -113,23 +105,52 @@ export function WeatherChart() {
               color: chartColors.text,
             }}
             labelStyle={{ color: chartColors.text }}
-            formatter={(value) => `${value.toFixed(1)}°C`}
+            formatter={(value) => {
+              if (typeof value === "number") {
+                return `${value.toFixed(2)} mm`;
+              }
+              return value;
+            }}
           />
           <Legend
             wrapperStyle={{ paddingTop: "20px", color: chartColors.text }}
           />
-          <Area
-            type="monotone"
-            dataKey="temperature"
-            stroke={chartColors.line}
-            fill="url(#revenueGradient)"
+          <ReferenceLine
+            y={ALERT_LEVEL}
+            stroke={chartColors.warning}
+            strokeDasharray="5 5"
             strokeWidth={2}
-            dot={false}
-            name="Temperatura"
+            name="Nível de Alerta"
+            label={{
+              value: `Alerta: ${ALERT_LEVEL}mm`,
+              position: "top",
+              fill: chartColors.warning,
+              fontSize: 11,
+              offset: 5,
+            }}
           />
-        </AreaChart>
+          <ReferenceLine
+            y={DANGER_LEVEL}
+            stroke={chartColors.error}
+            strokeDasharray="5 5"
+            strokeWidth={2}
+            name="Nível de Perigo"
+            label={{
+              value: `Perigo: ${DANGER_LEVEL}mm`,
+              position: "top",
+              fill: chartColors.error,
+              fontSize: 11,
+              offset: 5,
+            }}
+          />
+          <Bar
+            dataKey="precipitation"
+            fill={chartColors.bar}
+            name="Precipitação"
+            radius={[8, 8, 0, 0]}
+          />
+        </BarChart>
       </ResponsiveContainer>
-
       <Box sx={{ mt: 2 }}>
         <Text variant="caption" sx={{ color: "text.secondary" }}>
           Próxima atualização: dentro de 1 hora

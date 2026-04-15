@@ -12,25 +12,36 @@ export class UserRepository {
   async create(data: CreateUserDto): Promise<UserEntity> {
     const formattedPhone = `${data.phone.ddd}${data.phone.number}`;
 
+    const addressData = data.address ? {
+      cep: data.address.cep,
+      street: data.address.street,
+      neighborhood: data.address.neighborhood,
+      city: data.address.city,
+      ...(data.address.state && { state: data.address.state }),
+      number: data.address.number
+    } : null;
+
+    const createData = {
+      name: data.name,
+      lastName: data.lastName,
+      email: data.email,
+      cpf: data.cpf,
+      phone: formattedPhone,
+      password: data.password,
+      role: data.role ?? "USER",
+      address: addressData
+        ? {
+            create: addressData
+          }
+        : undefined
+    };
+
     return prisma.user.create({
-      data: {
-        name: data.name,
-        lastName: data.lastName,
-        email: data.email,
-        cpf: data.cpf,
-        phone: formattedPhone,
-        password: data.password,
-        role: data.role ?? "USER",
-        address: data.address
-          ? {
-              create: data.address
-            }
-          : undefined
-      },
+      data: createData as any,
       include: {
         address: true
       }
-    })
+    }) as Promise<UserEntity>;
   }
 
   async findByEmail(email: string): Promise<UserEntity | null> {

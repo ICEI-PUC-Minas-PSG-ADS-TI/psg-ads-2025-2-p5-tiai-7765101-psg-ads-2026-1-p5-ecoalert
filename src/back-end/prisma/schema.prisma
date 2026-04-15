@@ -9,7 +9,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  // A linha url = env("DATABASE_URL") foi removida daqui
 }
 
 enum UserRole {
@@ -38,7 +37,7 @@ model Address {
   street       String
   neighborhood String
   city         String
-  state        String
+  state        String?
   number       String
 
   userId String @unique

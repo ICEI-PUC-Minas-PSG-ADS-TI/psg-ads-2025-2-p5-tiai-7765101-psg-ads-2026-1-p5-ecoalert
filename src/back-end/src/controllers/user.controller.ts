@@ -12,8 +12,9 @@ export async function getUsers(req: AuthRequest, res: Response) {
 }
 
 export async function createUser(req: Request, res: Response) {
+    console.log("Received request to create user with body:", req.body);
     const response: Omit<User, "password"> = await UserService.create(req.body);
-    return res.json(response);
+    return res.status(201).json(response);
 }
 
 export async function getUserById(req: Request<Params>, res: Response) {

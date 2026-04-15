@@ -38,8 +38,7 @@ export const AuthContextProvider = ({ children }: AuthProviderProps) => {
       setUser(response.data);
     } catch (error) {
       setUser(null);
-      if (!publicPaths.includes(window.location.pathname)) 
-        navigate("/login");
+      if (!publicPaths.includes(window.location.pathname)) navigate("/login");
     } finally {
       setLoadingAuth(false);
     }
@@ -49,13 +48,15 @@ export const AuthContextProvider = ({ children }: AuthProviderProps) => {
     try {
       setLoadingAuth(true);
       setIsLoggingIn(true);
-      
+
       const response = await api.post(routes.auth.login, { email, password });
+      console.log(response);
       const userData: LoggedUser = response.data.user;
       setUser(userData);
       navigate("/home?login=true");
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.data) {
+        console.log(error.response.data);
         throw new ApiError(error.response.data);
       }
 
@@ -77,7 +78,6 @@ export const AuthContextProvider = ({ children }: AuthProviderProps) => {
       } else {
         throw new ApiError(response.data);
       }
-
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.data) {
         throw new ApiError(error.response.data);
@@ -94,7 +94,9 @@ export const AuthContextProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, setUser, login, logout, loadingAuth, isLoggingIn }}>
+    <AuthContext.Provider
+      value={{ user, setUser, login, logout, loadingAuth, isLoggingIn }}
+    >
       {children}
     </AuthContext.Provider>
   );
