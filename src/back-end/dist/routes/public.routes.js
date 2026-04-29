@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.publicRoutes = void 0;
+const user_controller_1 = require("@/controllers/user.controller");
+const errorHandler_1 = require("@/utils/errorHandler");
+const express_1 = require("express");
+const auth_routes_1 = require("./auth.routes");
+const community_controller_1 = require("@/controllers/community.controller");
+const publicRoutes = (0, express_1.Router)();
+exports.publicRoutes = publicRoutes;
+publicRoutes.use('/auth', auth_routes_1.authRoutes);
+publicRoutes.post('/users', (0, errorHandler_1.errorHandler)(user_controller_1.createUser));
+publicRoutes.get('/communities', (0, errorHandler_1.errorHandler)(community_controller_1.getCommunities));
+publicRoutes.get('/communities/:id', (0, errorHandler_1.errorHandler)(community_controller_1.getCommunityById));

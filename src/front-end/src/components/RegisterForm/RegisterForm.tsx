@@ -36,7 +36,7 @@ export function RegisterForm() {
     }
   };
 
-  const formSteps = [PersonalStep, AddressStep];
+  const formSteps = [PersonalStep, AddressStep, CompanyStep];
 
   return (
     <MultiStepForm

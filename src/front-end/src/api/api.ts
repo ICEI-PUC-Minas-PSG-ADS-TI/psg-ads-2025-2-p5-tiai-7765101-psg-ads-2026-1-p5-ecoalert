@@ -1,5 +1,6 @@
 import { routes } from "@/constants/api-routes";
 import { Filters } from "@/types/ApiTypes";
+import { clearAuthSession, getAccessToken, persistAuthSession } from "@/utils/auth";
 import axios from "axios";
 import qs from "qs";
 
@@ -16,6 +17,15 @@ export const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
+  const accessToken = getAccessToken();
+
+  if (accessToken) {
+    config.headers = {
+      ...config.headers,
+      Authorization: `Bearer ${accessToken}`,
+    };
+  }
+
   if (config.params) {
     config.params = buildParams(config.params);
   }
@@ -26,19 +36,31 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config;
+    const originalRequest = error.config as typeof error.config & { _retry?: boolean };
+    const status = error.response?.status;
 
     if (
-      error.response?.status === 403 &&
+      (status === 401 || status === 403) &&
       !originalRequest._retry &&
       !originalRequest.url?.includes(routes.auth.refresh)
     ) {
       originalRequest._retry = true;
 
       try {
-        await api.post(routes.auth.refresh);
+        const refreshResponse = await api.post(routes.auth.refresh);
+        const newToken = refreshResponse.data?.token;
+
+        if (newToken) {
+          persistAuthSession(newToken);
+          originalRequest.headers = {
+            ...originalRequest.headers,
+            Authorization: `Bearer ${newToken}`,
+          };
+        }
+
         return api(originalRequest);
       } catch(error) {
+        clearAuthSession();
         return Promise.reject(error);
       }
     }

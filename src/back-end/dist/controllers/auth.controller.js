@@ -1,72 +1,56 @@
-import { AuthService } from "@/services/auth.service";
-import { TokenService } from "@/services/token.service";
-import { AppError } from "@/types/error";
-import { ErrorMessages } from "@/utils/constants";
-import { Request, Response } from "express";
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.login = login;
+exports.refresh = refresh;
+exports.logout = logout;
+const auth_service_1 = require("@/services/auth.service");
+const token_service_1 = require("@/services/token.service");
+const error_1 = require("@/types/error");
+const constants_1 = require("@/utils/constants");
 function buildCookieOptions() {
     const isProduction = process.env.NODE_ENV === "production";
     const sameSite = isProduction ? "none" : "lax";
-
     return {
         httpOnly: true,
         secure: isProduction,
-        sameSite: sameSite as "none" | "lax",
+        sameSite: sameSite,
         maxAge: 1000 * 60 * 60 * 24
     };
 }
-
-export async function login(req: Request, res: Response) {
+async function login(req, res) {
     console.log("Login request received with body:", req.body);
     const { email, password } = req.body;
-
-    const response = await AuthService.login(email, password);
-
+    const response = await auth_service_1.AuthService.login(email, password);
     const { token, refreshToken, user } = response;
     const cookieOptions = buildCookieOptions();
-
     res.cookie("access_token", token, {
         ...cookieOptions
     });
-
     res.cookie("refresh_token", refreshToken, {
         ...cookieOptions,
         maxAge: 1000 * 60 * 60 * 24 * 7
     });
-
-    return res.status(200).json({user, token});
+    return res.status(200).json({ user, token });
 }
-
-export async function refresh(req: Request, res: Response) {
+async function refresh(req, res) {
     const refreshToken = req.cookies?.refresh_token;
-
     if (!refreshToken) {
-        throw new AppError(
-            "Refresh token nao informado",
-            401,
-            ErrorMessages.InvalidToken
-        );
+        throw new error_1.AppError("Refresh token nao informado", 401, constants_1.ErrorMessages.InvalidToken);
     }
-
-    const payload = TokenService.verifyRefreshToken(refreshToken);
-    const token = TokenService.generateAccessToken(payload);
+    const payload = token_service_1.TokenService.verifyRefreshToken(refreshToken);
+    const token = token_service_1.TokenService.generateAccessToken(payload);
     const cookieOptions = buildCookieOptions();
-
     res.cookie("access_token", token, {
         ...cookieOptions
     });
-
     return res.status(200).json({ token });
 }
-
-export async function logout(req: Request, res: Response) {
+async function logout(req, res) {
     const cookieOptions = buildCookieOptions();
-
     res.clearCookie("access_token", cookieOptions);
     res.clearCookie("refresh_token", {
         ...cookieOptions,
         maxAge: 1000 * 60 * 60 * 24 * 7
     });
-
     return res.status(204).send();
 }

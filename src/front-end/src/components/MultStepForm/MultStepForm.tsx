@@ -43,7 +43,7 @@ export function MultiStepForm<TIn extends FieldValues, TOut extends FieldValues 
           <CurrentStepComponent 
             onNext={next} 
             onBack={back} 
-            isLastStep={currentStep === totalSteps - 1} 
+            isLastStep={step === totalSteps - 1} 
             {...stepProps}
           />
         </form>

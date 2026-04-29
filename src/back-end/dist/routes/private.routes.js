@@ -1,0 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.privateRoutes = void 0;
+const express_1 = require("express");
+const user_routes_1 = require("./user.routes");
+const auth_middleware_1 = require("@/middlewares/auth.middleware");
+const errorHandler_1 = require("@/utils/errorHandler");
+const community_routes_1 = require("./community.routes");
+const weather_routes_1 = require("./weather.routes");
+const privateRoutes = (0, express_1.Router)();
+exports.privateRoutes = privateRoutes;
+privateRoutes.use(auth_middleware_1.authMiddleware);
+privateRoutes.use('/users', (0, errorHandler_1.errorHandler)(user_routes_1.userRoutes));
+privateRoutes.use('/communities', (0, errorHandler_1.errorHandler)(community_routes_1.communityRoutes));
+privateRoutes.use('/weather', (0, errorHandler_1.errorHandler)(weather_routes_1.weatherRoutes));

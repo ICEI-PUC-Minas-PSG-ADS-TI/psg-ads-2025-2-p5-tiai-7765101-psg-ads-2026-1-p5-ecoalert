@@ -5,6 +5,7 @@ import { publicPaths } from "@/constants/app-paths";
 import { api } from "@/api/api";
 import { ApiError } from "@/types/Error";
 import { LoggedUser } from "@/types/User";
+import { clearAuthSession, persistAuthSession } from "@/utils/auth";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { createContext, ReactNode, useEffect, useState } from "react";
@@ -50,7 +51,7 @@ export const AuthContextProvider = ({ children }: AuthProviderProps) => {
       setIsLoggingIn(true);
 
       const response = await api.post(routes.auth.login, { email, password });
-      console.log(response);
+      persistAuthSession(response.data);
       const userData: LoggedUser = response.data.user;
       setUser(userData);
       navigate("/home?login=true");
@@ -63,28 +64,19 @@ export const AuthContextProvider = ({ children }: AuthProviderProps) => {
       throw error;
     } finally {
       setLoadingAuth(false);
+      setIsLoggingIn(false);
     }
   }
 
   async function logout() {
-    setUser(null);
     try {
       setLoadingAuth(true);
-      const response = await api.post(routes.auth.logout);
-
-      if (response.status === 204) {
-        setUser(null);
-        navigate("/login?logout=true");
-      } else {
-        throw new ApiError(response.data);
-      }
+      await api.post(routes.auth.logout);
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.data) {
-        throw new ApiError(error.response.data);
-      }
-
-      throw error;
     } finally {
+      clearAuthSession();
+      setUser(null);
+      navigate("/login?logout=true");
       setLoadingAuth(false);
     }
   }

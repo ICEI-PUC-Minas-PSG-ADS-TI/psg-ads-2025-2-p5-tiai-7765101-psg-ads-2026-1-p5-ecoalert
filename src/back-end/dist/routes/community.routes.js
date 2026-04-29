@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.communityRoutes = void 0;
+const community_controller_1 = require("@/controllers/community.controller");
+const authorization_middleware_1 = require("@/middlewares/authorization.middleware");
+const errorHandler_1 = require("@/utils/errorHandler");
+const express_1 = require("express");
+const communityRoutes = (0, express_1.Router)();
+exports.communityRoutes = communityRoutes;
+communityRoutes.post("/", (0, authorization_middleware_1.authorize)(["ADMIN"]), (0, errorHandler_1.errorHandler)(community_controller_1.createCommunity));
+communityRoutes.put("/:id", (0, errorHandler_1.errorHandler)(community_controller_1.updateCommunity));
+communityRoutes.delete("/:id", (0, errorHandler_1.errorHandler)(community_controller_1.deleteCommunity));

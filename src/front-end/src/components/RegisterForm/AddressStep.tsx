@@ -50,9 +50,10 @@ export function AddressStep({ onNext, onBack }: AddressStepProps) {
             color="primary"
             shape="square"
             icon="arrow-left"
+            type="button"
           />
-          <Button type="submit" color="primary" shape="square">
-            Cadastrar
+          <Button onClick={onNext} color="primary" shape="square" icon="arrow-right" type="button">
+            Próximo
           </Button>
         </ButtonWrapper>
       </ButtonContainer>
