@@ -16,13 +16,6 @@ function getLast24HoursDates() {
     endDate: formatDate(endDate)
   };
 }
-
-/**
- * Busca dados climáticos para as coordenadas fornecidas
- * @param {number} latitude - Latitude da localização
- * @param {number} longitude - Longitude da localização
- * @returns {Promise<Array>} Array de dados climáticos formatados
- */
 export async function fetchWeatherData(latitude = null, longitude = null) {
   try {
     const { startDate, endDate } = getLast24HoursDates();

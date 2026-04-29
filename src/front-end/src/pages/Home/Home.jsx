@@ -9,28 +9,21 @@ import { requestGeolocation } from '@/services/geolocationService';
 export default function Home() {
   const { user } = useAuth();
   const [coordinates, setCoordinates] = useState(null);
-  const [locationSource, setLocationSource] = useState('default'); // 'gps' ou 'address'
+  const [locationSource, setLocationSource] = useState('default');
 
   useEffect(() => {
     const initializeLocation = async () => {
       // Tenta obter a localização do navegador
       const geoLocation = await requestGeolocation();
-      
+
       if (geoLocation) {
         // Se conseguir permissão, usa as coordenadas do GPS
         setCoordinates(geoLocation);
         setLocationSource('gps');
+      } else if (user?.address) {
+        setLocationSource('address');
       } else {
-        // Se não conseguir ou negar a permissão, usa o endereço cadastrado
-        if (user?.address) {
-          // Usar o endereço do usuário como fallback
-          // Aqui você pode implementar um serviço de geocoding se quiser
-          // Para agora, deixamos null e os gráficos usam o padrão (Belo Horizonte)
-          setLocationSource('address');
-          console.log('Usando dados do endereço cadastrado:', user.address);
-        } else {
-          setLocationSource('default');
-        }
+        setLocationSource('default');
       }
     };
 
