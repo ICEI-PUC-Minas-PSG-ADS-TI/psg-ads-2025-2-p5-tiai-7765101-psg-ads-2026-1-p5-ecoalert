@@ -4,7 +4,6 @@ import { CreateUserFormData, createUserSchema } from "@/types/Schemes";
 import { useForm } from "react-hook-form";
 import { PersonalStep } from "./PersonalStep";
 import { AddressStep } from "./AddressStep";
-import { CompanyStep } from "./CompanyStep";
 import { ApiError } from "@/types/Error";
 import { createUser } from "@/services/userService";
 import { useAuth } from "@/hooks/useAuth";
@@ -36,7 +35,7 @@ export function RegisterForm() {
     }
   };
 
-  const formSteps = [PersonalStep, AddressStep, CompanyStep];
+  const formSteps = [PersonalStep, AddressStep];
 
   return (
     <MultiStepForm

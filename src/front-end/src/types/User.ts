@@ -10,8 +10,6 @@ export type LoggedUser = {
   createdAt: string;
   updatedAt: string;
   address: Address;
-  socialName: string | null;
-  instagram: string | null;
   cpf: string;
   logo: string;
 };
@@ -39,9 +37,5 @@ export type CreateUser = {
     city: string;
     number: string;
   };
-
-  socialName: string;
-  instagram: string;
-
   logo?: string;
 }
