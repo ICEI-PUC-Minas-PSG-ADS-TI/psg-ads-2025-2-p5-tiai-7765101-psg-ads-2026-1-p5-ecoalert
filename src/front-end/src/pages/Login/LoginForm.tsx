@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { ApiError } from "@/types/Error";
 import { Text } from "@/components/Text/Text";
 import { useFlashMessage } from "@/contexts/FlashMessageContext";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -18,8 +19,11 @@ export default function LoginForm() {
   );
   const [defaultError, setDefaultError] = useState("");
 
+  
+  const navigate = useNavigate();
   const { login, loadingAuth } = useAuth();
   const { showMessage } = useFlashMessage();
+
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -40,6 +44,11 @@ export default function LoginForm() {
       if (Object.keys(newErrors).length === 0) {
         await login(email, password);
       }
+
+    showMessage("Bem vindo ao EcoAlert!", "success")
+    console.log("Login ok! Tentando redirecionar...");
+    navigate('/home')
+
     } catch (error) {
       if (error instanceof ApiError) {
         if (error.status === 401) {
