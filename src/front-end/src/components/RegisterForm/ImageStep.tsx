@@ -1,4 +1,3 @@
-// components/CompanyImageStep/CompanyImageStep.tsx
 "use client";
 
 import { Box } from "@mui/material";

@@ -20,7 +20,6 @@ export async function fetchWeatherData(latitude = null, longitude = null) {
   try {
     const { startDate, endDate } = getLast24HoursDates();
     
-    // Usa coordenadas fornecidas ou padrão de Belo Horizonte
     const coords = latitude && longitude 
       ? { latitude, longitude }
       : BELO_HORIZONTE;

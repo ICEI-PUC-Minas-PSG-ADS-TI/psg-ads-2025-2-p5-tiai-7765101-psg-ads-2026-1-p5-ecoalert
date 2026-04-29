@@ -13,11 +13,9 @@ export default function Home() {
 
   useEffect(() => {
     const initializeLocation = async () => {
-      // Tenta obter a localização do navegador
       const geoLocation = await requestGeolocation();
 
       if (geoLocation) {
-        // Se conseguir permissão, usa as coordenadas do GPS
         setCoordinates(geoLocation);
         setLocationSource('gps');
       } else if (user?.address) {
