@@ -16,20 +16,22 @@ function getLast24HoursDates() {
     endDate: formatDate(endDate)
   };
 }
-export async function fetchWeatherData() {
+export async function fetchWeatherData(latitude = null, longitude = null) {
   try {
     const { startDate, endDate } = getLast24HoursDates();
+    
+    // Usa coordenadas fornecidas ou padrão de Belo Horizonte
+    const coords = latitude && longitude 
+      ? { latitude, longitude }
+      : BELO_HORIZONTE;
 
-    const response = await api.get(`${import.meta.env.VITE_API_BASE_URL}/weather/archive`, {
+    const response = await api.get('/weather/archive', {
       params: {
-        latitude: BELO_HORIZONTE.latitude,
-        longitude: BELO_HORIZONTE.longitude,
+        latitude: coords.latitude,
+        longitude: coords.longitude,
         start_date: startDate,
         end_date: endDate,
         hourly: 'temperature_2m,precipitation'
-      },
-      headers: {
-    Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI0ZjhlYjhhOC1mYmI3LTRkZTMtYTZhYi0yZmMxNWZiZWRkYmQiLCJlbWFpbCI6InNhbXVlbC5tYWlhM0BlbWFpbC5jb20iLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc3NTk2MTI3MSwiZXhwIjoxNzc2MDQ3NjcxfQ.JoFOhsF6AGY7lUoob5KRa3MZsrV-torpeHW0P-XGpVk"
   }
     });
 

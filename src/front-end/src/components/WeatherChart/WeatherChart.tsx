@@ -17,9 +17,14 @@ import { Text } from "../Text/Text";
 import "./style.css";
 import { LoadingSpinner } from "../LoadingSpinner/LoadingSpinner";
 
-export function WeatherChart() {
+interface WeatherChartProps {
+  latitude?: number | null;
+  longitude?: number | null;
+}
+
+export function WeatherChart({ latitude, longitude }: WeatherChartProps) {
   const theme = useTheme();
-  const { data, loading, error, refetch } = useWeather();
+  const { data, loading, error, refetch } = useWeather(latitude, longitude);
 
   const chartColors = {
     text: theme.palette.text.primary,
@@ -62,7 +67,7 @@ export function WeatherChart() {
     <Box>
       <Box sx={{ mb: 3 }}>
         <Text variant="h5" sx={{ fontWeight: 600 }}>
-          Temperatura em Belo Horizonte (Últimas 24 horas)
+          Temperatura (Últimas 24 horas)
         </Text>
         <Text variant="caption" sx={{ color: "text.secondary" }}>
           Atualiza automaticamente a cada 1 hora

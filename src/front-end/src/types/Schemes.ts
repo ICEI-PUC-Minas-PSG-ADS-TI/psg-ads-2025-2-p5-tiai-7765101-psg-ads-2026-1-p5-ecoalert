@@ -42,14 +42,7 @@ export const createUserSchema = z.object({
 
     number: z.string().min(1, "Número é obrigatório"),
   }),
-
-  socialName: z.string().min(1, "Nome social é obrigatório"),
-
-  instagram: z
-    .string()
-    .min(1, "Instagram é obrigatório"),
-
-  logo: z.string().url().optional(),
+    logo: z.string().url().optional(),
 });
 
 export const productSchema = z.object({

@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {  useForm } from "react-hook-form";
 import { PersonalStep } from "./PersonalStep";
 import { AddressStep } from "./AddressStep";
-import { CompanyStep } from "./CompanyStep";
 import { ApiError } from "@/types/Error";
 import { createUser } from "@/services/user.service";
 import { useAuth } from "@hooks/useAuth";
@@ -20,14 +19,9 @@ export function RegisterForm() {
   });
 
   const { showMessage } = useFlashMessage();
-  const { trigger } = methods;
   const { login } = useAuth();
 
   const handleRegistration = async (data: CreateUserFormData) => {
-    const valid = await trigger(["socialName", "instagram"]);
-    
-    if (!valid) return;
-
     try {
       const response = await createUser(data);
       if (response.status === 201) {
@@ -41,7 +35,7 @@ export function RegisterForm() {
     }
   };
 
-  const formSteps = [PersonalStep, AddressStep, CompanyStep, CompanyImageStep];
+  const formSteps = [PersonalStep, AddressStep];
 
   return (
     <MultiStepForm

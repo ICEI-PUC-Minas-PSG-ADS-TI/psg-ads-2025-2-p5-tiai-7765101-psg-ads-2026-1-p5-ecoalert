@@ -24,8 +24,11 @@ export function CompanyStep({
             color="primary"
             shape="square"
             icon="arrow-left"
+            type="button"
           />
-          <Fab icon="arrow-right" onClick={onNext} />
+          <Button type="submit" color="primary" shape="square" icon="check">
+            Cadastrar
+          </Button>
         </ButtonWrapper>
       </ButtonContainer>
     </>

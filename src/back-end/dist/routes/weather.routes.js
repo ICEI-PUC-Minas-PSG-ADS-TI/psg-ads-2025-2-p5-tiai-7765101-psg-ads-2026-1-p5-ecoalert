@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.weatherRoutes = void 0;
+const weather_controller_1 = require("@/controllers/weather.controller");
+const errorHandler_1 = require("@/utils/errorHandler");
+const express_1 = require("express");
+const weatherRoutes = (0, express_1.Router)();
+exports.weatherRoutes = weatherRoutes;
+weatherRoutes.get("/forecast", (0, errorHandler_1.errorHandler)(weather_controller_1.getWeatherForecast));
+weatherRoutes.get("/archive", (0, errorHandler_1.errorHandler)(weather_controller_1.getWeatherArchive));

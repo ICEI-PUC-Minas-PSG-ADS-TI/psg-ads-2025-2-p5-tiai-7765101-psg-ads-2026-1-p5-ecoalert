@@ -9,9 +9,10 @@ import { maskCep } from "@/utils/formatter";
 interface AddressStepProps {
   onNext: () => void;
   onBack: () => void;
+  isLastStep?: boolean;
 }
 
-export function AddressStep({ onNext, onBack }: AddressStepProps) {
+export function AddressStep({ onNext, onBack, isLastStep }: AddressStepProps) {
   const { setValue, trigger } = useFormContext();
 
   async function handleFetchAddress(cep: string) {
@@ -50,10 +51,17 @@ export function AddressStep({ onNext, onBack }: AddressStepProps) {
             color="primary"
             shape="square"
             icon="arrow-left"
+            type="button"
           />
-          <Button type="submit" color="primary" shape="square">
-            Cadastrar
-          </Button>
+          {isLastStep ? (
+            <Button type="submit" color="primary" shape="square" icon="check">
+              Cadastrar
+            </Button>
+          ) : (
+            <Button onClick={onNext} color="primary" shape="square" icon="arrow-right" type="button">
+              Próximo
+            </Button>
+          )}
         </ButtonWrapper>
       </ButtonContainer>
     </>
