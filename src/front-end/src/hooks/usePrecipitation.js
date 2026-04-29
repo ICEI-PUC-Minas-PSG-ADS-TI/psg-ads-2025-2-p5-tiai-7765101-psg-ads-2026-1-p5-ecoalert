@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { fetchWeatherData } from '../services/weatherService';
 
-export function usePrecipitation() {
+export function usePrecipitation(latitude = null, longitude = null) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -10,7 +10,7 @@ export function usePrecipitation() {
     try {
       setLoading(true);
       setError(null);
-      const weatherData = await fetchWeatherData();
+      const weatherData = await fetchWeatherData(latitude, longitude);
       setData(weatherData);
     } catch (err) {
       setError(err.message || 'Erro ao carregar dados climáticos');
@@ -22,7 +22,11 @@ export function usePrecipitation() {
 
   useEffect(() => {
     loadPrecipitationData();
-  }, []);
+
+    const interval = setInterval(loadPrecipitationData, 3600000);
+
+    return () => clearInterval(interval);
+  }, [latitude, longitude]);
 
   return { data, loading, error, refetch: loadPrecipitationData };
 }

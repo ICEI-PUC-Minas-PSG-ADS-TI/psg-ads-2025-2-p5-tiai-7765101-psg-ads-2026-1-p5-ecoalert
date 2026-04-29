@@ -15,9 +15,14 @@ import { usePrecipitation } from "../../hooks/usePrecipitation";
 import { Text } from "../Text/Text";
 import { LoadingSpinner } from "../LoadingSpinner/LoadingSpinner";
 
-export function PrecipitationChart() {
+interface PrecipitationChartProps {
+  latitude?: number | null;
+  longitude?: number | null;
+}
+
+export function PrecipitationChart({ latitude, longitude }: PrecipitationChartProps) {
   const theme = useTheme();
-  const { data, loading, error, refetch } = usePrecipitation();
+  const { data, loading, error, refetch } = usePrecipitation(latitude, longitude);
 
   const chartColors = {
     text: theme.palette.text.primary,
@@ -65,7 +70,7 @@ export function PrecipitationChart() {
     <Box>
       <Box sx={{ mb: 3 }}>
         <Text variant="h5" sx={{ fontWeight: 600 }}>
-          Precipitação em Belo Horizonte (Últimas 24 horas)
+          Precipitação (Últimas 24 horas)
         </Text>
         <Text variant="caption" sx={{ color: "text.secondary" }}>
           Atualiza automaticamente a cada 1 hora

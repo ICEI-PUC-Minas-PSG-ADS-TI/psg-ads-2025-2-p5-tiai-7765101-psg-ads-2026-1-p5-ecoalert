@@ -1,9 +1,42 @@
+import { useState, useEffect } from 'react';
 import { WeatherChart } from '@/components/WeatherChart/WeatherChart';
 import { PrecipitationChart } from '@/components/PrecipitationChart/PrecipitationChart';
 import { Box, Grid, Paper } from '@mui/material';
 import { Text } from '@/components/Text/Text';
+import { useAuth } from '@/hooks/useAuth';
+import { requestGeolocation } from '@/services/geolocationService';
 
 export default function Home() {
+  const { user } = useAuth();
+  const [coordinates, setCoordinates] = useState(null);
+  const [locationSource, setLocationSource] = useState('default'); // 'gps' ou 'address'
+
+  useEffect(() => {
+    const initializeLocation = async () => {
+      // Tenta obter a localização do navegador
+      const geoLocation = await requestGeolocation();
+      
+      if (geoLocation) {
+        // Se conseguir permissão, usa as coordenadas do GPS
+        setCoordinates(geoLocation);
+        setLocationSource('gps');
+      } else {
+        // Se não conseguir ou negar a permissão, usa o endereço cadastrado
+        if (user?.address) {
+          // Usar o endereço do usuário como fallback
+          // Aqui você pode implementar um serviço de geocoding se quiser
+          // Para agora, deixamos null e os gráficos usam o padrão (Belo Horizonte)
+          setLocationSource('address');
+          console.log('Usando dados do endereço cadastrado:', user.address);
+        } else {
+          setLocationSource('default');
+        }
+      }
+    };
+
+    initializeLocation();
+  }, [user]);
+
   return (
     <Box>
       <Box>
@@ -22,7 +55,7 @@ export default function Home() {
             Central de Monitoramento Climático
           </Text>
           <Text variant="body2" sx={{ color: 'text.secondary' }}>
-            Acompanhe em tempo real as condições climáticas de Belo Horizonte
+            {coordinates ? 'Acompanhe em tempo real as condições climáticas da sua localização' : 'Acompanhe em tempo real as condições climáticas de Belo Horizonte'}
           </Text>
         </Box>
 
@@ -47,7 +80,7 @@ export default function Home() {
                 }
               }}
             >
-              <WeatherChart />
+              <WeatherChart latitude={coordinates?.latitude} longitude={coordinates?.longitude} />
             </Paper>
           </Grid>
 
@@ -71,7 +104,7 @@ export default function Home() {
                 }
               }}
             >
-              <PrecipitationChart />
+              <PrecipitationChart latitude={coordinates?.latitude} longitude={coordinates?.longitude} />
             </Paper>
           </Grid>
         </Grid>

@@ -16,14 +16,26 @@ function getLast24HoursDates() {
     endDate: formatDate(endDate)
   };
 }
-export async function fetchWeatherData() {
+
+/**
+ * Busca dados climáticos para as coordenadas fornecidas
+ * @param {number} latitude - Latitude da localização
+ * @param {number} longitude - Longitude da localização
+ * @returns {Promise<Array>} Array de dados climáticos formatados
+ */
+export async function fetchWeatherData(latitude = null, longitude = null) {
   try {
     const { startDate, endDate } = getLast24HoursDates();
+    
+    // Usa coordenadas fornecidas ou padrão de Belo Horizonte
+    const coords = latitude && longitude 
+      ? { latitude, longitude }
+      : BELO_HORIZONTE;
 
     const response = await api.get('/weather/archive', {
       params: {
-        latitude: BELO_HORIZONTE.latitude,
-        longitude: BELO_HORIZONTE.longitude,
+        latitude: coords.latitude,
+        longitude: coords.longitude,
         start_date: startDate,
         end_date: endDate,
         hourly: 'temperature_2m,precipitation'
