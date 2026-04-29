@@ -69,7 +69,7 @@ export function PrecipitationChart({ latitude, longitude }: PrecipitationChartPr
   return (
     <Box>
       <Box sx={{ mb: 3 }}>
-        <Text variant="h5" sx={{ fontWeight: 600 }}>
+        <Text variant="body2" sx={{ fontWeight: 600 }}>
           Precipitação (Últimas 24 horas)
         </Text>
         <Text variant="caption" sx={{ color: "text.secondary" }}>

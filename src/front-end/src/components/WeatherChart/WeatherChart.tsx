@@ -66,7 +66,7 @@ export function WeatherChart({ latitude, longitude }: WeatherChartProps) {
   return (
     <Box>
       <Box sx={{ mb: 3 }}>
-        <Text variant="h5" sx={{ fontWeight: 600 }}>
+        <Text variant="body2" sx={{ fontWeight: 600 }}>
           Temperatura (Últimas 24 horas)
         </Text>
         <Text variant="caption" sx={{ color: "text.secondary" }}>
