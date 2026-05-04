@@ -4,29 +4,59 @@ import { PrecipitationChart } from '@/components/PrecipitationChart/Precipitatio
 import { Box, Grid, Paper } from '@mui/material';
 import { Text } from '@/components/Text/Text';
 import { useAuth } from '@/hooks/useAuth';
-import { requestGeolocation } from '@/services/geolocationService';
+import { requestGeolocation , getCoordinatesFromAddress} from '@/services/geolocationService';
 
 export default function Home() {
   const { user } = useAuth();
   const [coordinates, setCoordinates] = useState(null);
   const [locationSource, setLocationSource] = useState('default');
+  const [loadingLocation, setLoadingLocation] = useState(true);
+
 
   useEffect(() => {
     const initializeLocation = async () => {
-      const geoLocation = await requestGeolocation();
+      setLoadingLocation(true);
 
-      if (geoLocation) {
-        setCoordinates(geoLocation);
-        setLocationSource('gps');
-      } else if (user?.address) {
-        setLocationSource('address');
-      } else {
-        setLocationSource('default');
+      try{
+        const geoLocation = await requestGeolocation();
+
+        if (geoLocation) {
+          setCoordinates(geoLocation);
+          setLocationSource('gps');
+        } else if (user?.address) {
+          const addressLocation = await getCoordinatesFromAddress(user.address);
+
+          if(addressLocation) {
+            setCoordinates(addressLocation);
+            setLocationSource('address');
+          }
+          else {
+            setCoordinates({ latitude: -19.9167, longitude: -43.9333 });
+            setLocationSource('default');
+          }
+        } else {
+          setCoordinates({ latitude: -19.9167, longitude: -43.9333 });
+          setLocationSource('default');
+        }
+        
+      }
+      catch (error){
+        console.error("Erro ao definir localização:", error);
+        setCoordinates({ latitude: -19.9167, longitude: -43.9333 });
+      }
+      finally {
+        setLoadingLocation(false);
       }
     };
 
     initializeLocation();
   }, [user]);
+
+  const locationMessage = {
+    gps: 'Monitorando sua localização via GPS',
+    address: `Monitorando seu bairro: ${user?.address?.neighborhood ||  'cadastrado'}`,
+    default: 'Exibindo dados gerais de Belo Horizonte'
+  }
 
   return (
     <Box>
@@ -44,6 +74,9 @@ export default function Home() {
             }}
           >
             Central de Monitoramento Climático
+          </Text>
+          <Text variant="body2" sx={{ color: 'text.secondary' }}>
+            {loadingLocation ? 'Buscando sua localização...' : locationMessage[locationSource]}
           </Text>
           <Text variant="body2" sx={{ color: 'text.secondary' }}>
             {coordinates ? 'Acompanhe em tempo real as condições climáticas da sua localização' : 'Acompanhe em tempo real as condições climáticas de Belo Horizonte'}
