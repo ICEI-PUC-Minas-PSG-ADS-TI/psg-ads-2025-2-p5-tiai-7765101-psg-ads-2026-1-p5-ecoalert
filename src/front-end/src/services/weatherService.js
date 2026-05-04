@@ -30,7 +30,7 @@ export async function fetchWeatherData(latitude = null, longitude = null) {
         longitude: coords.longitude,
         start_date: startDate,
         end_date: endDate,
-        hourly: 'temperature_2m,precipitation'
+        hourly: 'temperature_2m,precipitation,wind_speed_10m,wind_gusts_10m'
   }
     });
 
@@ -43,7 +43,9 @@ export async function fetchWeatherData(latitude = null, longitude = null) {
       }),
       fullTime: time,
       temperature: hourly.temperature_2m[index],
-      precipitation: hourly.precipitation[index] || 0
+      precipitation: hourly.precipitation[index] || 0,
+      windSpeed: hourly.wind_speed_10m[index],
+      windGusts: hourly.wind_gusts_10m[index]
     }));
 
     return formattedData;

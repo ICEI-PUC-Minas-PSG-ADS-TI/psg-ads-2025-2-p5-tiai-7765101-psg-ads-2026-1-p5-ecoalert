@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { WeatherChart } from '@/components/WeatherChart/WeatherChart';
 import { PrecipitationChart } from '@/components/PrecipitationChart/PrecipitationChart';
+import { WindChart } from '@/components/WindChart/WindChart';
 import { Box, Grid, Paper } from '@mui/material';
 import { Text } from '@/components/Text/Text';
 import { useAuth } from '@/hooks/useAuth';
@@ -131,6 +132,13 @@ export default function Home() {
               <PrecipitationChart latitude={coordinates?.latitude} longitude={coordinates?.longitude} />
             </Paper>
           </Grid>
+
+          <Grid item xs={12}>
+            <Paper elevation={2} sx={{ p: 3, borderRadius: 2 }}>
+              <WindChart latitude={coordinates?.latitude} longitude={coordinates?.longitude} />
+            </Paper>
+          </Grid>
+
         </Grid>
       </Box>
     </Box>

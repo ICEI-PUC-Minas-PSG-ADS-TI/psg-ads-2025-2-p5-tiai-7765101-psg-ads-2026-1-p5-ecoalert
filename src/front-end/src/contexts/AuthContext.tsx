@@ -9,7 +9,6 @@ import { clearAuthSession, persistAuthSession } from "@/utils/auth";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { createContext, ReactNode, useEffect, useState } from "react";
-import { persistAuthSession } from "@/utils/auth";
 
 interface AuthContextValues {
   user: LoggedUser | null;
