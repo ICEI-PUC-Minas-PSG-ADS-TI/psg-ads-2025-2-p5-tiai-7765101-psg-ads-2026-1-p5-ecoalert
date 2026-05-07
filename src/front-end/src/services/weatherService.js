@@ -54,3 +54,49 @@ export async function fetchWeatherData(latitude = null, longitude = null) {
     throw error;
   }
 }
+
+export async function fetchForecastData(latitude = null, longitude = null) {
+  try {
+    const coords = latitude && longitude
+      ? { latitude, longitude }
+      : BELO_HORIZONTE;
+
+    const response = await api.get('/weather/forecast', {
+      params: {
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+        hourly: [
+          'temperature_2m',
+          'apparent_temperature',
+          'relativehumidity_2m',
+          'uv_index',
+          'precipitation_probability',
+          'precipitation'
+        ].join(','),
+        forecast_days: 2,
+        timezone: 'auto'
+      }
+    });
+
+    const { hourly } = response.data;
+    const formattedData = hourly.time.map((time, index) => ({
+      time: new Date(time).toLocaleTimeString('pt-BR', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      }),
+      fullTime: time,
+      temperature: hourly.temperature_2m[index],
+      apparentTemperature: hourly.apparent_temperature[index],
+      relativeHumidity: hourly.relativehumidity_2m[index],
+      uvIndex: hourly.uv_index[index],
+      precipitationProbability: hourly.precipitation_probability[index] ?? 0,
+      precipitation: hourly.precipitation[index] ?? 0
+    }));
+
+    return formattedData;
+  } catch (error) {
+    console.error('Erro ao buscar previsao climatica:', error.data);
+    throw error;
+  }
+}
