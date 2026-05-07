@@ -54,6 +54,7 @@ export const AuthContextProvider = ({ children }: AuthProviderProps) => {
       persistAuthSession(response.data);
       const userData: LoggedUser = response.data.user;
       setUser(userData);
+
       navigate("/home?login=true");
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.data) {
