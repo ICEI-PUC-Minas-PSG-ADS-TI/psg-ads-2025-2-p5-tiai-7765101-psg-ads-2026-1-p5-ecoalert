@@ -15,9 +15,9 @@ import { Text } from "../Text/Text";
 import { LoadingSpinner } from "../LoadingSpinner/LoadingSpinner";
 
 
-export function WindChart({ latitude, longitude, hoursToShow = 24 }) {
+export function WindChart({ latitude, longitude, hoursToShow = 24, period = '24h' }) {
   const theme = useTheme();
-  const { data, loading, error, refetch } = useWeather(latitude, longitude);
+  const { data, loading, error, refetch } = useWeather(latitude, longitude, period);
 
   const chartColors = {
     text: theme.palette.text.primary,

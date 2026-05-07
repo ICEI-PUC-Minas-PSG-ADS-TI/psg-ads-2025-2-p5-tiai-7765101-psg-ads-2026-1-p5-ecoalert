@@ -19,11 +19,17 @@ interface PrecipitationChartProps {
   latitude?: number | null;
   longitude?: number | null;
   hoursToShow?: number;
+  period?: string;
 }
 
-export function PrecipitationChart({ latitude, longitude, hoursToShow = 24 }: PrecipitationChartProps) {
+export function PrecipitationChart({
+  latitude,
+  longitude,
+  hoursToShow = 24,
+  period = '24h'
+}: PrecipitationChartProps) {
   const theme = useTheme();
-  const { data, loading, error, refetch } = usePrecipitation(latitude, longitude);
+  const { data, loading, error, refetch } = usePrecipitation(latitude, longitude, period);
 
   const chartColors = {
     text: theme.palette.text.primary,

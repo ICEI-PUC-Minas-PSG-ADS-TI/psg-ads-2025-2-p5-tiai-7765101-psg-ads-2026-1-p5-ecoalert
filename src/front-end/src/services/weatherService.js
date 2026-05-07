@@ -5,9 +5,9 @@ const BELO_HORIZONTE = {
   longitude: -43.9445
 };
 
-function getLast24HoursDates() {
+function getDateRange(daysBack = 1) {
   const endDate = new Date();
-  const startDate = new Date(endDate.getTime() - 24 * 60 * 60 * 1000);
+  const startDate = new Date(endDate.getTime() - daysBack * 24 * 60 * 60 * 1000);
 
   const formatDate = (date) => date.toISOString().split('T')[0];
 
@@ -16,9 +16,19 @@ function getLast24HoursDates() {
     endDate: formatDate(endDate)
   };
 }
-export async function fetchWeatherData(latitude = null, longitude = null) {
+
+function getDaysForPeriod(period) {
+  if (period === '7d') {
+    return 7;
+  }
+
+  return 1;
+}
+
+export async function fetchWeatherData(latitude = null, longitude = null, period = '24h') {
   try {
-    const { startDate, endDate } = getLast24HoursDates();
+    const daysBack = getDaysForPeriod(period);
+    const { startDate, endDate } = getDateRange(daysBack);
     
     const coords = latitude && longitude 
       ? { latitude, longitude }

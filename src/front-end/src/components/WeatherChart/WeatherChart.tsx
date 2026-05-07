@@ -20,11 +20,12 @@ interface WeatherChartProps {
   latitude?: number | null;
   longitude?: number | null;
   hoursToShow?: number;
+  period?: string;
 }
 
-export function WeatherChart({ latitude, longitude, hoursToShow = 24 }: WeatherChartProps) {
+export function WeatherChart({ latitude, longitude, hoursToShow = 24, period = '24h' }: WeatherChartProps) {
   const theme = useTheme();
-  const { data, loading, error, refetch } = useWeather(latitude, longitude);
+  const { data, loading, error, refetch } = useWeather(latitude, longitude, period);
 
   const chartColors = {
     text: theme.palette.text.primary,
