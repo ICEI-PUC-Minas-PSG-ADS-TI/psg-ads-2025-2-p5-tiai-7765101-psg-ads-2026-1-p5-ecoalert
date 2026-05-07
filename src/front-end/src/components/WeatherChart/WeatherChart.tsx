@@ -1,8 +1,6 @@
 import { useTheme } from "@mui/material/styles";
 import { Box, Typography } from "@mui/material";
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -11,6 +9,7 @@ import {
   ResponsiveContainer,
   AreaChart,
   Area,
+  ReferenceDot,
 } from "recharts";
 import { useWeather } from "../../hooks/useWeather";
 import { Text } from "../Text/Text";
@@ -20,11 +19,13 @@ import { LoadingSpinner } from "../LoadingSpinner/LoadingSpinner";
 interface WeatherChartProps {
   latitude?: number | null;
   longitude?: number | null;
+  hoursToShow?: number;
+  period?: string;
 }
 
-export function WeatherChart({ latitude, longitude }: WeatherChartProps) {
+export function WeatherChart({ latitude, longitude, hoursToShow = 24, period = '24h' }: WeatherChartProps) {
   const theme = useTheme();
-  const { data, loading, error, refetch } = useWeather(latitude, longitude);
+  const { data, loading, error, refetch } = useWeather(latitude, longitude, period);
 
   const chartColors = {
     text: theme.palette.text.primary,
@@ -61,13 +62,21 @@ export function WeatherChart({ latitude, longitude }: WeatherChartProps) {
     );
   }
 
-  const displayData = data.slice(-24);
+  const safeHours = Math.min(hoursToShow, data.length || hoursToShow);
+  const displayData = data.slice(-safeHours);
+  const peakPoint = displayData.reduce((max, point) => {
+    if (!max || point.temperature > max.temperature) {
+      return point;
+    }
+    return max;
+  }, null);
+  const rangeLabel = hoursToShow >= 24 ? "Ultimas 24 horas" : `Ultimas ${hoursToShow} horas`;
 
   return (
     <Box>
       <Box sx={{ mb: 3 }}>
         <Text variant="body2" sx={{ fontWeight: 600 }}>
-          Temperatura (Últimas 24 horas)
+          Temperatura ({rangeLabel})
         </Text>
         <Text variant="caption" sx={{ color: "text.secondary" }}>
           Atualiza automaticamente a cada 1 hora
@@ -116,6 +125,7 @@ export function WeatherChart({ latitude, longitude }: WeatherChartProps) {
               border: `1px solid ${chartColors.grid}`,
               borderRadius: "4px",
               color: chartColors.text,
+              boxShadow: "0 12px 30px rgba(15, 23, 42, 0.12)",
             }}
             labelStyle={{ color: chartColors.text }}
             formatter={(value) => `${value.toFixed(1)}°C`}
@@ -132,6 +142,22 @@ export function WeatherChart({ latitude, longitude }: WeatherChartProps) {
             dot={false}
             name="Temperatura"
           />
+          {peakPoint && (
+            <ReferenceDot
+              x={peakPoint.time}
+              y={peakPoint.temperature}
+              r={6}
+              fill={chartColors.line}
+              stroke="#FFFFFF"
+              strokeWidth={2}
+              label={{
+                value: `Pico ${peakPoint.temperature.toFixed(1)}°C`,
+                position: "top",
+                fill: chartColors.text,
+                fontSize: 12,
+              }}
+            />
+          )}
         </AreaChart>
       </ResponsiveContainer>
 
