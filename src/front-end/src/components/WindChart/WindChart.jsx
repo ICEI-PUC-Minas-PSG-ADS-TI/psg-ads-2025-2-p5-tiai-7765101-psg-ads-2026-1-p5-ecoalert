@@ -15,7 +15,7 @@ import { Text } from "../Text/Text";
 import { LoadingSpinner } from "../LoadingSpinner/LoadingSpinner";
 
 
-export function WindChart({ latitude, longitude }) {
+export function WindChart({ latitude, longitude, hoursToShow = 24 }) {
   const theme = useTheme();
   const { data, loading, error, refetch } = useWeather(latitude, longitude);
 
@@ -55,13 +55,15 @@ export function WindChart({ latitude, longitude }) {
     );
   }
 
-  const displayData = data.slice(-24);
+  const safeHours = Math.min(hoursToShow, data.length || hoursToShow);
+  const displayData = data.slice(-safeHours);
+  const rangeLabel = hoursToShow >= 24 ? "Ultimas 24 horas" : `Ultimas ${hoursToShow} horas`;
 
   return (
     <Box>
       <Box sx={{ mb: 3 }}>
         <Text variant="body2" sx={{ fontWeight: 600 }}>
-          Velocidade e Rajadas de Vento (Últimas 24 horas)
+          Velocidade e Rajadas de Vento ({rangeLabel})
         </Text>
         <Text variant="caption" sx={{ color: "text.secondary" }}>
           Unidade de medida: km/h
