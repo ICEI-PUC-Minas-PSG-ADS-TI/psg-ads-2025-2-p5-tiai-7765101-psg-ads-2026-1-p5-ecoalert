@@ -159,7 +159,7 @@ O projeto pode utilizar a aba **Projects** do GitHub, porém é **OBRIGATÓRIO p
 |-------------|--------|--------|--------|--------|--------|
 | Vitor            |Arquiteto de Dados        | Implementar filtros | 28/04 | 10/05 | ✔️ |
 | Ricardo            |Facilitador Ágil        | Implementar localização por GPS | 28/04 | 10/05 | ✔️ |
-|             |        | Atualizar DER via Engenharia Reversa | 16/04 | 10/05 | ❌ |
+| Bruna            | Gerente de Qualidade       | Atualizar Dashboard | 28/04 | 10/05 | ✔️ |
 |             |        | Atualizar Diagrama de Classes | 16/04 | 10/05 | ❌ |
 
 ---
