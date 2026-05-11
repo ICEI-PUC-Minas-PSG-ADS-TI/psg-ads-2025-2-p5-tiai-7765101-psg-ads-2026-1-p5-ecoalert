@@ -12,7 +12,6 @@ export async function createCommunity(req: Request, res: Response){
         return res.json(response);
     }
     catch (error) {
-        console.log(error);
         return res.json({ message: "Erro ao criar comunidade" });
     }
 }
@@ -23,7 +22,6 @@ export async function getCommunities(req: Request, res: Response) {
         return res.json(communities);
     }
     catch (error) {
-        console.log(error);
         return res.json({ message: "Erro ao criar comunidade" });
     }
 }
@@ -35,7 +33,6 @@ export async function getCommunityById(req: Request<Params>, res: Response){
         return res.json(community);
     } 
     catch (error) {
-        console.log(error);
         return res.json({ message: "Erro ao buscar comunidade" });
     }
 }
@@ -47,7 +44,6 @@ export async function updateCommunity(req: Request<Params>, res: Response){
         return res.json(community);
     }
     catch (error) {
-        console.log(error);
         return res.json({ message: "Erro ao atualizar comunidade" });
     }
 }
@@ -59,7 +55,6 @@ export async function deleteCommunity(req: Request<Params>, res: Response){
         return res.json({ message: "Comunidade deletada com sucesso" });
     }
     catch (error) {
-        console.log(error);
         return res.json({ message: "Erro ao deletar comunidade" });
     }
 }

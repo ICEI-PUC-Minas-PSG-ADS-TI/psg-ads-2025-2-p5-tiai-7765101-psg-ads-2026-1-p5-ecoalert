@@ -8,7 +8,6 @@ async function getUsers(req, res) {
     return res.json(await user_service_1.UserService.findAll());
 }
 async function createUser(req, res) {
-    console.log("Received request to create user with body:", req.body);
     const response = await user_service_1.UserService.create(req.body);
     return res.status(201).json(response);
 }

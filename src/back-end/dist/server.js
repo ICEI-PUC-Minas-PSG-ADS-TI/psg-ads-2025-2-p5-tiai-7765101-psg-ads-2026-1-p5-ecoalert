@@ -7,5 +7,4 @@ const PORT = process.env.PORT || 3000;
 app_1.app.use("/api", routes_1.routes);
 app_1.app.use(error_middleware_1.errorMiddleware);
 app_1.app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
 });

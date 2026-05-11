@@ -7,7 +7,6 @@ const error_1 = require("@/types/error");
 const repository = new user_repository_1.UserRepository();
 class UserService {
     static async create(data) {
-        console.log("Creating user with data:", data);
         const errorFields = {};
         const userByEmail = await repository.findByEmail(data.email);
         if (userByEmail) {

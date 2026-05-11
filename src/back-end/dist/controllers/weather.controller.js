@@ -16,7 +16,6 @@ async function getWeatherForecast(req, res) {
     return res.json(response);
 }
 async function getWeatherArchive(req, res) {
-    console.log("Received request for weather archive with query:", req.query);
     const query = normalizeQuery(req.query);
     if (!query.latitude || !query.longitude) {
         throw new error_1.AppError("Latitude e longitude sao obrigatorias", 400, "WEATHER_COORDINATES_REQUIRED", {

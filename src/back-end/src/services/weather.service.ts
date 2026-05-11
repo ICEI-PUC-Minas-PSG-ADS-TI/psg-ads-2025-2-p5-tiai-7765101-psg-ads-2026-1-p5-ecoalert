@@ -27,7 +27,6 @@ export class WeatherService {
   }
 
   static async getArchive(query: Record<string, WeatherQueryValue>) {
-    console.log("Fetching weather archive with query:", query);
     try {
       const response = await api.get(`${process.env.OPEN_METEO_ARCHIVE_BASE_URL}/archive`, {
         params: query
@@ -37,8 +36,6 @@ export class WeatherService {
     } catch (error: any) {
       const status = error?.response?.status ?? 500;
       const data = error?.response?.data;
-
-      console.log("Error fetching weather archive:", error);
 
       throw new AppError(
         "Erro ao buscar dados meteorologicos",

@@ -18,7 +18,6 @@ function buildCookieOptions() {
     };
 }
 async function login(req, res) {
-    console.log("Login request received with body:", req.body);
     const { email, password } = req.body;
     const response = await auth_service_1.AuthService.login(email, password);
     const { token, refreshToken, user } = response;
