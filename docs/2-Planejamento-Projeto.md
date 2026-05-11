@@ -157,10 +157,10 @@ O projeto pode utilizar a aba **Projects** do GitHub, porém é **OBRIGATÓRIO p
 
 | Responsável | Papel | Tarefa | Início | Prazo | Status |
 |-------------|--------|--------|--------|--------|--------|
-|             |        | Implementar Regra de Negócio Y | 06/04 | 15/04 | ❌ |
-|             |        | Implementar Cálculo/Processo Z | 06/04 | 15/04 | ❌ |
-|             |        | Atualizar DER via Engenharia Reversa | 16/04 | 20/04 | ❌ |
-|             |        | Atualizar Diagrama de Classes | 16/04 | 23/04 | ❌ |
+| Vitor            |Arquiteto de Dados        | Implementar filtros | 06/04 | 10/05 | ✔️ |
+| Ricardo            |Facilitador Ágil        | Implementar localização por GPS | 28/04 | 10/05 | ✔️ |
+|             |        | Atualizar DER via Engenharia Reversa | 16/04 | 10/05 | ❌ |
+|             |        | Atualizar Diagrama de Classes | 16/04 | 10/05 | ❌ |
 
 ---
 
