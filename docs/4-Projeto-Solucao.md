@@ -25,17 +25,11 @@ Semelhante à imagem abaixo:
  **Fonte:** [Guia Completo de Desenvolvimento de Software - UDS](https://uds.com.br/blog/desenvolvimento-de-software-guia-completo/) <br><br>
  
  ### 📎 Inserir o Diagrama de Arquitetura do Projeto do Grupo
-🚨 O grupo deverá inserir aqui a imagem
 
 <img src="images/diagramaArquiteturaTiai.png" width="100%">
 
 ---
-🔧**Ferramentas recomendadas:**
-- Draw.io
-- Lucidchart
-- Figma
 
----
 
 ## 4.2 Tecnologias Utilizadas (Sprint 1)
 
@@ -83,8 +77,6 @@ Representação simplificada do Wireframe:
 ---
 
 ### 📎 Inserir AQUI Wireframes/ Mockups do Projeto de Software
-
-🚨 O grupo deverá inserir aqui a imagem
 
 #### Tela de Cadastro (RF-01)
 
