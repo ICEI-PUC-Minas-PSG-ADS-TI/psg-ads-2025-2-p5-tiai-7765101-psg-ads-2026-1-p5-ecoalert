@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.sensorRoutes = void 0;
+const sensor_controller_1 = require("@/controllers/sensor.controller");
+const errorHandler_1 = require("@/utils/errorHandler");
+const express_1 = require("express");
+const sensorRoutes = (0, express_1.Router)();
+exports.sensorRoutes = sensorRoutes;
+sensorRoutes.post("/", (0, errorHandler_1.errorHandler)(sensor_controller_1.createSensor));
+sensorRoutes.get("/", (0, errorHandler_1.errorHandler)(sensor_controller_1.getSensors));
+sensorRoutes.get("/:id", (0, errorHandler_1.errorHandler)(sensor_controller_1.getSensorById));
+sensorRoutes.patch("/:id", (0, errorHandler_1.errorHandler)(sensor_controller_1.updateSensor));
+sensorRoutes.delete("/:id", (0, errorHandler_1.errorHandler)(sensor_controller_1.deleteSensor));

@@ -13,6 +13,22 @@ enum UserRole {
   USER
 }
 
+enum SensorType {
+  RAIN
+  RIVER_LEVEL
+  SOIL_MOISTURE
+  WEATHER
+  TEMPERATURE
+  HUMIDITY
+}
+
+enum SensorStatus {
+  ACTIVE
+  INACTIVE
+  MAINTENANCE
+  OFFLINE
+}
+
 model User {
   id        String   @id @default(uuid())
   name      String
@@ -54,4 +70,30 @@ model Community {
 
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
+}
+
+model Sensor {
+  id                  String       @id @default(uuid())
+  name                String
+  description         String?
+  type                SensorType
+  organizationId      String
+  latitude            Float
+  longitude           Float
+  status              SensorStatus
+  batteryLevel        Int?
+  lastCommunicationAt DateTime?
+
+  // PostGIS-ready field for future geospatial features.
+  // TODO: Use ST_Contains for automatic area association.
+  // TODO: Use ST_DWithin for nearby sensors search.
+  // TODO: Implement queries for "sensors near me" and area monitoring integration.
+  geom                Unsupported("geometry(Point, 4326)")?
+
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  @@index([organizationId])
+  @@index([type])
+  @@index([status])
 }
