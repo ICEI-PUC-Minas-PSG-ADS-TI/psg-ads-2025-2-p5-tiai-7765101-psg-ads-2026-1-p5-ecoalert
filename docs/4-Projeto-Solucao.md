@@ -24,7 +24,7 @@ Semelhante à imagem abaixo:
 
  **Fonte:** [Guia Completo de Desenvolvimento de Software - UDS](https://uds.com.br/blog/desenvolvimento-de-software-guia-completo/) <br><br>
  
- ### 📎 Inserir o Diagrama de Arquitetura do Projeto do Grupo
+ ### 📎 Diagrama de Arquitetura do Projeto do Grupo
 
 <img src="images/diagramaArquiteturaTiai.png" width="100%">
 
