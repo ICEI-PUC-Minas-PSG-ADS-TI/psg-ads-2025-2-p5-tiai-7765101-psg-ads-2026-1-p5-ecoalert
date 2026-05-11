@@ -189,36 +189,7 @@ O arquivo .sql ou .js deve ser salvo na pasta: src/bd
 ---
 ### 4.4.2 Representação do Modelo Físico de Dados (Entrega na Sprint 3 - Core)
 
-
-> **Fundamentação:** Os modelos de dados físicos fornecem detalhes minuciosos que auxiliam administradores e desenvolvedores na implementação da lógica de negócios em um banco de dados real.
-> Eles incluem elementos não especificados no modelo lógico, como:
-> - Tipos de dados específicos da plataforma
-> - Restrições
-> - Índices
-> - Triggers (quando aplicável)
-> - Procedimentos armazenados (quando aplicável)
->
->Por representarem um banco real, devem respeitar:
-> - Convenções de nomenclatura
-> - Restrições da plataforma
-> - Uso adequado de palavras reservadas <br>
-
-
-**Exemplo:**
-
-<img src="https://d2908q01vomqb2.cloudfront.net/b6692ea5df920cad691c20319a6fffd7a4a766b8/2021/11/09/BDB-1321-image005.png" width="85%">
-
-**FONTE:** <https://aws.amazon.com/pt/compare/the-difference-between-logical-and-physical-data-model/>
-
-<br>O grupo deverá gerar um diagrama físico do banco de dados (estrutura real das tabelas), evidenciando PKs, FKs e relacionamentos, conforme implementado no código.
-
-Este modelo deve exibir:
-- Tabelas ou coleções existentes
-- Atributos com seus respectivos tipos de dados
-- Chaves Primárias (PK)
-- Chaves Estrangeiras (FK)
-- Relacionamentos entre tabelas
-- Restrições implementadas (quando aplicável)
+<img src="images/diagramaBD.jpeg" width="80%">
 
 ---
 
