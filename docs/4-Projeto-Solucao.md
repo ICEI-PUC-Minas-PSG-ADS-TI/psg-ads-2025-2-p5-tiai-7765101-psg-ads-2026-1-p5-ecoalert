@@ -1,30 +1,10 @@
 
 # 4. Projeto da Solução
 
-> ⚠️ **Aviso aos Squads (Software House)**
->
-> Esta seção **não deve ser preenchida integralmente antes da codificação**.
-> Trata-se de um **Documento Vivo**, que deverá ser atualizado **incrementalmente a cada Sprint**, refletindo fielmente o código real implementado.
-
 ---
 
 ## 4.1 Arquitetura da Solução (Sprint 1 e 2)
 
-Apresente um **diagrama macro** demonstrando como os componentes do sistema se comunicam.
-
-A arquitetura deve refletir o modelo de **fatias verticais**, evidenciando o fluxo:
-
-**Front-end → API (Back-end) → Banco de Dados**
-
-Semelhante à imagem abaixo:
-
-![Exemplo de Arquitetura](https://uds.com.br/blog/wp-content/uploads/2024/09/Imagem-1-Comparativo-ilustrativo-das-diferencas-entre-front-end-e-back-end.jpg)
-
-
-
- **Fonte:** [Guia Completo de Desenvolvimento de Software - UDS](https://uds.com.br/blog/desenvolvimento-de-software-guia-completo/) <br><br>
- 
- ### 📎 Diagrama de Arquitetura do Projeto do Grupo
 
 <img src="images/diagramaArquiteturaTiai.png" width="100%">
 
@@ -42,10 +22,6 @@ Descreva as tecnologias, linguagens, frameworks, bibliotecas e serviços escolhi
 | Front-end / Mobile | React 19, Vite, Axios e Material UI (MUI) |
 | Hospedagem / Deploy | Neon (Banco de Dados em nuvem) |
 | Gestão e Versionamento | Git e GitHub |
-
- ⚠️ **Observação:**
- - GitHub Pages não executa back-end.
- - Utilize apenas tecnologias realmente implementadas.
 
 ---
 
@@ -70,11 +46,7 @@ Representação simplificada do Wireframe:
 **Descrição:** A interface contempla todos os campos exigidos pelo RF-01 e permite persistência no banco após validação no backend.
 
 ---
-🔧 **Ferramentas sugeridas:**
-- Figma  
-- MarvelApp  
-- Balsamiq  
----
+
 
 ### 📎 Inserir AQUI Wireframes/ Mockups do Projeto de Software
 
@@ -264,7 +236,3 @@ Este modelo deve exibir:
 🚨 O grupo deverá inserir aqui a imagem do diagrama físico de dados.
 
 ---
-🔧**Ferramentas Sugeridas**
-- MySQL Workbench (engenharia reversa automática)
-- DbDesigner
-- Lucidchart
