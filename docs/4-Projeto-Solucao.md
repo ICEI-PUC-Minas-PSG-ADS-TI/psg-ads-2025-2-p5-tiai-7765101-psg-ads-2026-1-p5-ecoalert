@@ -193,17 +193,3 @@ O arquivo .sql ou .js deve ser salvo na pasta: src/bd
 
 ---
 
-### 📌 Requisitos Obrigatórios
-
-- O diagrama deve representar fielmente o banco já implementado.
-- Deve refletir exatamente o que foi criado nas Sprints 2 e 3.
-- Não incluir tabelas que não existam no código.
-- Deve contemplar o controle de acesso de usuários, quando implementado.
-- Deve respeitar as convenções e restrições da plataforma utilizada.
-
----
-
-### 📎 Representação do Modelo Físico de Dados
-🚨 O grupo deverá inserir aqui a imagem do diagrama físico de dados.
-
----
