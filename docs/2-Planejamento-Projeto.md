@@ -160,7 +160,7 @@ O projeto pode utilizar a aba **Projects** do GitHub, porém é **OBRIGATÓRIO p
 | Vitor            |Arquiteto de Dados        | Implementar filtros | 28/04 | 10/05 | ✔️ |
 | Ricardo            |Facilitador Ágil        | Implementar localização por GPS | 28/04 | 10/05 | ✔️ |
 | Bruna            | Gerente de Qualidade       | Atualizar Dashboard | 28/04 | 10/05 | ✔️ |
-| Samuel            |Tech Lead        | Atualizar Diagrama de Classes | 05/05 | 10/05 | ✔️ |
+| Samuel            |Tech Lead        | Implementar sensores | 05/05 | 10/05 | ✔️ |
 
 ---
 
