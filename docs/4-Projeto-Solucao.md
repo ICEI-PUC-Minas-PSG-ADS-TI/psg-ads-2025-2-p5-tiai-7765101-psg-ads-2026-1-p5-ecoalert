@@ -193,3 +193,6 @@ O arquivo .sql ou .js deve ser salvo na pasta: src/bd
 
 ---
 
+### 4.4.2 Diagrama de Classes (Sprint 3)
+
+<img src="images/diagramaClasses.png" width="80%">
