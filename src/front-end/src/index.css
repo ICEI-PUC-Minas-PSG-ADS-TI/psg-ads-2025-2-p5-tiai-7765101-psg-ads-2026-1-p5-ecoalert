@@ -13,6 +13,18 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
+}
+
+html,
+body {
+  overflow: hidden;
+}
+
 body {
   min-height: 100vh;
 }
@@ -20,6 +32,10 @@ body {
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
+}
+
+.private-layout-content::-webkit-scrollbar {
+  display: none;
 }
 
 

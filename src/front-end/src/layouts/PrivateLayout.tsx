@@ -23,7 +23,7 @@ export default function PrivateLayout() {
   }
 
   return (
-    <Box sx={{ display: "flex", height: "100vh", overflow: "hidden" }}>
+    <Box sx={{ display: "flex", height: "100dvh", overflow: "hidden" }}>
       <Sidebar mobileOpen={sidebarOpen} onClose={closeSidebar}/>
       <Box
         component="div"
@@ -39,7 +39,16 @@ export default function PrivateLayout() {
           onOpenSidebar={openSidebar}
         />
 
-        <main style={{ flexGrow: 1, overflowY: "auto", padding: "24px" }}>
+        <main
+          style={{
+            flexGrow: 1,
+            overflowY: "auto",
+            padding: "24px",
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+          }}
+          className="private-layout-content"
+        >
           <Outlet />
         </main>
       </Box>

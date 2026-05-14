@@ -26,7 +26,7 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
         <SectionTitle>Principal</SectionTitle>
         <List disablePadding>
           <NavItem
-            href="/dashboard"
+            href="/home"
             iconName="layout-dashboard"
             label="Dashboard"
             currentPath={pathname}

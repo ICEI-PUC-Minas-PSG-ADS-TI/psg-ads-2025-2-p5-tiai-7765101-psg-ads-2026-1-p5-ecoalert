@@ -137,12 +137,12 @@ export default function Home() {
 
   const status = useMemo(() => {
     if (totalRain >= 15 || maxWindGust >= 60) {
-      return { label: 'Risco alto', color: theme.palette.error.main };
+      return { label: 'Risco', color: theme.palette.error.main };
     }
     if (totalRain >= 5 || maxWindGust >= 40) {
-      return { label: 'Atencao', color: theme.palette.warning.main };
+      return { label: 'Atenção', color: theme.palette.warning.main };
     }
-    return { label: 'Sem risco', color: theme.palette.success.main };
+    return { label: 'Seguro', color: theme.palette.success.main };
   }, [totalRain, maxWindGust, theme.palette.error.main, theme.palette.success.main, theme.palette.warning.main]);
 
   const handleFilterChange = (field) => (event) => {
@@ -201,11 +201,7 @@ export default function Home() {
           <Text
             variant="h5"
             sx={{
-              fontWeight: 700,
-              background: 'linear-gradient(120deg, #1E3A8A 0%, #0E7490 55%, #16A34A 100%)',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
+              fontWeight: 700
             }}
           >
             Central de Monitoramento Climatico - {cityName}
@@ -350,16 +346,16 @@ export default function Home() {
                 </Text>
               </Stack>
               <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
-                <Chip size="small" label="Normal" sx={{ backgroundColor: theme.palette.success.light }} />
-                <Chip size="small" label="Atencao" sx={{ backgroundColor: theme.palette.warning.light }} />
-                <Chip size="small" label="Risco" sx={{ backgroundColor: theme.palette.error.light }} />
+                <Chip size="small" label="Normal" sx={{ backgroundColor: theme.palette.success.light, color: theme.palette.success.contrastText }} />
+                <Chip size="small" label="Atenção" sx={{ backgroundColor: theme.palette.warning.light, color: theme.palette.warning.contrastText }} />
+                <Chip size="small" label="Risco" sx={{ backgroundColor: theme.palette.error.light, color: theme.palette.error.contrastText }} />
               </Stack>
             </CardContent>
           </Card>
         </Grid>
       </Grid>
         <Grid container spacing={2} sx={{ animation: 'fadeInUp 0.8s ease' }}>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} lg={6}>
             <Paper
               elevation={0}
               sx={{
@@ -378,7 +374,7 @@ export default function Home() {
               />
             </Paper>
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} lg={6}>
             <Paper
               elevation={0}
               sx={{
@@ -397,7 +393,7 @@ export default function Home() {
               />
             </Paper>
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} lg={6}>
             <Paper
               elevation={0}
               sx={{
