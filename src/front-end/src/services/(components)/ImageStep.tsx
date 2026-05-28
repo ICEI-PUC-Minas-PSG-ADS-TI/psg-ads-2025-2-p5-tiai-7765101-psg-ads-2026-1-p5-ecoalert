@@ -3,22 +3,24 @@
 
 import { Box } from "@mui/material";
 import Image from "next/image";
-import { Button } from "@components/Button/Button";
-import { Fab } from "@components/Fab/Fab";
-import { Text } from "@components/Text/Text";
-import { LoadingSpinner } from "@components/LoadingSpinner/LoadingSpinner";
+import { Button } from "@/components/Button/Button";
+import { Fab } from "@/components/Fab/Fab";
+import { Text } from "@/components/Text/Text";
+import { LoadingSpinner } from "@/components/LoadingSpinner/LoadingSpinner";
 import { ButtonContainer } from "./style";
 import { useImageUpload } from "@/hooks/useImageUpload";
 import { useFormContext } from "react-hook-form";
 
-export function CompanyImageStep({
-  onBack,
-}: {
-  onBack: () => void;
-}) {
+export function CompanyImageStep({ onBack }: { onBack: () => void }) {
   const { formState } = useFormContext();
-  const { imageUri, uploading, error, inputRef, openFilePicker, handleFileChange } =
-    useImageUpload("logo");
+  const {
+    imageUri,
+    uploading,
+    error,
+    inputRef,
+    openFilePicker,
+    handleFileChange,
+  } = useImageUpload("logo");
 
   return (
     <Box display="flex" flexDirection="column" gap={3}>

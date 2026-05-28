@@ -1,16 +1,15 @@
 import { Navigate, Outlet } from 'react-router-dom'
 import { Box } from '@mui/material'
+import { useState } from 'react'
 
 import { isAuthenticated } from '@/utils/auth'
 import { Header } from '@/components/Header/Header'
 import Sidebar from '@/components/Sidebar/Sidebar'
-import { useState } from 'react';
 
 export default function PrivateLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   function openSidebar() {
-    console.log("Opening sidebar");
     setSidebarOpen(true);
   }
 
@@ -23,34 +22,32 @@ export default function PrivateLayout() {
   }
 
   return (
-    <Box sx={{ display: "flex", height: "100dvh", overflow: "hidden" }}>
-      <Sidebar mobileOpen={sidebarOpen} onClose={closeSidebar}/>
+    <Box sx={{ height: "100dvh", overflow: "hidden", backgroundColor: "background.default" }}>
+      <Header onOpenSidebar={openSidebar} />
       <Box
         component="div"
         sx={{
           display: "flex",
-          flexDirection: "column",
-          flexGrow: 1,
+          height: "calc(100dvh - 64px)",
           minWidth: 0,
           overflow: "hidden",
         }}
       >
-        <Header
-          onOpenSidebar={openSidebar}
-        />
-
-        <main
-          style={{
+        <Sidebar mobileOpen={sidebarOpen} onClose={closeSidebar}/>
+        <Box
+          component="main"
+          sx={{
             flexGrow: 1,
+            minWidth: 0,
             overflowY: "auto",
-            padding: "24px",
+            p: { xs: 2, sm: 3 },
             scrollbarWidth: "none",
             msOverflowStyle: "none",
           }}
           className="private-layout-content"
         >
           <Outlet />
-        </main>
+        </Box>
       </Box>
     </Box>
   )

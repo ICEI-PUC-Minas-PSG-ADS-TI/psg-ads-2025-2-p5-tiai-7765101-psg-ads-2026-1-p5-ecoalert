@@ -6,7 +6,7 @@ import {
   ListItemButtonProps
 } from '@mui/material';
 
-import { styled } from '@mui/material/styles';
+import { alpha, styled } from '@mui/material/styles';
 
 interface StyledNavButtonProps extends ListItemButtonProps {
   $active?: boolean;
@@ -14,7 +14,7 @@ interface StyledNavButtonProps extends ListItemButtonProps {
   to?: string;
 }
 
-const DRAWER_WIDTH = 260;
+const DRAWER_WIDTH = 248;
 
 export const StyledDrawer = styled(Drawer)(({ theme }) => ({
   width: DRAWER_WIDTH,
@@ -23,7 +23,7 @@ export const StyledDrawer = styled(Drawer)(({ theme }) => ({
   '& .MuiDrawer-paper': {
     width: DRAWER_WIDTH,
     boxSizing: 'border-box',
-    backgroundColor: theme.palette.background.paper, 
+    backgroundColor: theme.palette.mode === 'dark' ? '#050607' : theme.palette.background.paper, 
     borderRight: `1px solid ${theme.palette.divider}`,
     color: theme.palette.text.secondary,
   },
@@ -35,15 +35,15 @@ export const StyledDrawer = styled(Drawer)(({ theme }) => ({
 
 export const StyledListItemButton = styled(ListItemButton)<StyledNavButtonProps>(({ theme, $active }) => ({
   borderRadius: 8,
-  margin: '0 16px 4px',
-  padding: '8px 16px',
+  margin: '0 10px 4px',
+  padding: '10px 14px',
   
-  backgroundColor: $active ? theme.palette.action.selected : 'transparent',
-  color: $active ? theme.palette.text.primary : 'inherit',
+  backgroundColor: $active ? alpha(theme.palette.secondary.main, 0.12) : 'transparent',
+  color: $active ? theme.palette.secondary.light : 'inherit',
 
   '&:hover': {
-    backgroundColor: theme.palette.action.hover,
-    color: theme.palette.text.primary,
+    backgroundColor: $active ? alpha(theme.palette.secondary.main, 0.16) : theme.palette.action.hover,
+    color: $active ? theme.palette.secondary.light : theme.palette.text.primary,
   },
 
   '& .MuiListItemIcon-root': {

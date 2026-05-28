@@ -8,7 +8,6 @@ import { Icon } from "@/components/Icon/Icon";
 
 import {
   StyledDrawer,
-  SectionTitle,
   StyledListItemButton,
 } from "./style";
 
@@ -23,7 +22,6 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
   const drawerContent = (
     <>
       <Box sx={{ overflowY: "auto", flex: 1, py: 2 }}>
-        <SectionTitle>Principal</SectionTitle>
         <List disablePadding>
           <NavItem
             href="/home"
@@ -55,8 +53,7 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
           />
         </List>
 
-        <SectionTitle>Sistema</SectionTitle>
-        <List disablePadding>
+        <List disablePadding sx={{ mt: 1 }}>
           <NavItem
             href="/settings"
             iconName="settings"
@@ -89,6 +86,10 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
         variant="permanent"
         sx={{
           display: { xs: "none", md: "block" },
+          "& .MuiDrawer-paper": {
+            position: "relative",
+            height: "100%",
+          },
         }}
       >
         {drawerContent}
@@ -113,7 +114,7 @@ function NavItem({
   const isActive = currentPath === href;
 
   return (
-        <ListItem disablePadding>
+    <ListItem disablePadding>
       <StyledListItemButton
         component={Link}
         to={href}

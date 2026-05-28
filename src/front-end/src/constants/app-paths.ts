@@ -1,4 +1,4 @@
-export const publicPaths = ['/login', '/cadastro'];
+export const publicPaths = ['/', '/login', '/cadastro'];
 
 
 export const privatePaths = ['/dashboard'];

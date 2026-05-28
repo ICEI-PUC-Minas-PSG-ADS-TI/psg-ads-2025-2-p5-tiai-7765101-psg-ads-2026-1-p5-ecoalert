@@ -91,7 +91,7 @@ export function maskDate(value: string) {
 }
 
 export function parseToLocalDateTime(value: string) {
-  if (!value || value.length !== 8) return value; // Retorna o que tiver se não estiver completo
+  if (!value || value.length !== 8) return value;
 
   const day = value.substring(0, 2);
   const month = value.substring(2, 4);
