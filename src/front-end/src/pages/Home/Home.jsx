@@ -1,26 +1,22 @@
-import { useMemo, useState, useEffect } from 'react';
-import { useTheme } from '@mui/material/styles';
-import { WeatherChart } from '@/components/WeatherChart/WeatherChart';
+import { useEffect, useMemo, useState } from 'react';
+import { alpha, useTheme } from '@mui/material/styles';
+import { Box, Card, CardContent, Paper, Stack, ToggleButton, ToggleButtonGroup } from '@mui/material';
+
+import { Icon } from '@/components/Icon/Icon';
 import { PrecipitationChart } from '@/components/PrecipitationChart/PrecipitationChart';
-import { WindChart } from '@/components/WindChart/WindChart';
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Chip,
-  FormControl,
-  Grid,
-  InputLabel,
-  MenuItem,
-  Paper,
-  Select,
-  Stack,
-} from '@mui/material';
 import { Text } from '@/components/Text/Text';
+import { WeatherChart } from '@/components/WeatherChart/WeatherChart';
+import { WindChart } from '@/components/WindChart/WindChart';
 import { useAuth } from '@/hooks/useAuth';
 import { useWeather } from '@/hooks/useWeather';
-import { requestGeolocation, getCoordinatesFromAddress } from '@/services/geolocationService';
+import { getCoordinatesFromAddress, requestGeolocation } from '@/services/geolocationService';
+
+const PERIOD_OPTIONS = [
+  { value: '6h', label: '6h', hours: 6, summary: 'Últimas 6h', rainSummary: 'Acumulado nas últimas 6h' },
+  { value: '12h', label: '12h', hours: 12, summary: 'Últimas 12h', rainSummary: 'Acumulado nas últimas 12h' },
+  { value: '24h', label: '24h', hours: 24, summary: 'Últimas 24h', rainSummary: 'Acumulado nas últimas 24h' },
+  { value: '7d', label: '7 dias', hours: 168, summary: 'Últimos 7 dias', rainSummary: 'Acumulado nos últimos 7 dias' },
+];
 
 export default function Home() {
   const theme = useTheme();
@@ -28,21 +24,19 @@ export default function Home() {
   const [coordinates, setCoordinates] = useState(null);
   const [locationSource, setLocationSource] = useState('default');
   const [loadingLocation, setLoadingLocation] = useState(true);
-  const [filters, setFilters] = useState({ period: '24h', metric: 'temperatura' });
-  const [appliedFilters, setAppliedFilters] = useState({ period: '24h', metric: 'temperatura' });
+  const [selectedPeriod, setSelectedPeriod] = useState('24h');
 
   const { data: weatherData } = useWeather(
     coordinates?.latitude,
     coordinates?.longitude,
-    appliedFilters.period
+    selectedPeriod,
   );
-
 
   useEffect(() => {
     const initializeLocation = async () => {
       setLoadingLocation(true);
 
-      try{
+      try {
         const geoLocation = await requestGeolocation();
 
         if (geoLocation) {
@@ -51,11 +45,10 @@ export default function Home() {
         } else if (user?.address) {
           const addressLocation = await getCoordinatesFromAddress(user.address);
 
-          if(addressLocation) {
+          if (addressLocation) {
             setCoordinates(addressLocation);
             setLocationSource('address');
-          }
-          else {
+          } else {
             setCoordinates({ latitude: -19.9167, longitude: -43.9333 });
             setLocationSource('default');
           }
@@ -63,13 +56,11 @@ export default function Home() {
           setCoordinates({ latitude: -19.9167, longitude: -43.9333 });
           setLocationSource('default');
         }
-        
-      }
-      catch (error){
-        console.error("Erro ao definir localização:", error);
+      } catch (error) {
+        console.error('Erro ao definir localização:', error);
         setCoordinates({ latitude: -19.9167, longitude: -43.9333 });
-      }
-      finally {
+        setLocationSource('default');
+      } finally {
         setLoadingLocation(false);
       }
     };
@@ -77,30 +68,18 @@ export default function Home() {
     initializeLocation();
   }, [user]);
 
-  const locationMessage = {
-    gps: 'Monitorando sua localização via GPS',
-    address: `Monitorando seu bairro: ${user?.address?.neighborhood ||  'cadastrado'}`,
-    default: 'Exibindo dados gerais de Belo Horizonte'
-  }
-
   const cityName = user?.address?.city || 'Belo Horizonte';
+  const selectedPeriodOption = PERIOD_OPTIONS.find((option) => option.value === selectedPeriod) || PERIOD_OPTIONS[2];
+  const hoursToShow = selectedPeriodOption.hours;
 
-  const hoursByPeriod = {
-    '6h': 6,
-    '12h': 12,
-    '24h': 24,
-    '7d': 168,
-  };
-
-  const hoursToShow = hoursByPeriod[appliedFilters.period] || 24;
   const scopedWeatherData = useMemo(
     () => weatherData.slice(-Math.min(hoursToShow, weatherData.length || hoursToShow)),
-    [weatherData, hoursToShow]
+    [hoursToShow, weatherData],
   );
 
   const temperatureValues = useMemo(
     () => scopedWeatherData.map((point) => point.temperature).filter((value) => typeof value === 'number'),
-    [scopedWeatherData]
+    [scopedWeatherData],
   );
 
   const currentTemp = temperatureValues.length ? temperatureValues[temperatureValues.length - 1] : null;
@@ -109,310 +88,303 @@ export default function Home() {
 
   const totalRain = useMemo(
     () => scopedWeatherData.reduce((sum, point) => sum + (point.precipitation || 0), 0),
-    [scopedWeatherData]
+    [scopedWeatherData],
   );
 
   const maxWindGust = useMemo(
     () => scopedWeatherData.reduce((max, point) => Math.max(max, point.windGusts || 0), 0),
-    [scopedWeatherData]
+    [scopedWeatherData],
   );
-
-  const peakTime = useMemo(() => {
-    if (!scopedWeatherData.length) return null;
-    const peakPoint = scopedWeatherData.reduce((max, point) => {
-      if (!max || point.temperature > max.temperature) {
-        return point;
-      }
-      return max;
-    }, null);
-
-    if (!peakPoint?.fullTime) return null;
-    return new Date(peakPoint.fullTime).toLocaleTimeString('pt-BR', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    });
-  }, [scopedWeatherData]);
-
 
   const status = useMemo(() => {
     if (totalRain >= 15 || maxWindGust >= 60) {
-      return { label: 'Risco', color: theme.palette.error.main };
+      return {
+        label: 'Risco',
+        color: theme.palette.error.main,
+        description: 'Condições críticas detectadas',
+      };
     }
     if (totalRain >= 5 || maxWindGust >= 40) {
-      return { label: 'Atenção', color: theme.palette.warning.main };
+      return {
+        label: 'Atenção',
+        color: theme.palette.warning.main,
+        description: 'Acompanhe as próximas atualizações',
+      };
     }
-    return { label: 'Seguro', color: theme.palette.success.main };
+    return {
+      label: 'Seguro',
+      color: theme.palette.success.main,
+      description: 'Sem risco elevado no momento',
+    };
   }, [totalRain, maxWindGust, theme.palette.error.main, theme.palette.success.main, theme.palette.warning.main]);
 
-  const handleFilterChange = (field) => (event) => {
-    setFilters((prev) => ({ ...prev, [field]: event.target.value }));
+  const locationLabel = {
+    gps: 'via GPS',
+    address: user?.address?.neighborhood ? `no bairro ${user.address.neighborhood}` : 'no endereço cadastrado',
+    default: `em ${cityName}`,
+  }[locationSource];
+
+  const cardBackground = theme.palette.mode === 'dark' ? '#0B0D0F' : theme.palette.background.paper;
+  const handlePeriodChange = (_, nextPeriod) => {
+    if (nextPeriod) {
+      setSelectedPeriod(nextPeriod);
+    }
   };
-
-  const handleApplyFilters = () => {
-    setAppliedFilters(filters);
-  };
-
-  const focusBorder = (metric) =>
-    appliedFilters.metric === metric
-      ? { borderColor: theme.palette.primary.main, boxShadow: '0 0 0 1px rgba(59, 130, 246, 0.2)' }
-      : {};
-
-  const rangeLabel = useMemo(() => {
-    if (appliedFilters.period === '7d') return 'Ultimos 7 dias';
-    if (appliedFilters.period === '24h') return 'Ultimas 24h';
-    if (appliedFilters.period === '12h') return 'Ultimas 12h';
-    return 'Ultimas 6h';
-  }, [appliedFilters.period]);
 
   return (
     <Box
       sx={{
-        position: 'relative',
         display: 'flex',
         flexDirection: 'column',
         gap: 3,
-        '@keyframes fadeInUp': {
-          from: { opacity: 0, transform: 'translateY(8px)' },
-          to: { opacity: 1, transform: 'translateY(0)' },
-        },
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          inset: 0,
-          background: 'radial-gradient(circle at top left, rgba(59, 130, 246, 0.12), transparent 50%)',
-          pointerEvents: 'none',
-        },
+        width: '100%',
       }}
     >
+      <Box>
+        <Text variant="h5" weight={800}>
+          Dashboard
+        </Text>
+        <Text variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
+          {loadingLocation
+            ? 'Buscando localização para o monitoramento climático em tempo real'
+            : `Monitoramento climático em tempo real ${locationLabel}`}
+        </Text>
+      </Box>
+
       <Paper
         elevation={0}
         sx={{
-          position: 'relative',
-          p: 3,
+          p: 1,
           borderRadius: 3,
           border: '1px solid',
           borderColor: 'divider',
-          background: 'linear-gradient(135deg, rgba(59,130,246,0.12), rgba(14,116,144,0.08))',
-          animation: 'fadeInUp 0.5s ease',
+          backgroundColor: cardBackground,
+          alignSelf: { xs: 'stretch', md: 'flex-start' },
         }}
       >
-        <Stack spacing={1}>
-          <Text
-            variant="h5"
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={1.25}
+          alignItems={{ xs: 'stretch', sm: 'center' }}
+        >
+          <Text variant="body2" weight={700} sx={{ color: 'text.secondary', px: { xs: 1, sm: 1.25 } }}>
+            Período
+          </Text>
+          <ToggleButtonGroup
+            exclusive
+            value={selectedPeriod}
+            onChange={handlePeriodChange}
+            aria-label="Filtro de período"
             sx={{
-              fontWeight: 700
+              display: 'grid',
+              gridTemplateColumns: { xs: 'repeat(2, minmax(0, 1fr))', sm: 'repeat(4, auto)' },
+              gap: 0.75,
+              '& .MuiToggleButtonGroup-grouped': {
+                m: 0,
+                px: 2,
+                py: 0.75,
+                minWidth: { xs: 0, sm: 72 },
+                border: '1px solid',
+                borderColor: 'divider !important',
+                borderRadius: '8px !important',
+                color: 'text.secondary',
+                textTransform: 'none',
+                fontWeight: 700,
+                '&.Mui-selected': {
+                  color: theme.palette.primary.main,
+                  backgroundColor: alpha(theme.palette.primary.main, 0.12),
+                },
+                '&.Mui-selected:hover': {
+                  backgroundColor: alpha(theme.palette.primary.main, 0.18),
+                },
+              },
             }}
           >
-            Central de Monitoramento Climatico - {cityName}
-          </Text>
-          <Text variant="body2" sx={{ color: 'text.secondary' }}>
-            {loadingLocation ? 'Buscando sua localizacao...' : locationMessage[locationSource]}
-          </Text>
-          <Text variant="body2" sx={{ color: 'text.secondary' }}>
-            {coordinates
-              ? 'Dados atualizados para a sua area de monitoramento.'
-              : 'Dados atualizados para Belo Horizonte.'}
-          </Text>
+            {PERIOD_OPTIONS.map((option) => (
+              <ToggleButton key={option.value} value={option.value} aria-label={option.summary}>
+                {option.label}
+              </ToggleButton>
+            ))}
+          </ToggleButtonGroup>
         </Stack>
       </Paper>
 
-      <Paper
-        elevation={0}
+      <Box
         sx={{
-          p: 2.5,
-          borderRadius: 3,
-          border: '1px solid',
-          borderColor: 'divider',
-          animation: 'fadeInUp 0.6s ease',
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: '1fr',
+            sm: 'repeat(2, minmax(0, 1fr))',
+            lg: 'repeat(4, minmax(0, 1fr))',
+          },
+          gap: 2,
         }}
       >
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={4}>
-            <FormControl fullWidth size="small">
-              <InputLabel id="period-filter">Periodo</InputLabel>
-              <Select
-                labelId="period-filter"
-                label="Periodo"
-                value={filters.period}
-                onChange={handleFilterChange('period')}
-              >
-                <MenuItem value="6h">Ultimas 6h</MenuItem>
-                <MenuItem value="12h">Ultimas 12h</MenuItem>
-                <MenuItem value="24h">Ultimas 24h</MenuItem>
-                <MenuItem value="7d">7 dias</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <FormControl fullWidth size="small">
-              <InputLabel id="metric-filter">Metrica</InputLabel>
-              <Select
-                labelId="metric-filter"
-                label="Metrica"
-                value={filters.metric}
-                onChange={handleFilterChange('metric')}
-              >
-                <MenuItem value="temperatura">Temperatura</MenuItem>
-                <MenuItem value="precipitacao">Precipitacao</MenuItem>
-                <MenuItem value="vento">Vento</MenuItem>
-                <MenuItem value="umidade">Umidade</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <Button
-              fullWidth
-              variant="contained"
-              onClick={handleApplyFilters}
-              sx={{ height: 40, fontWeight: 600 }}
-            >
-              Aplicar filtros
-            </Button>
-          </Grid>
-        </Grid>
-          {appliedFilters.metric === 'umidade' && (
-            <Text variant="caption" sx={{ color: 'text.secondary', mt: 1, display: 'block' }}>
-              Metrica de umidade sem grafico dedicado no momento.
-            </Text>
-          )}
-      </Paper>
+        <DashboardCard
+          title="Temperatura atual"
+          value={currentTemp !== null ? currentTemp.toFixed(1) : '--'}
+          unit="°C"
+          detail="Sensação em tempo real"
+          iconName="thermometer"
+          color={theme.palette.secondary.light}
+        />
+        <DashboardCard
+          title="Máxima e mínima"
+          value={maxTemp !== null && minTemp !== null ? `${maxTemp.toFixed(1)}° / ${minTemp.toFixed(1)}°` : '--'}
+          detail={selectedPeriodOption.summary}
+          iconName="activity"
+          color={theme.palette.primary.light}
+        />
+        <DashboardCard
+          title="Volume total de chuva"
+          value={totalRain ? totalRain.toFixed(1) : '0'}
+          unit="mm"
+          detail={selectedPeriodOption.rainSummary}
+          iconName="cloud-rain"
+          color={theme.palette.info.light}
+        />
+        <DashboardCard
+          title="Status geral"
+          value={status.label}
+          detail={status.description}
+          iconName="shield-alert"
+          color={status.color}
+          valueColor={status.color}
+        />
+      </Box>
 
-      <Grid container spacing={2} sx={{ animation: 'fadeInUp 0.7s ease' }}>
-        <Grid item xs={12} md={3}>
-          <Card elevation={0} sx={{ height: '100%', ...focusBorder('temperatura') }}>
-            <CardContent>
-              <Text variant="caption" sx={{ color: 'text.secondary' }}>
-                Temperatura atual
-              </Text>
-              <Text variant="h4" weight={700}>
-                {currentTemp !== null ? `${currentTemp.toFixed(1)}°C` : '--'}
-              </Text>
-              <Text variant="body2" sx={{ color: 'text.secondary' }}>
-                Sensacao em tempo real
-              </Text>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <Card elevation={0} sx={{ height: '100%', ...focusBorder('temperatura') }}>
-            <CardContent>
-              <Text variant="caption" sx={{ color: 'text.secondary' }}>
-                Maxima e minima
-              </Text>
-              <Text variant="h4" weight={700}>
-                {maxTemp !== null && minTemp !== null
-                  ? `${maxTemp.toFixed(1)}° / ${minTemp.toFixed(1)}°`
-                  : '--'}
-              </Text>
-              <Text variant="body2" sx={{ color: 'text.secondary' }}>
-                  {rangeLabel}
-              </Text>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <Card elevation={0} sx={{ height: '100%', ...focusBorder('precipitacao') }}>
-            <CardContent>
-              <Text variant="caption" sx={{ color: 'text.secondary' }}>
-                Volume total de chuva
-              </Text>
-              <Text variant="h4" weight={700}>
-                {totalRain ? `${totalRain.toFixed(1)} mm` : '0 mm'}
-              </Text>
-              <Text variant="body2" sx={{ color: 'text.secondary' }}>
-                Acumulado recente
-              </Text>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <Card elevation={0} sx={{ height: '100%' }}>
-            <CardContent>
-              <Text variant="caption" sx={{ color: 'text.secondary' }}>
-                Status geral
-              </Text>
-              <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 1 }}>
-                <Box
-                  sx={{
-                    width: 12,
-                    height: 12,
-                    borderRadius: '50%',
-                    backgroundColor: status.color,
-                  }}
-                />
-                <Text variant="h6" weight={700}>
-                  {status.label}
-                </Text>
-              </Stack>
-              <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
-                <Chip size="small" label="Normal" sx={{ backgroundColor: theme.palette.success.light, color: theme.palette.success.contrastText }} />
-                <Chip size="small" label="Atenção" sx={{ backgroundColor: theme.palette.warning.light, color: theme.palette.warning.contrastText }} />
-                <Chip size="small" label="Risco" sx={{ backgroundColor: theme.palette.error.light, color: theme.palette.error.contrastText }} />
-              </Stack>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-        <Grid container spacing={2} sx={{ animation: 'fadeInUp 0.8s ease' }}>
-          <Grid item xs={12} lg={6}>
-            <Paper
-              elevation={0}
-              sx={{
-                p: 3,
-                borderRadius: 3,
-                border: '1px solid',
-                borderColor: 'divider',
-                ...focusBorder('temperatura'),
-              }}
-            >
-              <WeatherChart
-                latitude={coordinates?.latitude}
-                longitude={coordinates?.longitude}
-                hoursToShow={hoursToShow}
-                period={appliedFilters.period}
-              />
-            </Paper>
-          </Grid>
-          <Grid item xs={12} lg={6}>
-            <Paper
-              elevation={0}
-              sx={{
-                p: 3,
-                borderRadius: 3,
-                border: '1px solid',
-                borderColor: 'divider',
-                ...focusBorder('precipitacao'),
-              }}
-            >
-              <PrecipitationChart
-                latitude={coordinates?.latitude}
-                longitude={coordinates?.longitude}
-                hoursToShow={hoursToShow}
-                period={appliedFilters.period}
-              />
-            </Paper>
-          </Grid>
-          <Grid item xs={12} lg={6}>
-            <Paper
-              elevation={0}
-              sx={{
-                p: 3,
-                borderRadius: 3,
-                border: '1px solid',
-                borderColor: 'divider',
-                ...focusBorder('vento'),
-              }}
-            >
-              <WindChart
-                latitude={coordinates?.latitude}
-                longitude={coordinates?.longitude}
-                hoursToShow={hoursToShow}
-                period={appliedFilters.period}
-              />
-            </Paper>
-          </Grid>
-        </Grid>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', lg: 'repeat(2, minmax(0, 1fr))' },
+          gap: 3,
+        }}
+      >
+        <ChartPanel background={cardBackground}>
+          <WeatherChart
+            latitude={coordinates?.latitude}
+            longitude={coordinates?.longitude}
+            hoursToShow={hoursToShow}
+            period={selectedPeriod}
+          />
+        </ChartPanel>
+
+        <ChartPanel background={cardBackground}>
+          <PrecipitationChart
+            latitude={coordinates?.latitude}
+            longitude={coordinates?.longitude}
+            hoursToShow={hoursToShow}
+            period={selectedPeriod}
+          />
+        </ChartPanel>
+
+        <ChartPanel background={cardBackground}>
+          <WindChart
+            latitude={coordinates?.latitude}
+            longitude={coordinates?.longitude}
+            hoursToShow={hoursToShow}
+            period={selectedPeriod}
+          />
+        </ChartPanel>
+      </Box>
     </Box>
+  );
+}
+
+function DashboardCard({ title, value, unit, detail, iconName, color, valueColor }) {
+  const theme = useTheme();
+
+  return (
+    <Card
+      elevation={0}
+      sx={{
+        minHeight: 186,
+        borderRadius: 3,
+        border: '1px solid',
+        borderColor: 'divider',
+        backgroundImage: 'none',
+        backgroundColor: theme.palette.mode === 'dark' ? '#0B0D0F' : theme.palette.background.paper,
+      }}
+    >
+      <CardContent
+        sx={{
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 2,
+          p: { xs: 2.5, md: 3 },
+          '&:last-child': { pb: { xs: 2.5, md: 3 } },
+        }}
+      >
+        <Box sx={{ minWidth: 0 }}>
+          <Text variant="body2" sx={{ color: 'text.secondary', mb: 1.25 }}>
+            {title}
+          </Text>
+          <Stack direction="row" spacing={0.75} alignItems="baseline" sx={{ minWidth: 0 }}>
+            <Text
+              variant="h4"
+              weight={800}
+              sx={{
+                color: valueColor || 'text.primary',
+                lineHeight: 1,
+                overflowWrap: 'anywhere',
+              }}
+            >
+              {value}
+            </Text>
+            {unit && (
+              <Text variant="body2" weight={700} sx={{ color: 'text.primary' }}>
+                {unit}
+              </Text>
+            )}
+          </Stack>
+          <Text
+            variant="caption"
+            sx={{
+              color: 'text.secondary',
+              display: 'block',
+              mt: 1.5,
+            }}
+          >
+            {detail}
+          </Text>
+        </Box>
+
+        <Box
+          sx={{
+            width: 44,
+            height: 44,
+            borderRadius: 2,
+            display: 'grid',
+            placeItems: 'center',
+            color,
+            backgroundColor: alpha(color, 0.12),
+            flexShrink: 0,
+          }}
+        >
+          <Icon name={iconName} size={22} />
+        </Box>
+      </CardContent>
+    </Card>
+  );
+}
+
+function ChartPanel({ children, background }) {
+  return (
+    <Paper
+      elevation={0}
+      sx={{
+        minWidth: 0,
+        p: { xs: 2, md: 3 },
+        borderRadius: 3,
+        border: '1px solid',
+        borderColor: 'divider',
+        backgroundColor: background,
+        overflow: 'hidden',
+      }}
+    >
+      {children}
+    </Paper>
   );
 }
