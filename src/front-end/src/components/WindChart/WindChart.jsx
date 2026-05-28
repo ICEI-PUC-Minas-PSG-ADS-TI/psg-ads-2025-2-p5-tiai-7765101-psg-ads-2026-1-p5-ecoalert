@@ -76,12 +76,10 @@ export function WindChart({ latitude, longitude, hoursToShow = 24, period = '24h
           margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
         >
           <defs>
-            {/* Gradiente para Velocidade Média */}
             <linearGradient id="windGradient" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor={chartColors.primary} stopOpacity={0.3} />
               <stop offset="95%" stopColor={chartColors.primary} stopOpacity={0} />
             </linearGradient>
-            {/* Gradiente para Rajadas */}
             <linearGradient id="gustGradient" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor={chartColors.warning} stopOpacity={0.2} />
               <stop offset="95%" stopColor={chartColors.warning} stopOpacity={0} />
@@ -124,7 +122,6 @@ export function WindChart({ latitude, longitude, hoursToShow = 24, period = '24h
           
           <Legend wrapperStyle={{ paddingTop: "20px", color: chartColors.text }} />
 
-          {/* Área de Rajadas*/}
           <Area
             type="monotone"
             dataKey="windGusts"
@@ -136,7 +133,6 @@ export function WindChart({ latitude, longitude, hoursToShow = 24, period = '24h
             dot={false}
           />
 
-          {/* Área de Velocidade Média*/}
           <Area
             type="monotone"
             dataKey="windSpeed"
