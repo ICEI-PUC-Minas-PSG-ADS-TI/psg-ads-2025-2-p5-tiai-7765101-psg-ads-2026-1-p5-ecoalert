@@ -323,7 +323,7 @@ function DashboardCard({ title, value, unit, detail, iconName, color, valueColor
           </Text>
           <Stack direction="row" spacing={0.75} alignItems="baseline" sx={{ minWidth: 0 }}>
             <Text
-              variant="h4"
+              variant="h5"
               weight={800}
               sx={{
                 color: valueColor || 'text.primary',
