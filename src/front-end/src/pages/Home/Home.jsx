@@ -167,45 +167,53 @@ export default function Home() {
           spacing={1.25}
           alignItems={{ xs: 'stretch', sm: 'center' }}
         >
-          <Text variant="body2" weight={700} sx={{ color: 'text.secondary', px: { xs: 1, sm: 1.25 } }}>
-            Período
-          </Text>
-          <ToggleButtonGroup
-            exclusive
-            value={selectedPeriod}
-            onChange={handlePeriodChange}
-            aria-label="Filtro de período"
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: { xs: 'repeat(2, minmax(0, 1fr))', sm: 'repeat(4, auto)' },
-              gap: 0.75,
-              '& .MuiToggleButtonGroup-grouped': {
-                m: 0,
-                px: 2,
-                py: 0.75,
-                minWidth: { xs: 0, sm: 72 },
-                border: '1px solid',
-                borderColor: 'divider !important',
-                borderRadius: '8px !important',
-                color: 'text.secondary',
-                textTransform: 'none',
-                fontWeight: 700,
-                '&.Mui-selected': {
-                  color: theme.palette.primary.main,
-                  backgroundColor: alpha(theme.palette.primary.main, 0.12),
+          <div style={{display: 'flex', alignItems: 'center',gap: '16px',flexDirection: 'row'}}>
+            <Text 
+              variant="body2" 
+              weight={700} 
+              sx={{ 
+                color: 'text.secondary', 
+                px: { xs: 1, sm: 1.25 },
+              }}>
+              Período
+            </Text>
+            <ToggleButtonGroup
+              exclusive
+              value={selectedPeriod}
+              onChange={handlePeriodChange}
+              aria-label="Filtro de período"
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: { xs: 'repeat(2, minmax(0, 1fr))', sm: 'repeat(4, auto)' },
+                gap: 0.75,
+                '& .MuiToggleButtonGroup-grouped': {
+                  m: 0,
+                  px: 2,
+                  py: 0.75,
+                  minWidth: { xs: 0, sm: 72 },
+                  border: '1px solid',
+                  borderColor: 'divider !important',
+                  borderRadius: '8px !important',
+                  color: 'text.secondary',
+                  textTransform: 'none',
+                  fontWeight: 700,
+                  '&.Mui-selected': {
+                    color: theme.palette.primary.main,
+                    backgroundColor: alpha(theme.palette.primary.main, 0.12),
+                  },
+                  '&.Mui-selected:hover': {
+                    backgroundColor: alpha(theme.palette.primary.main, 0.18),
+                  },
                 },
-                '&.Mui-selected:hover': {
-                  backgroundColor: alpha(theme.palette.primary.main, 0.18),
-                },
-              },
-            }}
-          >
-            {PERIOD_OPTIONS.map((option) => (
-              <ToggleButton key={option.value} value={option.value} aria-label={option.summary}>
-                {option.label}
-              </ToggleButton>
-            ))}
-          </ToggleButtonGroup>
+              }}
+            >
+              {PERIOD_OPTIONS.map((option) => (
+                <ToggleButton key={option.value} value={option.value} aria-label={option.summary}>
+                  {option.label}
+                </ToggleButton>
+              ))}
+            </ToggleButtonGroup>
+          </div>
         </Stack>
       </Paper>
 
