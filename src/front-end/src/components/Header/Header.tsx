@@ -90,9 +90,14 @@ export function Header({ onOpenSidebar }: HeaderProps) {
             </Badge>
           </HeaderIconButton>
         </Tooltip>
+        <Tooltip title="Conta">
+          <HeaderIconButton aria-label="Conta">
+            <Icon size={24} name={"user"} />
+          </HeaderIconButton>
+        </Tooltip>
         <Tooltip title="Sair">
           <HeaderIconButton aria-label="Sair" onClick={handleLogout}>
-            <UserAvatar>{initials}</UserAvatar>
+            <Icon size={24} name={"log-out"} />
           </HeaderIconButton>
         </Tooltip>
       </ButtonsContainer>
