@@ -2,6 +2,7 @@
 
 import { useTheme } from "@/hooks/useTheme";
 import { Badge, Tooltip } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 import {
   BrandContainer,
@@ -24,6 +25,8 @@ interface HeaderProps {
 }
 
 export function Header({ onOpenSidebar }: HeaderProps) {
+  const navigate = useNavigate();
+
   const [snackBar, setSnackBar] = useState<IFlashMessage>({
     open: false,
     message: "",
@@ -90,9 +93,14 @@ export function Header({ onOpenSidebar }: HeaderProps) {
             </Badge>
           </HeaderIconButton>
         </Tooltip>
+        <Tooltip title="Conta">
+          <HeaderIconButton aria-label="Conta" onClick={()=> navigate("/conta")}>
+            <Icon size={24} name={"user"} />
+          </HeaderIconButton>
+        </Tooltip>
         <Tooltip title="Sair">
           <HeaderIconButton aria-label="Sair" onClick={handleLogout}>
-            <UserAvatar>{initials}</UserAvatar>
+            <Icon size={24} name={"log-out"} />
           </HeaderIconButton>
         </Tooltip>
       </ButtonsContainer>
