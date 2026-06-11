@@ -31,3 +31,13 @@ export async function me(req: AuthRequest, res: Response) {
 
     return res.json(await UserService.findById(userId));
 }
+
+export async function updateMe(req: AuthRequest, res: Response) {
+    const userId = req.user?.userId;
+
+    if (!userId) {
+        throw new AppError("Token inválido", 401, "Invalid token");
+    }
+
+    return res.json(await UserService.update(userId, req.body));
+}

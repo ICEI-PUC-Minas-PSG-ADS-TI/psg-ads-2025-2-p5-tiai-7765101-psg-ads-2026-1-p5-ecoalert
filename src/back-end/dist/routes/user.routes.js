@@ -9,4 +9,5 @@ const userRoutes = (0, express_1.Router)();
 exports.userRoutes = userRoutes;
 userRoutes.get("/", (0, errorHandler_1.errorHandler)(user_controller_1.getUsers));
 userRoutes.get("/me", auth_middleware_1.authMiddleware, (0, errorHandler_1.errorHandler)(user_controller_1.me));
+userRoutes.patch("/me", auth_middleware_1.authMiddleware, (0, errorHandler_1.errorHandler)(user_controller_1.updateMe));
 userRoutes.get("/:id", (0, errorHandler_1.errorHandler)(user_controller_1.getUserById));

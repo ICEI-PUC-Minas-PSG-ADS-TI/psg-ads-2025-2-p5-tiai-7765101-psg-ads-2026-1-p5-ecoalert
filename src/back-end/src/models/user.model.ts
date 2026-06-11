@@ -41,3 +41,13 @@ export interface CreateUserDto {
   role?: UserRole
   address?: Address
 }
+
+export interface UpdateUserDto {
+  name?: string
+  lastName?: string
+  email?: string
+  cpf?: string
+  phone?: Phone
+  address?: Address
+  currentPassword: string
+}

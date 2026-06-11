@@ -1,6 +1,7 @@
 import { prisma } from "@/config/database"
 import {
   CreateUserDto,
+  UpdateUserDto,
   UserEntity,
   UserEntityWithoutPassword,
   UserWithoutPassword
@@ -58,6 +59,13 @@ export class UserRepository {
     })
   }
 
+  async findEntityById(id: string): Promise<UserEntity | null> {
+    return prisma.user.findUnique({
+      where: { id },
+      include: { address: true }
+    }) as Promise<UserEntity | null>
+  }
+
   async findById(id: string): Promise<UserWithoutPassword | null> {
     const userEntity = await prisma.user.findUnique({
       where: { id },
@@ -83,6 +91,58 @@ export class UserRepository {
     };
 
     return user;
+  }
+
+  async update(id: string, data: Omit<UpdateUserDto, "currentPassword">): Promise<UserWithoutPassword> {
+    const formattedPhone = data.phone
+      ? `${data.phone.ddd}${data.phone.number}`
+      : undefined;
+
+    const addressData = data.address
+      ? {
+          cep: data.address.cep,
+          street: data.address.street,
+          neighborhood: data.address.neighborhood,
+          city: data.address.city,
+          state: data.address.state ?? null,
+          number: data.address.number
+        }
+      : undefined;
+
+    const updatedUser = await prisma.user.update({
+      where: { id },
+      data: {
+        ...(data.name && { name: data.name }),
+        ...(data.lastName && { lastName: data.lastName }),
+        ...(data.email && { email: data.email }),
+        ...(data.cpf && { cpf: data.cpf }),
+        ...(formattedPhone && { phone: formattedPhone }),
+        ...(addressData && {
+          address: {
+            upsert: {
+              create: addressData,
+              update: addressData
+            }
+          }
+        })
+      },
+      select: {
+        id: true,
+        name: true,
+        lastName: true,
+        email: true,
+        cpf: true,
+        phone: true,
+        role: true,
+        address: true
+      }
+    });
+
+    return {
+      ...updatedUser,
+      phone: parsePhone(updatedUser.phone),
+      address: updatedUser.address ?? undefined
+    };
   }
 
   async delete(id: string) {

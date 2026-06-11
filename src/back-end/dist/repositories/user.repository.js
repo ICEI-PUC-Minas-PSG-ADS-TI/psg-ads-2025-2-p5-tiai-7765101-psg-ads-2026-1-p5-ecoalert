@@ -47,6 +47,12 @@ class UserRepository {
             include: { address: true }
         });
     }
+    async findEntityById(id) {
+        return database_1.prisma.user.findUnique({
+            where: { id },
+            include: { address: true }
+        });
+    }
     async findById(id) {
         const userEntity = await database_1.prisma.user.findUnique({
             where: { id },
@@ -69,6 +75,54 @@ class UserRepository {
             address: userEntity.address ?? undefined
         };
         return user;
+    }
+    async update(id, data) {
+        const formattedPhone = data.phone
+            ? `${data.phone.ddd}${data.phone.number}`
+            : undefined;
+        const addressData = data.address
+            ? {
+                cep: data.address.cep,
+                street: data.address.street,
+                neighborhood: data.address.neighborhood,
+                city: data.address.city,
+                state: data.address.state ?? null,
+                number: data.address.number
+            }
+            : undefined;
+        const updatedUser = await database_1.prisma.user.update({
+            where: { id },
+            data: {
+                ...(data.name && { name: data.name }),
+                ...(data.lastName && { lastName: data.lastName }),
+                ...(data.email && { email: data.email }),
+                ...(data.cpf && { cpf: data.cpf }),
+                ...(formattedPhone && { phone: formattedPhone }),
+                ...(addressData && {
+                    address: {
+                        upsert: {
+                            create: addressData,
+                            update: addressData
+                        }
+                    }
+                })
+            },
+            select: {
+                id: true,
+                name: true,
+                lastName: true,
+                email: true,
+                cpf: true,
+                phone: true,
+                role: true,
+                address: true
+            }
+        });
+        return {
+            ...updatedUser,
+            phone: (0, formatter_1.parsePhone)(updatedUser.phone),
+            address: updatedUser.address ?? undefined
+        };
     }
     async delete(id) {
         return database_1.prisma.user.delete({

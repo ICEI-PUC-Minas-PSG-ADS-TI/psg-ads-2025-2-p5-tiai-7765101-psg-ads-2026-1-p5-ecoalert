@@ -18,10 +18,13 @@ const DRAWER_WIDTH = 248;
 
 export const StyledDrawer = styled(Drawer)(({ theme }) => ({
   width: DRAWER_WIDTH,
+  height: '100%',
   flexShrink: 0,
   
   '& .MuiDrawer-paper': {
     width: DRAWER_WIDTH,
+    height: '100%',
+    display: 'flex',
     boxSizing: 'border-box',
     backgroundColor: theme.palette.mode === 'dark' ? '#050607' : theme.palette.background.paper, 
     borderRight: `1px solid ${theme.palette.divider}`,

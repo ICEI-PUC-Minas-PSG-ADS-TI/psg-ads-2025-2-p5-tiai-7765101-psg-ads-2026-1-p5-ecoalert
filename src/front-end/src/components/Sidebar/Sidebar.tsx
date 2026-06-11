@@ -20,7 +20,7 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
   const { pathname } = useLocation();
 
   const drawerContent = (
-    <>
+    <Box sx={{ height: "100%", display: "flex", flexDirection: "column", overflow: "hidden" }}>
       <Box sx={{ overflowY: "auto", flex: 1, py: 2 }}>
         <List disablePadding>
           <NavItem
@@ -55,19 +55,19 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
 
         <List disablePadding sx={{ mt: 1 }}>
           <NavItem
-            href="/settings"
-            iconName="settings"
-            label="Configurações"
+            href="/conta"
+            iconName="user"
+            label="Minha Conta"
             currentPath={pathname}
             onClick={onClose}
           />
         </List>
       </Box>
-    </>
+    </Box>
   );
 
   return (
-    <Box component="nav">
+    <Box component="nav" sx={{ height: "100%", flexShrink: 0 }}>
       <StyledDrawer
         variant="temporary"
         open={mobileOpen}
@@ -86,9 +86,11 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
         variant="permanent"
         sx={{
           display: { xs: "none", md: "block" },
+          height: "100%",
           "& .MuiDrawer-paper": {
             position: "relative",
             height: "100%",
+            minHeight: 0,
           },
         }}
       >

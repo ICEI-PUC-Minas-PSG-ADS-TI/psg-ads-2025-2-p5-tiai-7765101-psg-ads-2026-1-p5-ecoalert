@@ -47,5 +47,40 @@ class UserService {
         }
         return user;
     }
+    static async update(id, data) {
+        const user = await repository.findEntityById(id);
+        if (!user) {
+            throw new error_1.AppError("Usuário não encontrado", 404, "User not found");
+        }
+        if (!data.currentPassword) {
+            throw new error_1.AppError("Senha atual obrigatória", 400, "Current password required", {
+                currentPassword: "Informe sua senha atual para confirmar a edição"
+            });
+        }
+        const passwordMatches = await crypto_service_1.CryptoService.verifyPassword(data.currentPassword, user.password);
+        if (!passwordMatches) {
+            throw new error_1.AppError("Senha atual inválida", 401, "Invalid current password", {
+                currentPassword: "Senha atual inválida"
+            });
+        }
+        const errorFields = {};
+        if (data.email && data.email !== user.email) {
+            const userByEmail = await repository.findByEmail(data.email);
+            if (userByEmail && userByEmail.id !== id) {
+                errorFields.email = "Já existe um usuário cadastrado com este e-mail";
+            }
+        }
+        if (data.cpf && data.cpf !== user.cpf) {
+            const userByCpf = await repository.findByCpf(data.cpf);
+            if (userByCpf && userByCpf.id !== id) {
+                errorFields.cpf = "Já existe um usuário cadastrado com este CPF";
+            }
+        }
+        if (Object.keys(errorFields).length > 0) {
+            throw new error_1.AppError("Dados já cadastrados", 400, "User already exists", errorFields);
+        }
+        const { currentPassword, ...updateData } = data;
+        return repository.update(id, updateData);
+    }
 }
 exports.UserService = UserService;

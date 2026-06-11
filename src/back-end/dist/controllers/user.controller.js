@@ -4,6 +4,7 @@ exports.getUsers = getUsers;
 exports.createUser = createUser;
 exports.getUserById = getUserById;
 exports.me = me;
+exports.updateMe = updateMe;
 const user_service_1 = require("@/services/user.service");
 const error_1 = require("@/types/error");
 async function getUsers(req, res) {
@@ -23,4 +24,11 @@ async function me(req, res) {
         throw new error_1.AppError("Token inválido", 401, "Invalid token");
     }
     return res.json(await user_service_1.UserService.findById(userId));
+}
+async function updateMe(req, res) {
+    const userId = req.user?.userId;
+    if (!userId) {
+        throw new error_1.AppError("Token inválido", 401, "Invalid token");
+    }
+    return res.json(await user_service_1.UserService.update(userId, req.body));
 }
