@@ -10,6 +10,7 @@ import { WindChart } from '@/components/WindChart/WindChart';
 import { useAuth } from '@/hooks/useAuth';
 import { useWeather } from '@/hooks/useWeather';
 import { getCoordinatesFromAddress, requestGeolocation } from '@/services/geolocationService';
+import { prepareWeatherDataForPeriod } from '@/utils/weatherPeriods';
 
 const PERIOD_OPTIONS = [
   { value: '6h', label: '6h', hours: 6, summary: 'Últimas 6h', rainSummary: 'Acumulado nas últimas 6h' },
@@ -26,7 +27,12 @@ export default function Home() {
   const [loadingLocation, setLoadingLocation] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState('24h');
 
-  const { data: weatherData } = useWeather(
+  const {
+    data: weatherData,
+    loading: weatherLoading,
+    error: weatherError,
+    refetch: refetchWeather,
+  } = useWeather(
     coordinates?.latitude,
     coordinates?.longitude,
     selectedPeriod,
@@ -70,11 +76,10 @@ export default function Home() {
 
   const cityName = user?.address?.city || 'Belo Horizonte';
   const selectedPeriodOption = PERIOD_OPTIONS.find((option) => option.value === selectedPeriod) || PERIOD_OPTIONS[2];
-  const hoursToShow = selectedPeriodOption.hours;
 
   const scopedWeatherData = useMemo(
-    () => weatherData.slice(-Math.min(hoursToShow, weatherData.length || hoursToShow)),
-    [hoursToShow, weatherData],
+    () => prepareWeatherDataForPeriod(weatherData, selectedPeriod),
+    [selectedPeriod, weatherData],
   );
 
   const temperatureValues = useMemo(
@@ -270,27 +275,30 @@ export default function Home() {
       >
         <ChartPanel background={cardBackground}>
           <WeatherChart
-            latitude={coordinates?.latitude}
-            longitude={coordinates?.longitude}
-            hoursToShow={hoursToShow}
+            data={scopedWeatherData}
+            loading={weatherLoading}
+            error={weatherError}
+            onRetry={() => refetchWeather()}
             period={selectedPeriod}
           />
         </ChartPanel>
 
         <ChartPanel background={cardBackground}>
           <PrecipitationChart
-            latitude={coordinates?.latitude}
-            longitude={coordinates?.longitude}
-            hoursToShow={hoursToShow}
+            data={scopedWeatherData}
+            loading={weatherLoading}
+            error={weatherError}
+            onRetry={() => refetchWeather()}
             period={selectedPeriod}
           />
         </ChartPanel>
 
         <ChartPanel background={cardBackground}>
           <WindChart
-            latitude={coordinates?.latitude}
-            longitude={coordinates?.longitude}
-            hoursToShow={hoursToShow}
+            data={scopedWeatherData}
+            loading={weatherLoading}
+            error={weatherError}
+            onRetry={() => refetchWeather()}
             period={selectedPeriod}
           />
         </ChartPanel>

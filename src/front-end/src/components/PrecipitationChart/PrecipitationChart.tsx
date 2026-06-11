@@ -11,25 +11,26 @@ import {
   ResponsiveContainer,
   ReferenceLine,
 } from "recharts";
-import { usePrecipitation } from "../../hooks/usePrecipitation";
 import { Text } from "../Text/Text";
 import { LoadingSpinner } from "../LoadingSpinner/LoadingSpinner";
+import { getWeatherPeriodLabel } from "@/utils/weatherPeriods";
 
 interface PrecipitationChartProps {
-  latitude?: number | null;
-  longitude?: number | null;
-  hoursToShow?: number;
+  data?: any[];
+  loading?: boolean;
+  error?: string | null;
+  onRetry?: () => void;
   period?: string;
 }
 
 export function PrecipitationChart({
-  latitude,
-  longitude,
-  hoursToShow = 24,
-  period = '24h'
+  data = [],
+  loading = false,
+  error = null,
+  onRetry,
+  period = "24h",
 }: PrecipitationChartProps) {
   const theme = useTheme();
-  const { data, loading, error, refetch } = usePrecipitation(latitude, longitude, period);
 
   const chartColors = {
     text: theme.palette.text.primary,
@@ -64,23 +65,44 @@ export function PrecipitationChart({
         <Typography color="error" variant="h6">
           Erro ao carregar dados: {error}
         </Typography>
-        <button onClick={refetch} style={{ marginTop: "1rem" }}>
+        <button onClick={onRetry} style={{ marginTop: "1rem" }}>
           Tentar novamente
         </button>
       </Box>
     );
   }
 
-  const safeHours = Math.min(hoursToShow, data.length || hoursToShow);
-  const displayData = data.slice(-safeHours);
+  const displayData = data;
+
+  if (displayData.length === 0) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: 320,
+          borderRadius: 2,
+          border: "1px dashed",
+          borderColor: "divider",
+          backgroundColor: "background.default",
+        }}
+      >
+        <Text variant="body2" sx={{ color: "text.secondary" }}>
+          Sem dados para o período selecionado
+        </Text>
+      </Box>
+    );
+  }
+
   const totalPrecipitation = displayData.reduce((sum, point) => sum + (point.precipitation || 0), 0);
-  const rangeLabel = hoursToShow >= 24 ? "Ultimas 24 horas" : `Ultimas ${hoursToShow} horas`;
+  const rangeLabel = getWeatherPeriodLabel(period);
 
   return (
     <Box>
       <Box sx={{ mb: 3 }}>
         <Text variant="body2" sx={{ fontWeight: 600 }}>
-          Precipitacao ({rangeLabel})
+          Precipitação ({rangeLabel})
         </Text>
         <Text variant="caption" sx={{ color: "text.secondary" }}>
           Volume acumulado: {totalPrecipitation.toFixed(1)} mm
@@ -115,13 +137,13 @@ export function PrecipitationChart({
               vertical={false}
             />
             <XAxis
-              dataKey="time"
+              dataKey="label"
               tick={{ fill: chartColors.text, fontSize: 12 }}
               axisLine={{ stroke: chartColors.text }}
             />
             <YAxis
               label={{
-                value: "Precipitacao (mm)",
+                value: "Precipitação (mm)",
                 angle: -90,
                 position: "insideLeft",
                 fill: chartColors.text,
@@ -153,7 +175,7 @@ export function PrecipitationChart({
               stroke={chartColors.warning}
               strokeDasharray="5 5"
               strokeWidth={2}
-              name="Nivel de Alerta"
+              name="Nível de alerta"
               label={{
                 value: `Alerta: ${ALERT_LEVEL}mm`,
                 position: "top",
@@ -167,7 +189,7 @@ export function PrecipitationChart({
               stroke={chartColors.error}
               strokeDasharray="5 5"
               strokeWidth={2}
-              name="Nivel de Perigo"
+              name="Nível de perigo"
               label={{
                 value: `Perigo: ${DANGER_LEVEL}mm`,
                 position: "top",
@@ -179,7 +201,7 @@ export function PrecipitationChart({
             <Bar
               dataKey="precipitation"
               fill={chartColors.bar}
-              name="Precipitacao"
+              name="Precipitação"
               radius={[8, 8, 0, 0]}
             />
           </BarChart>

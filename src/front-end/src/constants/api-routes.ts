@@ -7,7 +7,8 @@ export const routes = {
   users: {
     list: "/users",
     create: "/users/create", 
-    get: "/users",       
+    get: "/users",
+    me: "/users/me",
     products: "/users/products",
     costumers: "/users/costumers",
     orders: "/users/orders",

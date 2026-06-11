@@ -2,9 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.userRoutes = void 0;
 const user_controller_1 = require("@/controllers/user.controller");
+const auth_middleware_1 = require("@/middlewares/auth.middleware");
 const errorHandler_1 = require("@/utils/errorHandler");
 const express_1 = require("express");
 const userRoutes = (0, express_1.Router)();
 exports.userRoutes = userRoutes;
 userRoutes.get("/", (0, errorHandler_1.errorHandler)(user_controller_1.getUsers));
+userRoutes.get("/me", auth_middleware_1.authMiddleware, (0, errorHandler_1.errorHandler)(user_controller_1.me));
 userRoutes.get("/:id", (0, errorHandler_1.errorHandler)(user_controller_1.getUserById));

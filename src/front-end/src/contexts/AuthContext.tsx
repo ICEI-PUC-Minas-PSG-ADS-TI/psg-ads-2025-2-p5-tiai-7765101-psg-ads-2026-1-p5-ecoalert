@@ -35,7 +35,7 @@ export const AuthContextProvider = ({ children }: AuthProviderProps) => {
 
   async function loadUser() {
     try {
-      const response = await api.get(routes.users.get);
+      const response = await api.get(routes.users.me);
       setUser(response.data);
     } catch (error) {
       setUser(null);
@@ -58,7 +58,6 @@ export const AuthContextProvider = ({ children }: AuthProviderProps) => {
       navigate("/home?login=true");
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.data) {
-        console.log(error.response.data);
         throw new ApiError(error.response.data);
       }
 

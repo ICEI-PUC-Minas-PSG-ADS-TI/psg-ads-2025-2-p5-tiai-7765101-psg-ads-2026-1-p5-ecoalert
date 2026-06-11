@@ -10,14 +10,19 @@ import {
   AreaChart,
   Area,
 } from "recharts";
-import { useWeather } from "../../hooks/useWeather";
 import { Text } from "../Text/Text";
 import { LoadingSpinner } from "../LoadingSpinner/LoadingSpinner";
+import { getWeatherPeriodLabel } from "@/utils/weatherPeriods";
 
 
-export function WindChart({ latitude, longitude, hoursToShow = 24, period = '24h' }) {
+export function WindChart({
+  data = [],
+  loading = false,
+  error = null,
+  onRetry,
+  period = "24h",
+}) {
   const theme = useTheme();
-  const { data, loading, error, refetch } = useWeather(latitude, longitude, period);
 
   const chartColors = {
     text: theme.palette.text.primary,
@@ -48,16 +53,37 @@ export function WindChart({ latitude, longitude, hoursToShow = 24, period = '24h
         <Typography color="error" variant="h6">
           Erro ao carregar ventos: {error}
         </Typography>
-        <button onClick={refetch} style={{ marginTop: "1rem" }}>
+        <button onClick={onRetry} style={{ marginTop: "1rem" }}>
           Tentar novamente
         </button>
       </Box>
     );
   }
 
-  const safeHours = Math.min(hoursToShow, data.length || hoursToShow);
-  const displayData = data.slice(-safeHours);
-  const rangeLabel = hoursToShow >= 24 ? "Ultimas 24 horas" : `Ultimas ${hoursToShow} horas`;
+  const displayData = data;
+
+  if (displayData.length === 0) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: 320,
+          borderRadius: 2,
+          border: "1px dashed",
+          borderColor: "divider",
+          backgroundColor: "background.default",
+        }}
+      >
+        <Text variant="body2" sx={{ color: "text.secondary" }}>
+          Sem dados para o período selecionado
+        </Text>
+      </Box>
+    );
+  }
+
+  const rangeLabel = getWeatherPeriodLabel(period);
 
   return (
     <Box>
@@ -93,7 +119,7 @@ export function WindChart({ latitude, longitude, hoursToShow = 24, period = '24h
           />
           
           <XAxis
-            dataKey="time"
+            dataKey="label"
             tick={{ fill: chartColors.text, fontSize: 12 }}
             axisLine={{ stroke: chartColors.text }}
           />
@@ -117,7 +143,7 @@ export function WindChart({ latitude, longitude, hoursToShow = 24, period = '24h
               color: chartColors.text,
             }}
             labelStyle={{ color: chartColors.text }}
-            formatter={(value) => `${value.toFixed(1)} km/h`}
+            formatter={(value) => (typeof value === "number" ? `${value.toFixed(1)} km/h` : value)}
           />
           
           <Legend wrapperStyle={{ paddingTop: "20px", color: chartColors.text }} />

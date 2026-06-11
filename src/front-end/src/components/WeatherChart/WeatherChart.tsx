@@ -11,21 +11,27 @@ import {
   Area,
   ReferenceDot,
 } from "recharts";
-import { useWeather } from "../../hooks/useWeather";
 import { Text } from "../Text/Text";
 import "./style.css";
 import { LoadingSpinner } from "../LoadingSpinner/LoadingSpinner";
+import { getWeatherPeriodLabel } from "@/utils/weatherPeriods";
 
 interface WeatherChartProps {
-  latitude?: number | null;
-  longitude?: number | null;
-  hoursToShow?: number;
+  data?: any[];
+  loading?: boolean;
+  error?: string | null;
+  onRetry?: () => void;
   period?: string;
 }
 
-export function WeatherChart({ latitude, longitude, hoursToShow = 24, period = '24h' }: WeatherChartProps) {
+export function WeatherChart({
+  data = [],
+  loading = false,
+  error = null,
+  onRetry,
+  period = "24h",
+}: WeatherChartProps) {
   const theme = useTheme();
-  const { data, loading, error, refetch } = useWeather(latitude, longitude, period);
 
   const chartColors = {
     text: theme.palette.text.primary,
@@ -55,22 +61,48 @@ export function WeatherChart({ latitude, longitude, hoursToShow = 24, period = '
         <Typography color="error" variant="h6">
           Erro ao carregar dados: {error}
         </Typography>
-        <button onClick={refetch} style={{ marginTop: "1rem" }}>
+        <button onClick={onRetry} style={{ marginTop: "1rem" }}>
           Tentar novamente
         </button>
       </Box>
     );
   }
 
-  const safeHours = Math.min(hoursToShow, data.length || hoursToShow);
-  const displayData = data.slice(-safeHours);
+  const displayData = data;
+
+  if (displayData.length === 0) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: 320,
+          borderRadius: 2,
+          border: "1px dashed",
+          borderColor: "divider",
+          backgroundColor: "background.default",
+        }}
+      >
+        <Text variant="body2" sx={{ color: "text.secondary" }}>
+          Sem dados para o período selecionado
+        </Text>
+      </Box>
+    );
+  }
+
   const peakPoint = displayData.reduce((max, point) => {
+    if (typeof point.temperature !== "number") {
+      return max;
+    }
+
     if (!max || point.temperature > max.temperature) {
       return point;
     }
+
     return max;
   }, null);
-  const rangeLabel = hoursToShow >= 24 ? "Ultimas 24 horas" : `Ultimas ${hoursToShow} horas`;
+  const rangeLabel = getWeatherPeriodLabel(period);
 
   return (
     <Box>
@@ -105,7 +137,7 @@ export function WeatherChart({ latitude, longitude, hoursToShow = 24, period = '
             vertical={false}
           />
           <XAxis
-            dataKey="time"
+            dataKey="label"
             tick={{ fill: chartColors.text, fontSize: 12 }}
             axisLine={{ stroke: chartColors.text }}
           />
@@ -128,7 +160,7 @@ export function WeatherChart({ latitude, longitude, hoursToShow = 24, period = '
               boxShadow: "0 12px 30px rgba(15, 23, 42, 0.12)",
             }}
             labelStyle={{ color: chartColors.text }}
-            formatter={(value) => `${value.toFixed(1)}°C`}
+            formatter={(value) => (typeof value === "number" ? `${value.toFixed(1)}°C` : value)}
           />
           <Legend
             wrapperStyle={{ paddingTop: "20px", color: chartColors.text }}
@@ -144,7 +176,7 @@ export function WeatherChart({ latitude, longitude, hoursToShow = 24, period = '
           />
           {peakPoint && (
             <ReferenceDot
-              x={peakPoint.time}
+              x={peakPoint.label}
               y={peakPoint.temperature}
               r={6}
               fill={chartColors.line}

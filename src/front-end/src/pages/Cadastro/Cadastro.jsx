@@ -1,50 +1,65 @@
-import { Link } from "react-router-dom"
+import { Box } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
-import { createUser } from "@/services/userService"
-import { useCadastro } from "@/hooks/useCadastro"
 import { Button } from "@/components/Button/Button";
-import { Input } from "@/components/Input/Input";
 import { RegisterForm } from "@/components/RegisterForm/RegisterForm";
+import { Text } from "@/components/Text/Text";
 
-export default function Cadastro(){
+export default function Cadastro() {
+  const navigate = useNavigate();
 
-    const {form, handleChange} = useCadastro();
+  return (
+    <Box
+      sx={{
+        minHeight: "calc(100dvh - 72px)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        px: 3,
+        py: 4,
+      }}
+    >
+      <Box
+        sx={{
+          width: "80%",
+          maxWidth: 720,
+        }}
+      >
+        <Box sx={{ mb: 4, textAlign: "center" }}>
+          <Text
+            variant="h4"
+            color="primary"
+            fontWeight={700}
+            sx={{ mb: 1 }}
+          >
+            Crie sua conta
+          </Text>
 
-    async function handleSubmit(){
-        const user = {
-            name: form.name,
-            lastName: form.lastName,
-            email: form.email,
-            cpf: form.cpf,
-            phone:{
-                ddd: form.phone.substring(0,2),
-                number: form.phone.substring(2)
-            },
-            password: form.password,
-            address:{
-                cep: form.cep,
-                street: form.street,
-                neighborhood: form.neighborhood,
-                city: form.city,
-                state: form.state,
-                number: form.number
-            }
-        };
+          <Text
+            variant="body1"
+            color="textSecondary"
+            sx={{ maxWidth: 520, mx: "auto" }}
+          >
+            Informe seus dados para acompanhar alertas e acessar seu painel de
+            monitoramento.
+          </Text>
+        </Box>
 
-        try {
-            await createUser(user);
-            alert("Usuário cadastrado")
-        }
-        catch (error){
-            alert("Erro ao cadastrar usuário")
-        }
-        
-    }
+        <RegisterForm />
 
-    return(
-        <div>
-           <RegisterForm />
-        </div>
-    )
+        <Box sx={{ mt: 3 }}>
+          <Button
+            type="button"
+            variant="text"
+            color="primary"
+            fullWidth
+            icon="arrow-right"
+            onClick={() => navigate("/login")}
+          >
+            Já tem uma conta? Faça login
+          </Button>
+        </Box>
+      </Box>
+    </Box>
+  );
 }
-

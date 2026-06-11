@@ -9,7 +9,13 @@ function getDateRange(daysBack = 1) {
   const endDate = new Date();
   const startDate = new Date(endDate.getTime() - daysBack * 24 * 60 * 60 * 1000);
 
-  const formatDate = (date) => date.toISOString().split('T')[0];
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  };
 
   return {
     startDate: formatDate(startDate),
@@ -40,8 +46,9 @@ export async function fetchWeatherData(latitude = null, longitude = null, period
         longitude: coords.longitude,
         start_date: startDate,
         end_date: endDate,
-        hourly: 'temperature_2m,precipitation,wind_speed_10m,wind_gusts_10m'
-  }
+        hourly: 'temperature_2m,precipitation,wind_speed_10m,wind_gusts_10m',
+        timezone: 'auto'
+      }
     });
 
     const { hourly } = response.data;

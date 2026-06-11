@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { fetchWeatherData } from '../services/weatherService';
 
 export function useWeather(latitude = null, longitude = null, period = '24h') {
@@ -6,10 +6,15 @@ export function useWeather(latitude = null, longitude = null, period = '24h') {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const loadWeatherData = async () => {
+  const loadWeatherData = useCallback(async ({ reset = false } = {}) => {
     try {
       setLoading(true);
       setError(null);
+
+      if (reset) {
+        setData([]);
+      }
+
       const weatherData = await fetchWeatherData(latitude, longitude, period);
       setData(weatherData);
     } catch (err) {
@@ -18,15 +23,15 @@ export function useWeather(latitude = null, longitude = null, period = '24h') {
     } finally {
       setLoading(false);
     }
-  };
+  }, [latitude, longitude, period]);
 
   useEffect(() => {
-    loadWeatherData();
+    loadWeatherData({ reset: true });
 
     const interval = setInterval(loadWeatherData, 3600000);
 
     return () => clearInterval(interval);
-  }, [latitude, longitude, period]);
+  }, [loadWeatherData]);
 
   return { data, loading, error, refetch: loadWeatherData };
 }

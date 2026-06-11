@@ -27,9 +27,7 @@ export function RegisterForm() {
         await login(data.email, data.password);
       }
     } catch (error) {
-      console.log(error);
       if (error instanceof ApiError) {
-        console.log(JSON.stringify(error));
         showMessage(`Erro ao criar usuário: ${error.message}`, "error");
       }
     }
