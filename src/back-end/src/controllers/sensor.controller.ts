@@ -22,12 +22,10 @@ export async function getSensors(req: Request, res: Response) {
 
   const type = parseOptionalString(req.query.type)
   const status = parseOptionalString(req.query.status)
-  const organizationId = parseOptionalString(req.query.organizationId)
 
   const result = await SensorService.findAll({
     ...(type ? { type: parseSensorType(type) } : {}),
     ...(status ? { status: parseSensorStatus(status) } : {}),
-    ...(organizationId ? { organizationId } : {}),
     page,
     perPage
   })

@@ -21,27 +21,25 @@ export type SensorStatus = (typeof SENSOR_STATUSES)[number]
 export interface Sensor {
   id: string
   name: string
-  description?: string | null
   type: SensorType
-  organizationId: string
   latitude: number
   longitude: number
   status: SensorStatus
-  batteryLevel?: number | null
+  batery?: number | null
   lastCommunicationAt?: Date | null
   createdAt?: Date
   updatedAt?: Date
 }
 
 export interface CreateSensorDto {
+  id?: string
   name: string
-  description?: string | null
   type: SensorType
-  organizationId: string
   latitude: number
   longitude: number
   status: SensorStatus
-  batteryLevel?: number | null
+  batery?: number | null
   lastCommunicationAt?: Date | string | null
 }
 
+export type UpdateSensorDto = Partial<CreateSensorDto>
