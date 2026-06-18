@@ -58,6 +58,7 @@ async function main() {
     `
 
     for (const point of points.rows) {
+      console.log(point)
       const sensorIndex = Number(point.sensorIndex)
       const neighborhoodName = point.neighborhoodName ?? `Bairro ${point.neighborhoodId}`
       console.log(neighborhoodName, sensorIndex, point.latitude, point.longitude)

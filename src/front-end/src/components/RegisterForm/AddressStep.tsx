@@ -3,7 +3,6 @@ import { useFormContext } from "react-hook-form";
 import { ButtonContainer, ButtonWrapper } from "./style";
 import { Button } from "@/components/Button/Button";
 import { fetchAddressByCep } from "@/services/viacep.service";
-import { Fab } from "@/components/Fab/Fab";
 import { maskCep } from "@/utils/formatter";
 
 interface AddressStepProps {
@@ -23,6 +22,7 @@ export function AddressStep({ onNext, onBack, isLastStep }: AddressStepProps) {
       setValue("address.street", address.street);
       setValue("address.neighborhood", address.neighborhood);
       setValue("address.city", address.city);
+      setValue("address.state", address.state);
 
       await trigger("address");
     } catch (error) {
@@ -41,6 +41,7 @@ export function AddressStep({ onNext, onBack, isLastStep }: AddressStepProps) {
       <RHFInput name="address.street" label="Rua" />
       <RHFInput name="address.neighborhood" label="Bairro" />
       <RHFInput name="address.city" label="Cidade" />
+      <RHFInput name="address.state" label="Estado" />
       <RHFInput name="address.number" label="Número" />
 
       <ButtonContainer>
@@ -58,7 +59,13 @@ export function AddressStep({ onNext, onBack, isLastStep }: AddressStepProps) {
               Cadastrar
             </Button>
           ) : (
-            <Button onClick={onNext} color="primary" shape="square" icon="arrow-right" type="button">
+            <Button
+              onClick={onNext}
+              color="primary"
+              shape="square"
+              icon="arrow-right"
+              type="button"
+            >
               Próximo
             </Button>
           )}

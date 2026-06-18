@@ -8,5 +8,6 @@ export async function fetchAddressByCep(cep: string) {
     street: data.logradouro,
     neighborhood: data.bairro,
     city: data.localidade,
+    state: data.estado || data.uf,
   };
 }

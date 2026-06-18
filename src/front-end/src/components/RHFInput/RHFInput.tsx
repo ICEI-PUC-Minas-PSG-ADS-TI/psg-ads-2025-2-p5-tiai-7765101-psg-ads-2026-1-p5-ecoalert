@@ -15,6 +15,12 @@ interface RHFInputProps {
   onBlur?: (value: string) => void | Promise<void>;
 }
 
+function getFieldError(errors: any, name: string) {
+  return name
+    .split(".")
+    .reduce((current, key) => current?.[key], errors);
+}
+
 export function RHFInput({
   name,
   label,
@@ -30,7 +36,7 @@ export function RHFInput({
     formState: { errors },
   } = useFormContext();
 
-  const fieldError = errors as any;
+  const fieldError = getFieldError(errors, name);
 
   return (
     <Container>
@@ -48,17 +54,23 @@ export function RHFInput({
             onBlur={async e => {
               field.onBlur();
               if (onBlur) {
-                await onBlur(e.target.value.replace(/\D/g, ""));
+                const value = mask
+                  ? mask(e.target.value).replace(/\D/g, "")
+                  : e.target.value;
+
+                await onBlur(value);
               }
             }}
             value={mask ? mask(field.value ?? "") : field.value ?? ""}
-            onChange={e =>
-              field.onChange(
-                mask ? e.target.value.replace(/\D/g, "") : e.target.value
-              )
-            }
-            error={!!fieldError?.[name]}
-            helperText={fieldError?.[name]?.message}
+            onChange={e => {
+              const value = mask
+                ? mask(e.target.value).replace(/\D/g, "")
+                : e.target.value;
+
+              field.onChange(value);
+            }}
+            error={!!fieldError}
+            helperText={fieldError?.message}
           />
         )}
       />

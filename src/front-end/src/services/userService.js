@@ -5,11 +5,6 @@ import { AxiosError } from 'axios';
 
 export async function createUser(user){
     try {
-        user.phone = {
-            ddd: '31',
-            number: '999999999'
-        }
-        user.address.state = 'Minas Gerais'
         const response = await api.post("users", user);
         return response
     } catch (error) {

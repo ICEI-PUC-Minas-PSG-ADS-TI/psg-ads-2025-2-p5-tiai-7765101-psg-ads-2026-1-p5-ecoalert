@@ -22,6 +22,7 @@ export function formatPath(path = "") {
 export function maskCpf(value: string) {
   return value
     .replace(/\D/g, "")
+    .slice(0, 11)
     .replace(/(\d{3})(\d)/, "$1.$2")
     .replace(/(\d{3})(\d)/, "$1.$2")
     .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
@@ -30,7 +31,23 @@ export function maskCpf(value: string) {
 export function maskCep(value: string) {
   return value
     .replace(/\D/g, "")
+    .slice(0, 8)
     .replace(/(\d{5})(\d)/, "$1-$2");
+}
+
+export function maskDdd(value: string) {
+  return value.replace(/\D/g, "").slice(0, 2);
+}
+
+export function maskPhoneNumber(value: string) {
+  const digits = value.replace(/\D/g, "").slice(0, 9);
+
+  if (digits.length <= 4) return digits;
+  if (digits.length <= 8) {
+    return digits.replace(/(\d{4})(\d)/, "$1-$2");
+  }
+
+  return digits.replace(/(\d{5})(\d)/, "$1-$2");
 }
 
 export function maskInstagram(value: string) {

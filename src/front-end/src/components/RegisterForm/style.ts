@@ -13,3 +13,16 @@ export const ButtonWrapper = styled(Box)(({ theme }) => ({
     gap: 16,
   })
 );
+
+export const FieldRow = styled(Box)(({ theme }) => ({
+    display: "grid",
+    gridTemplateColumns: "minmax(76px, 96px) 1fr",
+    gap: 16,
+    alignItems: "start",
+
+    [theme.breakpoints.down("sm")]: {
+      gridTemplateColumns: "1fr",
+      gap: 0,
+    },
+  })
+);

@@ -2,6 +2,11 @@ import { Contract } from "./Contract";
 import { Order } from "./Order";
 import { Address } from "./ValueObjects";
 
+type Phone = {
+  ddd: string;
+  number: string;
+}
+
 export type LoggedUser = {
   id: string;
   name: string;
@@ -29,12 +34,14 @@ export type CreateUser = {
   email: string;
   cpf: string;
   password: string;
+  phone: Phone;
 
   address: {
     cep: string;
     street: string;
     neighborhood: string;
     city: string;
+    state: string;
     number: string;
   };
   logo?: string;

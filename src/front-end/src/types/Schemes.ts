@@ -28,6 +28,18 @@ export const createUserSchema = z.object({
       message: "Senha deve conter ao menos um número",
     }),
 
+  phone: z.object({
+    ddd: z
+      .string()
+      .min(2, "DDD incompleto")
+      .max(2, "DDD invalido"),
+
+    number: z
+      .string()
+      .min(8, "Telefone incompleto")
+      .max(9, "Telefone invalido"),
+  }),
+
   address: z.object({
     cep: z
       .string()
@@ -41,6 +53,7 @@ export const createUserSchema = z.object({
     city: z.string().min(1, "Cidade é obrigatória"),
 
     number: z.string().min(1, "Número é obrigatório"),
+    state: z.string().min(1, "Estado obrigatorio"),
   }),
     logo: z.string().url().optional(),
 });

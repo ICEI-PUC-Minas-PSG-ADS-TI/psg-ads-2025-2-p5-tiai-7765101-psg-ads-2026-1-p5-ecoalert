@@ -1,10 +1,9 @@
 import { RHFInput } from "@/components/RHFInput/RHFInput";
 import { useFormContext } from "react-hook-form";
-import { ButtonContainer } from "./style";
-import { Button } from "@/components/Button/Button";
+import { ButtonContainer, FieldRow } from "./style";
 import { useState } from "react";
 import { Fab } from "@/components/Fab/Fab";
-import { maskCpf } from "@/utils/formatter";
+import { maskCpf, maskDdd, maskPhoneNumber } from "@/utils/formatter";
 
 export function PersonalStep({ onNext }: { onNext: () => void }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -16,6 +15,8 @@ export function PersonalStep({ onNext }: { onNext: () => void }) {
       "lastName",
       "email",
       "cpf",
+      "phone.ddd",
+      "phone.number",
       "password",
     ]);
 
@@ -28,6 +29,10 @@ export function PersonalStep({ onNext }: { onNext: () => void }) {
       <RHFInput name="lastName" label="Sobrenome" />
       <RHFInput name="email" label="E-mail" type="email" />
       <RHFInput name="cpf" label="CPF" mask={maskCpf} />
+      <FieldRow>
+        <RHFInput name="phone.ddd" label="DDD" mask={maskDdd} />
+        <RHFInput name="phone.number" label="Telefone" mask={maskPhoneNumber} />
+      </FieldRow>
       <RHFInput
         name="password"
         label="Senha"
