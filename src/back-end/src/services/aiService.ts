@@ -1,7 +1,7 @@
-import {GoogleGenAI} from "@google/generative-ai"
+import {GoogleGenerativeAI} from "@google/generative-ai"
 import {AppError} from "@/types/error"
 
-const ai = new GoogleGenAI({apiKey: process.env.GEMINI_API_KEY}); 
+const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || ""); 
 
 export class AIService {
     static async generateReportText(weatherData: any, neighborhood: string): Promise<string> {
