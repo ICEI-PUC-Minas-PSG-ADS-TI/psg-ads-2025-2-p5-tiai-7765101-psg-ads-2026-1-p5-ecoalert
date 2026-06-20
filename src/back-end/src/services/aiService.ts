@@ -25,7 +25,7 @@ export class AIService {
             const model = ai.getGenerativeModel({ model: "gemini-2.5-flash" });
 
             const prompt = `
-            Você é o assistente inteligente do sistema EcoAlert, focado em segurança ambiental e Defesa Civil em Belo Horizonte.Sua tarefa é analisar os dados meteorológicos das últimas 24 horas fornecidos abaixo e gerar um relatório textual de monitoramento para o bairro "${neighborhood}".
+            Você é o assistente inteligente do sistema Nimbly, focado em segurança ambiental e Defesa Civil em Belo Horizonte.Sua tarefa é analisar os dados meteorológicos das últimas 24 horas fornecidos abaixo e gerar um relatório textual de monitoramento para o bairro "${neighborhood}".
             
             Dados meteorológicos das últimas 24 horas: ${weatherSummary}
             
