@@ -6,14 +6,23 @@ const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 export class AIService {
     static async generateReportText(weatherData: any, neighborhood: string): Promise<string> {
         try {
-            const {time, temperature_2m, precipitation, wind_speed_10m} = weatherData.hourly
+            let weatherSummary = "";
 
-            const weatherSummary = time.slice(-24).map((t: string, index: number) => {
-                const hour = new Date(t).getHours()
-                return `Hora: ${hour}h | Temp: ${temperature_2m[index]}°C | Chuva: ${precipitation[index]}mm |Vento: ${wind_speed_10m[index]}km/h`
-            }).join("\n")
+            if(weatherData && weatherData.hourly){
+                const {time, temperature_2m, precipitation, wind_speed_10m} = weatherData.hourly
 
-            const model = ai.getGenerativeModel({model: "gemini-1.5-flash"})
+                weatherSummary = time.slice(-24).map((t: string, index: number) => {
+
+                    const hour = new Date(t).getHours()
+
+                    return `Hora: ${hour}h | Temp: ${temperature_2m[index]}°C | Chuva: ${precipitation[index]}mm |Vento: ${wind_speed_10m[index]}km/h`
+                }).join("\n")
+            } else if(Array.isArray(weatherData)){
+                weatherSummary = weatherData.slice(-24).map((d: any) => 
+                `Hora: ${d.time || ''} | Temp: ${d.temperature || d.temperature_2m}°C | Chuva: ${d.precipitation}mm | Vento: ${d.windSpeed || d.wind_speed_10m}km/h`
+                ).join("\n");
+            }
+            const model = ai.getGenerativeModel({ model: "gemini-2.5-flash" });
 
             const prompt = `
             Você é o assistente inteligente do sistema EcoAlert, focado em segurança ambiental e Defesa Civil em Belo Horizonte.Sua tarefa é analisar os dados meteorológicos das últimas 24 horas fornecidos abaixo e gerar um relatório textual de monitoramento para o bairro "${neighborhood}".
