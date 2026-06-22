@@ -1,4 +1,5 @@
 import { WeatherService } from "@/services/weather.service";
+import { AIService } from "@/services/aiService";
 import { AppError } from "@/types/error";
 import { Request, Response } from "express";
 
@@ -65,4 +66,25 @@ function normalizeQuery(query: Request["query"]): Record<string, QueryValue> {
   });
 
   return normalized;
+}
+
+export async function getWeatherTextReport(req: Request, res: Response){
+  const {latitude, longitude, neighborhood} = req.query
+
+  if (!latitude || !longitude) {
+    return res.status(400).json({ error: "Coordenadas necessárias" });
+  }
+
+  const weatherData = await WeatherService.getForecast({
+    latitude: latitude as string, 
+    longitude: longitude as string,
+    hourly: ["temperature_2m", "precipitation", "wind_speed_10m"]
+  })
+
+  const reportText = await AIService.generateReportText(
+    weatherData, 
+    (neighborhood as string) || "Região Cadastrada"
+  );
+
+  return res.json({ report: reportText });
 }
