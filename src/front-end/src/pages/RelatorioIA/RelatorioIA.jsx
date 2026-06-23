@@ -256,9 +256,10 @@ export default function RelatorioIA() {
     >
       <Stack
         direction={{ xs: 'column', md: 'row' }}
-        alignItems={{ xs: 'stretch', md: 'flex-start' }}
+        alignItems={{ xs: 'stretch', md: 'center' }}
         justifyContent="space-between"
-        gap={2}
+        gap={3}
+        sx={{ width: '100%' }}
       >
         <Box>
           <Text variant="h5" weight={800}>
@@ -269,15 +270,33 @@ export default function RelatorioIA() {
           </Text>
         </Box>
 
-        <Button
-          icon="sparkles"
-          loading={reportLoading}
-          disabled={!canGenerateReport || reportLoading}
-          onClick={handleGenerateReport}
-          style={{ minWidth: 220 }}
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: { xs: 'stretch', md: 'flex-end' },
+            flex: 1,
+          }}
         >
-          Gerar relatorio
-        </Button>
+          <Button
+            icon="sparkles"
+            loading={reportLoading}
+            disabled={!canGenerateReport || reportLoading}
+            onClick={handleGenerateReport}
+            style={{
+              minWidth: 236,
+              height: 48,
+              borderRadius: 14,
+              background: canGenerateReport
+                ? `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`
+                : undefined,
+              border: canGenerateReport ? '1px solid rgba(255, 255, 255, 0.18)' : undefined,
+              boxShadow: canGenerateReport ? `0 16px 34px ${alpha(theme.palette.primary.main, 0.28)}` : undefined,
+              letterSpacing: 0.2,
+            }}
+          >
+            Gerar relatorio
+          </Button>
+        </Box>
       </Stack>
 
       <Paper
@@ -640,18 +659,30 @@ function StatusPill({ color, label }) {
   return (
     <Stack
       direction="row"
-      spacing={0.75}
+      spacing={0.85}
       alignItems="center"
       sx={{
-        px: 1.25,
-        py: 0.75,
+        px: 1.35,
+        py: 0.65,
         borderRadius: 999,
         color,
-        backgroundColor: alpha(color, 0.12),
+        backgroundColor: alpha(color, 0.1),
+        border: '1px solid',
+        borderColor: alpha(color, 0.3),
+        boxShadow: `0 8px 24px ${alpha(color, 0.08)}`,
+        lineHeight: 1,
       }}
     >
-      <Box sx={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: color }} />
-      <Text variant="caption" weight={800} color="inherit">
+      <Box
+        sx={{
+          width: 7,
+          height: 7,
+          borderRadius: '50%',
+          backgroundColor: color,
+          boxShadow: `0 0 0 3px ${alpha(color, 0.12)}`,
+        }}
+      />
+      <Text variant="caption" weight={800} color="inherit" sx={{ lineHeight: 1 }}>
         {label}
       </Text>
     </Stack>
