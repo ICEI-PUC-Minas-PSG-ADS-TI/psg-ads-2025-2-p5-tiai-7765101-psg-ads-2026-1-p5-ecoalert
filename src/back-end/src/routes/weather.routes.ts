@@ -7,5 +7,6 @@ const weatherRoutes = Router();
 weatherRoutes.get("/forecast", errorHandler(getWeatherForecast));
 weatherRoutes.get("/archive", errorHandler(getWeatherArchive));
 weatherRoutes.get("/report", errorHandler(getWeatherTextReport));
+weatherRoutes.post("/report", errorHandler(getWeatherTextReport));
 
 export { weatherRoutes };
