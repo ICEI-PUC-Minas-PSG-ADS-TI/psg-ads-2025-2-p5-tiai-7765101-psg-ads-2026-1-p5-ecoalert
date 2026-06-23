@@ -526,6 +526,10 @@ export default function RelatorioIA() {
                 minHeight: 280,
                 borderRadius: 2,
                 backgroundColor: report ? 'transparent' : subtleSurface,
+                display: 'flex',
+                alignItems: report ? 'stretch' : 'center',
+                justifyContent: report ? 'flex-start' : 'center',
+                overflow: 'hidden',
               }}
             >
               {reportLoading ? (
@@ -692,27 +696,49 @@ function StatusPill({ color, label }) {
 function EmptyState({ iconName, title, description, toneColor, loading = false }) {
   return (
     <Stack
-      spacing={1.25}
+      spacing={1.75}
       alignItems="center"
       justifyContent="center"
       sx={{
-        minHeight: 280,
-        px: 3,
+        width: '100%',
+        minHeight: 300,
+        px: { xs: 2.5, md: 4 },
+        py: { xs: 4, md: 5 },
         textAlign: 'center',
-        color: toneColor || 'text.secondary',
+        color: toneColor || 'primary.main',
       }}
     >
-      {loading ? (
-        <LoadingSpinner size={30} />
-      ) : (
-        <Icon name={iconName} size={30} />
-      )}
-      <Text variant="subtitle1" weight={800} color="text.primary">
-        {title}
-      </Text>
-      <Text variant="body2" sx={{ color: 'text.secondary', maxWidth: 420 }}>
-        {description}
-      </Text>
+      <Box
+        sx={{
+          width: 58,
+          height: 58,
+          borderRadius: 2.5,
+          display: 'grid',
+          placeItems: 'center',
+          color: 'inherit',
+          backgroundColor: 'currentColor',
+          boxShadow: '0 14px 34px rgb(0 0 0 / 0.18)',
+          '& > *': {
+            color: 'background.paper',
+          },
+          opacity: 0.92,
+        }}
+      >
+        {loading ? (
+          <LoadingSpinner size={26} color="inherit" />
+        ) : (
+          <Icon name={iconName} size={26} />
+        )}
+      </Box>
+
+      <Stack spacing={0.75} alignItems="center" sx={{ maxWidth: 440 }}>
+        <Text variant="subtitle1" weight={800} color="text.primary">
+          {title}
+        </Text>
+        <Text variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.65 }}>
+          {description}
+        </Text>
+      </Stack>
     </Stack>
   );
 }
