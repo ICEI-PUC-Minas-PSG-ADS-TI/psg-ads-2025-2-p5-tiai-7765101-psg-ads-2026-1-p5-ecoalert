@@ -117,3 +117,28 @@ export async function fetchForecastData(latitude = null, longitude = null) {
     throw error;
   }
 }
+
+export async function fetchWeatherReport({
+  latitude = null,
+  longitude = null,
+  neighborhood = '',
+  metrics = null
+} = {}) {
+  try {
+    const coords = latitude && longitude
+      ? { latitude, longitude }
+      : BELO_HORIZONTE;
+
+    const response = await api.post('/weather/report', {
+      latitude: coords.latitude,
+      longitude: coords.longitude,
+      neighborhood,
+      metrics
+    });
+
+    return response.data.report;
+  } catch (error) {
+    console.error('Erro ao gerar relatorio inteligente:', error.data);
+    throw error;
+  }
+}

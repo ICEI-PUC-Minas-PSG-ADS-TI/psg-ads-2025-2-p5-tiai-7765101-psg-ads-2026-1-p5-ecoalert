@@ -7,6 +7,7 @@ import Cadastro from '@/pages/Cadastro/Cadastro'
 import Home from '@/pages/Home/Home'
 import Landing from '@/pages/Landing/Landing'
 import Login from '@/pages/Login/Login'
+import RelatorioIA from '@/pages/RelatorioIA/RelatorioIA'
 import Sensores from '@/pages/Sensores/Sensores'
 import Conta from '@/pages/Conta/Conta'
 
@@ -46,6 +47,10 @@ export const router = createBrowserRouter([
           {
             path: '/sensores',
             element: <Sensores />,
+          },
+          {
+            path: '/relatorio-ia',
+            element: <RelatorioIA />,
           },
           {
             path: '/conta',

@@ -45,6 +45,13 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
             onClick={onClose}
           />
           <NavItem
+            href="/relatorio-ia"
+            iconName="sparkles"
+            label="Relatorio IA"
+            currentPath={pathname}
+            onClick={onClose}
+          />
+          <NavItem
             href="/sensores"
             iconName="radio"
             label="Sensores"

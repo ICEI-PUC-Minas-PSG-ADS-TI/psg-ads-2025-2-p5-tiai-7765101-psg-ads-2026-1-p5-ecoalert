@@ -16,11 +16,9 @@ async function getSensors(req, res) {
     const perPage = parsePositiveInt(req.query.perPage, 10, 100);
     const type = parseOptionalString(req.query.type);
     const status = parseOptionalString(req.query.status);
-    const organizationId = parseOptionalString(req.query.organizationId);
     const result = await sensor_service_1.SensorService.findAll({
         ...(type ? { type: parseSensorType(type) } : {}),
         ...(status ? { status: parseSensorStatus(status) } : {}),
-        ...(organizationId ? { organizationId } : {}),
         page,
         perPage
     });

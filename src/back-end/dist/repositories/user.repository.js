@@ -11,7 +11,7 @@ class UserRepository {
             street: data.address.street,
             neighborhood: data.address.neighborhood,
             city: data.address.city,
-            ...(data.address.state && { state: data.address.state }),
+            state: data.address.state ?? null,
             number: data.address.number
         } : null;
         const createData = {
