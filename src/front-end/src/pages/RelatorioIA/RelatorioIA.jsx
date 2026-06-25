@@ -23,10 +23,10 @@ import { getCoordinatesFromAddress, requestGeolocation } from '@/services/geoloc
 import { prepareWeatherDataForPeriod } from '@/utils/weatherPeriods';
 
 const PERIOD_OPTIONS = [
-  { value: '6h', label: '6h', summary: 'Ultimas 6 horas' },
-  { value: '12h', label: '12h', summary: 'Ultimas 12 horas' },
-  { value: '24h', label: '24h', summary: 'Ultimas 24 horas' },
-  { value: '7d', label: '7 dias', summary: 'Ultimos 7 dias' },
+  { value: '6h', label: '6h', summary: 'Últimas 6 horas' },
+  { value: '12h', label: '12h', summary: 'Últimas 12 horas' },
+  { value: '24h', label: '24h', summary: 'Últimas 24 horas' },
+  { value: '7d', label: '7 dias', summary: 'Últimos 7 dias' },
 ];
 
 export default function RelatorioIA() {
@@ -37,6 +37,7 @@ export default function RelatorioIA() {
   const [loadingLocation, setLoadingLocation] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState('24h');
   const [report, setReport] = useState('');
+  const [reportGeneratedAt, setReportGeneratedAt] = useState(null);
   const [reportLoading, setReportLoading] = useState(false);
   const [reportError, setReportError] = useState(null);
 
@@ -83,7 +84,7 @@ export default function RelatorioIA() {
         setCoordinates({ latitude: -19.9167, longitude: -43.9333 });
         setLocationSource('default');
       } catch (error) {
-        console.error('Erro ao definir localizacao:', error);
+        console.error('Erro ao definir localização:', error);
 
         if (isActive) {
           setCoordinates({ latitude: -19.9167, longitude: -43.9333 });
@@ -105,6 +106,7 @@ export default function RelatorioIA() {
 
   useEffect(() => {
     setReport('');
+    setReportGeneratedAt(null);
     setReportError(null);
   }, [selectedPeriod, coordinates?.latitude, coordinates?.longitude]);
 
@@ -152,15 +154,15 @@ export default function RelatorioIA() {
       return {
         label: 'Risco',
         color: theme.palette.error.main,
-        description: 'Condicoes criticas detectadas',
+        description: 'Condições críticas detectadas',
       };
     }
 
     if (totalRain >= 5 || maxWindGust >= 40) {
       return {
-        label: 'Atencao',
+        label: 'Atenção',
         color: theme.palette.warning.main,
-        description: 'Acompanhe as proximas atualizacoes',
+        description: 'Acompanhe as próximas atualizações',
       };
     }
 
@@ -225,6 +227,9 @@ export default function RelatorioIA() {
     try {
       setReportLoading(true);
       setReportError(null);
+      setReportGeneratedAt(null);
+
+      const generatedAt = new Date().toISOString();
 
       const generatedReport = await fetchWeatherReport({
         latitude: coordinates.latitude,
@@ -232,17 +237,45 @@ export default function RelatorioIA() {
         neighborhood,
         metrics: {
           ...metrics,
-          generatedAt: new Date().toISOString(),
+          generatedAt,
         },
       });
 
       setReport(generatedReport);
+      setReportGeneratedAt(generatedAt);
     } catch (error) {
       console.error(error);
-      setReportError('Nao foi possivel gerar o relatorio inteligente agora.');
+      setReportError('Não foi possível gerar o relatório inteligente agora.');
     } finally {
       setReportLoading(false);
     }
+  };
+
+  const handleGeneratePdf = () => {
+    if (!report) return;
+
+    const printWindow = window.open('', '_blank', 'width=900,height=720');
+
+    if (!printWindow) {
+      window.alert('Permita pop-ups para gerar o PDF do relatório.');
+      return;
+    }
+
+    printWindow.document.open();
+    printWindow.document.write(buildPrintableReportHtml({
+      report,
+      generatedAt: reportGeneratedAt,
+      neighborhood,
+      locationLabel,
+      status,
+      metrics,
+    }));
+    printWindow.document.close();
+    printWindow.focus();
+
+    printWindow.setTimeout(() => {
+      printWindow.print();
+    }, 250);
   };
 
   return (
@@ -263,10 +296,10 @@ export default function RelatorioIA() {
       >
         <Box>
           <Text variant="h5" weight={800}>
-            Relatorio Inteligente
+            Relatório Inteligente
           </Text>
           <Text variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-            IA aplicada ao monitoramento climatico {loadingLocation ? 'com localizacao em processamento' : locationLabel}
+            IA aplicada ao monitoramento climático {loadingLocation ? 'com localização em processamento' : locationLabel}
           </Text>
         </Box>
 
@@ -294,7 +327,7 @@ export default function RelatorioIA() {
               letterSpacing: 0.2,
             }}
           >
-            Gerar relatorio
+            Gerar relatório
           </Button>
         </Box>
       </Stack>
@@ -329,7 +362,7 @@ export default function RelatorioIA() {
             exclusive
             value={selectedPeriod}
             onChange={handlePeriodChange}
-            aria-label="Filtro de periodo"
+            aria-label="Filtro de período"
             sx={{
               display: 'grid',
               gridTemplateColumns: { xs: 'repeat(2, minmax(0, 1fr))', sm: 'repeat(4, auto)' },
@@ -373,7 +406,7 @@ export default function RelatorioIA() {
             </Button>
           }
         >
-          Nao foi possivel carregar as metricas climaticas.
+          Não foi possivel carregar as métricas climáticas.
         </Alert>
       )}
 
@@ -412,7 +445,7 @@ export default function RelatorioIA() {
           title="Maior rajada"
           value={formatNumber(maxWindGust)}
           unit="km/h"
-          detail="Pico de vento no periodo"
+          detail="Pico de vento no período"
           iconName="wind"
           color={theme.palette.primary.light}
           background={alpha(theme.palette.primary.main, 0.14)}
@@ -468,7 +501,7 @@ export default function RelatorioIA() {
                   Contexto enviado
                 </Text>
                 <Text variant="caption" sx={{ color: 'text.secondary' }}>
-                  Metricas usadas no prompt da IA
+                  Métricas usadas no prompt da IA
                 </Text>
               </Box>
             </Stack>
@@ -478,9 +511,9 @@ export default function RelatorioIA() {
             <Stack spacing={1.4}>
               <ContextRow label="Local" value={neighborhood} />
               <ContextRow label="Origem" value={locationLabel} />
-              <ContextRow label="Periodo" value={selectedPeriodOption.summary} />
-              <ContextRow label="Maxima / minima" value={`${formatNumber(maxTemp)}C / ${formatNumber(minTemp)}C`} />
-              <ContextRow label="Vento medio" value={`${formatNumber(averageWindSpeed)} km/h`} />
+              <ContextRow label="Período" value={selectedPeriodOption.summary} />
+              <ContextRow label="Máxima / mínima" value={`${formatNumber(maxTemp)}C / ${formatNumber(minTemp)}C`} />
+              <ContextRow label="Vento médio" value={`${formatNumber(averageWindSpeed)} km/h`} />
               <ContextRow label="Pontos analisados" value={scopedWeatherData.length || '--'} />
             </Stack>
           </Stack>
@@ -506,15 +539,35 @@ export default function RelatorioIA() {
             >
               <Box>
                 <Text variant="subtitle1" weight={800}>
-                  Relatorio gerado pela IA
+                  Relatório gerado pela IA
                 </Text>
                 <Text variant="caption" sx={{ color: 'text.secondary' }}>
-                  Análise textual baseada nos dados meteorologicos e metricas atuais
+                  Análise textual baseada nos dados meteorológicos e métricas atuais
                 </Text>
               </Box>
 
               {report && (
-                <StatusPill color={status.color} label={status.label} />
+                <Stack
+                  direction={{ xs: 'column', sm: 'row' }}
+                  spacing={1}
+                  alignItems={{ xs: 'stretch', sm: 'center' }}
+                  sx={{ width: { xs: '100%', sm: 'auto' } }}
+                >
+                  <Button
+                    variant="outline"
+                    color="info"
+                    icon="file-down"
+                    onClick={handleGeneratePdf}
+                    style={{
+                      minHeight: 38,
+                      borderRadius: 10,
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    Gerar PDF do relatório
+                  </Button>
+                  <StatusPill color={status.color} label={status.label} />
+                </Stack>
               )}
             </Stack>
 
@@ -536,13 +589,13 @@ export default function RelatorioIA() {
                 <EmptyState
                   iconName="loader-circle"
                   title="Gerando análise"
-                  description="A IA esta cruzando as metricas com os dados meteorologicos."
+                  description="A IA está cruzando as métricas com os dados meteorológicos."
                   loading
                 />
               ) : reportError ? (
                 <EmptyState
                   iconName="circle-alert"
-                  title="Falha ao gerar relatorio"
+                  title="Falha ao gerar relatório"
                   description={reportError}
                   toneColor={theme.palette.error.main}
                 />
@@ -552,7 +605,7 @@ export default function RelatorioIA() {
                 <EmptyState
                   iconName="sparkles"
                   title="Pronto para gerar"
-                  description="Revise as metricas e clique em Gerar relatorio para criar a análise inteligente."
+                  description="Revise as métricas e clique em 'Gerar relatório' para criar a análise inteligente."
                   toneColor={theme.palette.secondary.light}
                 />
               )}
@@ -791,6 +844,242 @@ function ReportContent({ report }) {
       })}
     </Stack>
   );
+}
+
+function buildPrintableReportHtml({ report, generatedAt, neighborhood, locationLabel, status, metrics }) {
+  const generatedAtLabel = formatDateTime(generatedAt);
+  const statusColor = status?.color || '#2563EB';
+  const statusLabel = status?.label || '--';
+  const metricRows = [
+    ['Local', neighborhood],
+    ['Origem', locationLabel],
+    ['Periodo', metrics.periodLabel],
+    ['Status', `${metrics.riskStatus} - ${metrics.riskDescription}`],
+    ['Temperatura atual', `${formatNumber(metrics.currentTemperature)} C`],
+    ['Maxima / minima', `${formatNumber(metrics.maxTemperature)} C / ${formatNumber(metrics.minTemperature)} C`],
+    ['Chuva acumulada', `${formatNumber(metrics.totalRain)} mm`],
+    ['Maior rajada', `${formatNumber(metrics.maxWindGust)} km/h`],
+    ['Vento medio', `${formatNumber(metrics.averageWindSpeed)} km/h`],
+    ['Pontos analisados', metrics.dataPoints || '--'],
+  ];
+
+  return `
+    <!doctype html>
+    <html lang="pt-BR">
+      <head>
+        <meta charset="utf-8" />
+        <title>Relatório IA EcoAlert</title>
+        <style>
+          @page {
+            margin: 18mm;
+          }
+
+          * {
+            box-sizing: border-box;
+          }
+
+          body {
+            margin: 0;
+            color: #111827;
+            background: #FFFFFF;
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 1.55;
+          }
+
+          .page {
+            max-width: 780px;
+            margin: 0 auto;
+          }
+
+          .header {
+            display: flex;
+            justify-content: space-between;
+            gap: 24px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid #D1D5DB;
+          }
+
+          .eyebrow {
+            margin: 0 0 6px;
+            color: #4B5563;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+          }
+
+          h1 {
+            margin: 0;
+            font-size: 28px;
+            line-height: 1.2;
+          }
+
+          .meta {
+            min-width: 190px;
+            color: #4B5563;
+            font-size: 12px;
+            text-align: right;
+          }
+
+          .pill {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 6px 10px;
+            border: 1px solid ${statusColor};
+            border-radius: 999px;
+            color: ${statusColor};
+            font-size: 12px;
+            font-weight: 700;
+          }
+
+          .metrics {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px 18px;
+            margin: 24px 0;
+            padding: 16px;
+            border: 1px solid #E5E7EB;
+            border-radius: 10px;
+            background: #F9FAFB;
+          }
+
+          .metric-label {
+            margin: 0;
+            color: #6B7280;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+          }
+
+          .metric-value {
+            margin: 2px 0 0;
+            color: #111827;
+            font-size: 13px;
+            font-weight: 700;
+          }
+
+          .report {
+            margin-top: 20px;
+          }
+
+          .report h2 {
+            margin: 20px 0 8px;
+            font-size: 17px;
+            line-height: 1.3;
+          }
+
+          .report p {
+            margin: 0 0 10px;
+            color: #374151;
+            font-size: 14px;
+          }
+
+          .report .bullet {
+            position: relative;
+            margin: 0 0 8px;
+            padding-left: 16px;
+            color: #374151;
+            font-size: 14px;
+          }
+
+          .report .bullet::before {
+            content: '';
+            position: absolute;
+            top: 0.72em;
+            left: 0;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #2563EB;
+          }
+
+          .spacer {
+            height: 8px;
+          }
+
+          strong {
+            color: #111827;
+          }
+
+          @media print {
+            body {
+              print-color-adjust: exact;
+              -webkit-print-color-adjust: exact;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <main class="page">
+          <header class="header">
+            <div>
+              <p class="eyebrow">EcoAlert</p>
+              <h1>Relatório Inteligente</h1>
+            </div>
+            <div class="meta">
+              <div>Gerado em ${escapeHtml(generatedAtLabel)}</div>
+              <span class="pill">${escapeHtml(statusLabel)}</span>
+            </div>
+          </header>
+
+          <section class="metrics">
+            ${metricRows.map(([label, value]) => `
+              <div>
+                <p class="metric-label">${escapeHtml(label)}</p>
+                <p class="metric-value">${escapeHtml(value)}</p>
+              </div>
+            `).join('')}
+          </section>
+
+          <section class="report">
+            ${renderPrintableReport(report)}
+          </section>
+        </main>
+      </body>
+    </html>
+  `;
+}
+
+function renderPrintableReport(report) {
+  return report.split('\n').map((line) => {
+    const trimmedLine = line.trim();
+
+    if (!trimmedLine) {
+      return '<div class="spacer"></div>';
+    }
+
+    if (trimmedLine.startsWith('###')) {
+      return `<h2>${formatInlineMarkdownForPrint(trimmedLine.replace(/^###\s*/, ''))}</h2>`;
+    }
+
+    if (trimmedLine.startsWith('-')) {
+      return `<div class="bullet">${formatInlineMarkdownForPrint(trimmedLine.replace(/^-\s*/, ''))}</div>`;
+    }
+
+    return `<p>${formatInlineMarkdownForPrint(trimmedLine)}</p>`;
+  }).join('');
+}
+
+function formatInlineMarkdownForPrint(text) {
+  return escapeHtml(text).replace(/\*\*(.*?)\*\*/g, (_, value) => `<strong>${value}</strong>`);
+}
+
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;',
+  }[char]));
+}
+
+function formatDateTime(value) {
+  if (!value) {
+    return new Date().toLocaleString('pt-BR');
+  }
+
+  return new Date(value).toLocaleString('pt-BR');
 }
 
 function formatInlineMarkdown(text) {

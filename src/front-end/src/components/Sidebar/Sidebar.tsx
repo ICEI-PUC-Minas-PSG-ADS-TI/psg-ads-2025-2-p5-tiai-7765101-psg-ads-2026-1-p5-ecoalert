@@ -47,7 +47,7 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
           <NavItem
             href="/relatorio-ia"
             iconName="sparkles"
-            label="Relatorio IA"
+            label="Relatório IA"
             currentPath={pathname}
             onClick={onClose}
           />
