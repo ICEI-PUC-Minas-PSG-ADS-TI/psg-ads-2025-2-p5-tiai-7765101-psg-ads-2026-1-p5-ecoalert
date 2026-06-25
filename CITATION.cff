@@ -1,29 +1,24 @@
 cff-version: 1.0.1
 message: Please cite this software using these metadata.
-title: 
+title: Nimbly 
 authors:
-  - family-names: 
-    given-names: 
-  - family-names: 
-    given-names: 
-  - family-names: 
-    given-names: 
-  - family-names: 
-    given-names: 
-  - family-names: 
-    given-names: 
+  - family-names: Siqueira Borges Matias
+    given-names: Bruna Luiza
+  - family-names: Araújo Maciel
+    given-names: Ricardo
+  - family-names: Maia de Oliveira
+    given-names: Samuel
+  - family-names: Fortunato Silva
+    given-names: Vitor
 
   - name-suffix: Professor
     affiliation: PUC Minas
-    family-names: 
-    given-names: 
-  - name-suffix: Professor
-    affiliation: PUC Minas
-    family-names: 
-    given-names: 
-    keywords:
+    family-names: Padilha
+    given-names: Juliana 
+
+    keywords: nimbly, ecoalert, sistema, aviso, clima, tempo, weather, chuva, desastres, naturais, avisos, temperatura, degree, inteligencia, artificial, climatico
     - 
-repository-code: 
+repository-code: psg-ads-2025-2-p5-tiai-7765101-psg-ads-2026-1-p5-ecoalert
 license: CC-BY-4.0
 version: 1.0.0
-date-released:
+date-released: 25/06/2026
