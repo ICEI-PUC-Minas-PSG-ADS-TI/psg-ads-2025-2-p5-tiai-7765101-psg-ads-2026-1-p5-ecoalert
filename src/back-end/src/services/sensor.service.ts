@@ -8,9 +8,11 @@ import {
   UpdateSensorDto
 } from "@/models/sensor.model"
 import { SensorRepository } from "@/repositories/sensor.repository"
+import { GeolocationService } from "@/services/geolocation.service"
 import { AppError, ErrorFields } from "@/types/error"
 
 const repository = new SensorRepository()
+const SENSOR_COUNTRY = "Brasil"
 
 type SensorListQuery = {
   type?: SensorType
@@ -90,7 +92,30 @@ export class SensorService {
       throw new AppError("Sensor nao encontrado", 404, "SENSOR_NOT_FOUND")
     }
 
-    return sensor
+    if (this.hasCompleteAddress(sensor)) {
+      return sensor
+    }
+
+    const address = await GeolocationService.getAddressFromCoordinates(
+      sensor.latitude,
+      sensor.longitude
+    )
+
+    if (!address) {
+      return sensor
+    }
+
+    const neighborhood = this.firstFilled(address.neighborhood, sensor.neighborhood)
+    const updated = await repository.updateAddress(id, {
+      name: this.buildSensorNameWithNeighborhood(sensor.name, neighborhood),
+      rua: this.firstFilled(address.street, sensor.rua),
+      bairro: neighborhood,
+      cidade: this.firstFilled(address.city, sensor.cidade),
+      estado: this.firstFilled(address.state, sensor.estado),
+      pais: SENSOR_COUNTRY
+    })
+
+    return updated ?? sensor
   }
 
   static async update(id: string, data: UpdateSensorDto) {
@@ -117,6 +142,27 @@ export class SensorService {
     }
 
     return repository.delete(id)
+  }
+
+  private static hasCompleteAddress(sensor: Sensor) {
+    return [sensor.bairro, sensor.cidade, sensor.estado, sensor.pais].every((value) =>
+      this.isFilled(value)
+    )
+  }
+
+  private static buildSensorNameWithNeighborhood(name: string, neighborhood: string | null) {
+    if (!neighborhood) return name
+
+    const baseName = name.match(/^Sensor\s+\d+/i)?.[0] ?? name.split(" - ")[0]?.trim() ?? name
+    return `${baseName} - ${neighborhood}`
+  }
+
+  private static firstFilled(...values: Array<string | null | undefined>) {
+    return values.find((value) => this.isFilled(value))?.trim() ?? null
+  }
+
+  private static isFilled(value: string | null | undefined) {
+    return typeof value === "string" && value.trim().length > 0
   }
 
   private static validateCreate(data: CreateSensorDto): {

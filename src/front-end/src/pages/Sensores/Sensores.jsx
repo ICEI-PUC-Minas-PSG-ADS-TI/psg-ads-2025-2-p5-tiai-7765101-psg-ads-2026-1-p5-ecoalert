@@ -4,6 +4,7 @@ import {
   Box,
   Card,
   CardContent,
+  CircularProgress,
   LinearProgress,
   Pagination,
   Paper,
@@ -237,12 +238,23 @@ export default function Sensores() {
         </Box>
 
         <TableContainer
+          aria-busy={isLoading}
           sx={{
             maxHeight: { xs: 520, lg: 380 },
+            minHeight: sensors.length === 0 ? 260 : undefined,
             overflowX: 'auto',
+            position: 'relative',
           }}
         >
-          <Table stickyHeader aria-label="Tabela de status dos sensores" sx={{ minWidth: 780 }}>
+          <Table
+            stickyHeader
+            aria-label="Tabela de status dos sensores"
+            sx={{
+              minWidth: 780,
+              opacity: isLoading ? 0.42 : 1,
+              transition: 'opacity 180ms ease',
+            }}
+          >
             <TableHead>
               <TableRow>
                 {['ID', 'Localização', 'Status', 'Bateria', 'Última Atualização'].map((heading) => (
@@ -264,7 +276,17 @@ export default function Sensores() {
             </TableHead>
 
             <TableBody>
-              {sensors.map((sensor) => {
+              {!isLoading && sensors.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={5}
+                    align="center"
+                    sx={{ borderColor: 'divider', color: 'text.secondary', py: 8 }}
+                  >
+                    Nenhum sensor encontrado
+                  </TableCell>
+                </TableRow>
+              ) : sensors.map((sensor) => {
                 const statusColor = statusColors[sensor.status];
                 const batteryColor = getBatteryColor(sensor.battery, sensor.status);
 
@@ -324,6 +346,28 @@ export default function Sensores() {
               })}
             </TableBody>
           </Table>
+
+          {isLoading ? (
+            <Box
+              role="status"
+              aria-live="polite"
+              sx={{
+                position: 'absolute',
+                inset: 0,
+                display: 'grid',
+                placeItems: 'center',
+                backgroundColor: alpha(surfaceColor, 0.82),
+                pointerEvents: 'none',
+              }}
+            >
+              <Stack alignItems="center" spacing={1.5}>
+                <CircularProgress size={32} />
+                <Text variant="body2" weight={600} sx={{ color: 'text.secondary' }}>
+                  Carregando sensores...
+                </Text>
+              </Stack>
+            </Box>
+          ) : null}
         </TableContainer>
 
         <Box

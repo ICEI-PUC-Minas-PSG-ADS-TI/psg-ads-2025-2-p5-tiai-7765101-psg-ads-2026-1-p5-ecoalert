@@ -20,6 +20,15 @@ type SensorOrigin = {
   longitude: number
 }
 
+type SensorAddressUpdate = {
+  name: string
+  rua: string | null
+  bairro: string | null
+  cidade: string | null
+  estado: string | null
+  pais: string | null
+}
+
 const SENSOR_RETURN_COLUMNS = `
   id,
   name,
@@ -151,6 +160,43 @@ export class SensorRepository {
     return result.rows[0] ?? null
   }
 
+  async updateAddress(id: string, data: SensorAddressUpdate): Promise<Sensor | null> {
+    await this.ensureSensorColumns()
+
+    const result = await pool.query<Sensor>(
+      `
+        WITH updated AS (
+          UPDATE sensors
+          SET
+            name = $2,
+            rua = $3,
+            bairro = $4,
+            cidade = $5,
+            estado = $6,
+            pais = $7,
+            "updatedAt" = CURRENT_TIMESTAMP
+          WHERE id = $1
+          RETURNING *
+        )
+        SELECT ${this.buildSelectColumns("NULL::double precision")}
+        FROM updated s
+        ${SENSOR_NEIGHBORHOOD_JOIN}
+        LIMIT 1
+      `,
+      [
+        id,
+        data.name,
+        data.rua,
+        data.bairro,
+        data.cidade,
+        data.estado,
+        data.pais
+      ]
+    )
+
+    return result.rows[0] ?? null
+  }
+
   async delete(id: string): Promise<Sensor | null> {
     await this.ensureSensorColumns()
 
@@ -243,10 +289,10 @@ export class SensorRepository {
     }
   }
 
-  async findAllForMeasurementGeneration(): Promise<Array<Pick<Sensor, "id" | "type">>> {
-    const result = await pool.query<Array<Pick<Sensor, "id" | "type">>[number]>(
+  async findAllForMeasurementGeneration(): Promise<Array<Pick<Sensor, "id">>> {
+    const result = await pool.query<Array<Pick<Sensor, "id">>[number]>(
       `
-        SELECT id, type
+        SELECT id
         FROM sensors
         ORDER BY id
       `
@@ -256,17 +302,20 @@ export class SensorRepository {
   }
 
   async appendMeasurements(
-    measurements: Array<{ sensorId: string; measurement: SensorMeasurement }>
+    measurementsBySensor: Array<{ sensorId: string; measurements: SensorMeasurement[] }>
   ): Promise<number> {
-    if (measurements.length === 0) return 0
+    if (measurementsBySensor.length === 0) return 0
     await this.ensureSensorColumns()
 
     const client = await pool.connect()
+    let insertedMeasurements = 0
 
     try {
       await client.query("BEGIN")
 
-      for (const { sensorId, measurement } of measurements) {
+      for (const { sensorId, measurements } of measurementsBySensor) {
+        if (measurements.length === 0) continue
+
         await client.query(
           `
             UPDATE sensors
@@ -276,12 +325,14 @@ export class SensorRepository {
               "updatedAt" = CURRENT_TIMESTAMP
             WHERE id = $1
           `,
-          [sensorId, JSON.stringify([measurement])]
+          [sensorId, JSON.stringify(measurements)]
         )
+
+        insertedMeasurements += measurements.length
       }
 
       await client.query("COMMIT")
-      return measurements.length
+      return insertedMeasurements
     } catch (error) {
       await client.query("ROLLBACK")
       throw error

@@ -30,6 +30,13 @@ const SENSOR_TYPE_LABELS = {
   HUMIDITY: 'Umidade',
 };
 
+const MEASUREMENT_TYPE_LABELS = {
+  ...SENSOR_TYPE_LABELS,
+  WEATHER: 'Pressao atmosferica',
+  WIND_SPEED: 'Velocidade do vento',
+  WIND_GUST: 'Rajada de vento',
+};
+
 const STATUS_LABELS = {
   ACTIVE: 'Ativo',
   INACTIVE: 'Inativo',
@@ -193,10 +200,10 @@ export default function SensorDetalhe() {
           </Text>
 
           <TableContainer sx={{ maxHeight: 420, overflowX: 'auto' }}>
-            <Table stickyHeader aria-label="Histórico de medições" sx={{ minWidth: 620 }}>
+            <Table stickyHeader aria-label="Histórico de medições" sx={{ minWidth: 720 }}>
               <TableHead>
                 <TableRow>
-                  {['Momento', 'Valor', 'Unidade'].map((heading) => (
+                  {['Momento', 'Tipo', 'Valor', 'Unidade'].map((heading) => (
                     <TableCell
                       key={heading}
                       sx={{
@@ -214,7 +221,7 @@ export default function SensorDetalhe() {
               <TableBody>
                 {measurements.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={3} sx={{ borderColor: 'divider', color: 'text.secondary' }}>
+                    <TableCell colSpan={4} sx={{ borderColor: 'divider', color: 'text.secondary' }}>
                       Nenhuma medicao registrada.
                     </TableCell>
                   </TableRow>
@@ -223,6 +230,9 @@ export default function SensorDetalhe() {
                     <TableRow key={`${measurement.measuredAt}-${index}`}>
                       <TableCell sx={{ borderColor: 'divider' }}>
                         {formatDateTime(measurement.measuredAt)}
+                      </TableCell>
+                      <TableCell sx={{ borderColor: 'divider', color: 'text.secondary' }}>
+                        {formatMeasurementType(measurement.type, sensor.type)}
                       </TableCell>
                       <TableCell sx={{ borderColor: 'divider', fontWeight: 700 }}>
                         {formatMeasurementValue(measurement.value)}
@@ -317,6 +327,11 @@ function formatBattery(battery) {
 function formatCoordinate(value) {
   const number = Number(value);
   return Number.isFinite(number) ? number.toFixed(6) : 'indisponivel';
+}
+
+function formatMeasurementType(type, fallbackType) {
+  const measurementType = type || fallbackType;
+  return MEASUREMENT_TYPE_LABELS[measurementType] ?? measurementType ?? 'Sem tipo';
 }
 
 function formatMeasurementValue(value) {

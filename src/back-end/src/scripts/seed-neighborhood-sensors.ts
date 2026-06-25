@@ -1,13 +1,10 @@
 import { randomUUID } from "crypto"
 import { pool } from "@/config/postgres"
-import { CoordinatesAddress, GeolocationService } from "@/services/geolocation.service"
 
 const SENSOR_TABLE = process.env.SENSOR_TABLE ?? "sensors"
 const SENSOR_BATTERY_COLUMN = process.env.SENSOR_BATTERY_COLUMN ?? "batery"
 
 const SENSOR_STATUS = "ACTIVE"
-const SENSOR_COUNTRY = "Brasil"
-const NOMINATIM_LOOP_DELAY_MS = 10_000
 
 type NeighborhoodCoordinates = {
   latitude: number
@@ -18,6 +15,8 @@ async function main() {
   const client = await pool.connect()
 
   try {
+    await client.query("BEGIN")
+
     const coordinates = await client.query<NeighborhoodCoordinates>(
       `
         SELECT
@@ -54,34 +53,29 @@ async function main() {
 
     for (const [index, coordinate] of coordinates.rows.entries()) {
       const sensorIndex = index + 1
-      await sleep(NOMINATIM_LOOP_DELAY_MS)
-
-      const address = await GeolocationService.getAddressFromCoordinates(
-        coordinate.latitude,
-        coordinate.longitude
-      )
-
       const now = new Date()
 
       await client.query(insertSql, [
         randomUUID(),
-        buildSensorName(sensorIndex, address),
+        buildSensorName(sensorIndex),
         coordinate.latitude,
         coordinate.longitude,
         SENSOR_STATUS,
         randomBatteryLevel(),
-        address?.street ?? null,
-        address?.neighborhood ?? null,
-        address?.city ?? null,
-        address?.state ?? null,
-        SENSOR_COUNTRY,
+        null,
+        null,
+        null,
+        null,
+        null,
         now,
         now,
         now
       ])
     }
 
+    await client.query("COMMIT")
   } catch (error) {
+    await client.query("ROLLBACK").catch(() => undefined)
     throw error
   } finally {
     client.release()
@@ -93,14 +87,8 @@ function randomBatteryLevel() {
   return Math.floor(Math.random() * 41) + 60
 }
 
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
-
-function buildSensorName(index: number, address: CoordinatesAddress | null) {
-  const location = [address?.street, address?.neighborhood].filter(Boolean).join(" - ")
-
-  return location ? `Sensor ${index} - ${location}` : `Sensor ${index}`
+function buildSensorName(index: number) {
+  return `Sensor ${index}`
 }
 
 function quoteTableName(tableName: string) {

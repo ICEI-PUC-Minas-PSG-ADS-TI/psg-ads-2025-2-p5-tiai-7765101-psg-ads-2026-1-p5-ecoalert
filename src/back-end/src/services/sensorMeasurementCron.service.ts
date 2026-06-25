@@ -1,4 +1,8 @@
-import { SensorMeasurement, SensorType } from "@/models/sensor.model"
+import {
+  SENSOR_MEASUREMENT_TYPES,
+  SensorMeasurement,
+  SensorMeasurementType
+} from "@/models/sensor.model"
 import { SensorRepository } from "@/repositories/sensor.repository"
 
 type MeasurementRule = {
@@ -10,13 +14,15 @@ type MeasurementRule = {
 
 const DEFAULT_INTERVAL_MS = 60_000
 
-const MEASUREMENT_RULES: Record<SensorType, MeasurementRule> = {
+const MEASUREMENT_RULES: Record<SensorMeasurementType, MeasurementRule> = {
   RAIN: { min: 0, max: 45, decimals: 1, unit: "mm" },
   RIVER_LEVEL: { min: 0.2, max: 6.5, decimals: 2, unit: "m" },
   SOIL_MOISTURE: { min: 12, max: 96, decimals: 1, unit: "%" },
   WEATHER: { min: 960, max: 1040, decimals: 1, unit: "hPa" },
   TEMPERATURE: { min: 12, max: 39, decimals: 1, unit: "C" },
-  HUMIDITY: { min: 30, max: 100, decimals: 1, unit: "%" }
+  HUMIDITY: { min: 30, max: 100, decimals: 1, unit: "%" },
+  WIND_SPEED: { min: 0, max: 55, decimals: 1, unit: "km/h" },
+  WIND_GUST: { min: 0, max: 90, decimals: 1, unit: "km/h" }
 }
 
 const repository = new SensorRepository()
@@ -30,17 +36,25 @@ export class SensorMeasurementCronService {
 
     const measurements = sensors.map((sensor) => ({
       sensorId: sensor.id,
-      measurement: this.generateMeasurement(sensor.type, measuredAt)
+      measurements: this.generateMeasurements(measuredAt)
     }))
 
     return repository.appendMeasurements(measurements)
   }
 
-  private static generateMeasurement(type: SensorType, measuredAt: string): SensorMeasurement {
+  private static generateMeasurements(measuredAt: string): SensorMeasurement[] {
+    return SENSOR_MEASUREMENT_TYPES.map((type) => this.generateMeasurement(type, measuredAt))
+  }
+
+  private static generateMeasurement(
+    type: SensorMeasurementType,
+    measuredAt: string
+  ): SensorMeasurement {
     const rule = MEASUREMENT_RULES[type]
 
     return {
       measuredAt,
+      type,
       value: randomNumber(rule.min, rule.max, rule.decimals),
       unit: rule.unit
     }
@@ -62,17 +76,7 @@ export function startSensorMeasurementsCron() {
       .finally(() => {
         isRunning = false
       })
-  }, parseIntervalMs())
-}
-
-function parseIntervalMs() {
-  const interval = Number(process.env.SENSOR_MEASUREMENTS_CRON_MS)
-
-  if (!Number.isFinite(interval) || interval < 1_000) {
-    return DEFAULT_INTERVAL_MS
-  }
-
-  return interval
+  }, DEFAULT_INTERVAL_MS)
 }
 
 function randomNumber(min: number, max: number, decimals: number) {
