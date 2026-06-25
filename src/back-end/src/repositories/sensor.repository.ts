@@ -210,6 +210,39 @@ export class SensorRepository {
     return Number(result.rows[0]?.total ?? 0)
   }
 
+  async countSummary(where: SensorWhereInput): Promise<{
+    online: number
+    offline: number
+    lowBattery: number
+  }> {
+    await this.ensureSensorColumns()
+
+    const { whereSql, values } = this.buildWhere(where)
+    const result = await pool.query<{
+      online: string
+      offline: string
+      lowBattery: string
+    }>(
+      `
+        SELECT
+          COUNT(*) FILTER (WHERE s.status = 'ACTIVE') AS online,
+          COUNT(*) FILTER (WHERE s.status <> 'ACTIVE') AS offline,
+          COUNT(*) FILTER (WHERE COALESCE(s.batery, 0) <= 25) AS "lowBattery"
+        FROM sensors s
+        ${whereSql}
+      `,
+      values
+    )
+
+    const summary = result.rows[0]
+
+    return {
+      online: Number(summary?.online ?? 0),
+      offline: Number(summary?.offline ?? 0),
+      lowBattery: Number(summary?.lowBattery ?? 0)
+    }
+  }
+
   async findAllForMeasurementGeneration(): Promise<Array<Pick<Sensor, "id" | "type">>> {
     const result = await pool.query<Array<Pick<Sensor, "id" | "type">>[number]>(
       `
@@ -385,4 +418,3 @@ export class SensorRepository {
     return sensorColumnsReady
   }
 }
-

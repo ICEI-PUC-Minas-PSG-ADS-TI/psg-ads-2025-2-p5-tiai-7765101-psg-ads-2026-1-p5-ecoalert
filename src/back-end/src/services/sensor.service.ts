@@ -27,6 +27,12 @@ type SensorListResult = {
   page: number
   perPage: number
   total: number
+  totalPages: number
+  summary: {
+    online: number
+    offline: number
+    lowBattery: number
+  }
 }
 
 export class SensorService {
@@ -61,16 +67,19 @@ export class SensorService {
     const skip = (query.page - 1) * query.perPage
     const take = query.perPage
 
-    const [items, total] = await Promise.all([
+    const [items, total, summary] = await Promise.all([
       repository.findMany({ where, skip, take, origin }),
-      repository.count(where)
+      repository.count(where),
+      repository.countSummary(where)
     ])
 
     return {
       items,
       page: query.page,
       perPage: query.perPage,
-      total
+      total,
+      totalPages: Math.ceil(total / query.perPage),
+      summary
     }
   }
 

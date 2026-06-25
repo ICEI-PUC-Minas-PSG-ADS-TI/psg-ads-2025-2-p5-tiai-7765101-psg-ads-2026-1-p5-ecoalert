@@ -7,6 +7,7 @@ const SENSOR_BATTERY_COLUMN = process.env.SENSOR_BATTERY_COLUMN ?? "batery"
 
 const SENSOR_STATUS = "ACTIVE"
 const SENSOR_COUNTRY = "Brasil"
+const NOMINATIM_LOOP_DELAY_MS = 10_000
 
 type NeighborhoodCoordinates = {
   latitude: number
@@ -53,6 +54,8 @@ async function main() {
 
     for (const [index, coordinate] of coordinates.rows.entries()) {
       const sensorIndex = index + 1
+      await sleep(NOMINATIM_LOOP_DELAY_MS)
+
       const address = await GeolocationService.getAddressFromCoordinates(
         coordinate.latitude,
         coordinate.longitude
@@ -88,6 +91,10 @@ async function main() {
 
 function randomBatteryLevel() {
   return Math.floor(Math.random() * 41) + 60
+}
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 function buildSensorName(index: number, address: CoordinatesAddress | null) {

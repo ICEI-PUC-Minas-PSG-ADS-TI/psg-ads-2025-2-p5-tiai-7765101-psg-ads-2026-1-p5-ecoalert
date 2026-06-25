@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Card,
   CardContent,
   LinearProgress,
+  Pagination,
   Paper,
   Stack,
   Table,
@@ -22,48 +23,117 @@ import { requestGeolocation } from '@/services/geolocationService';
 import { fetchSensors } from '@/services/sensorService';
 
 const PER_PAGE = 20;
+const EMPTY_SUMMARY = {
+  online: 0,
+  offline: 0,
+  lowBattery: 0,
+};
 
 export default function Sensores() {
   const theme = useTheme();
   const navigate = useNavigate();
   const [sensors, setSensors] = useState([]);
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    perPage: PER_PAGE,
+    total: 0,
+    totalPages: 1,
+    summary: EMPTY_SUMMARY,
+  });
+  const [locationParams, setLocationParams] = useState({});
+  const [isLocationReady, setIsLocationReady] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
 
-    async function loadSensors() {
-      const location = await requestGeolocation();
-      const data = await fetchSensors({
-        page: 1,
-        perPage: PER_PAGE,
-        ...(location ? {
+    async function loadLocation() {
+      try {
+        const location = await requestGeolocation();
+
+        if (!isMounted) return;
+        setLocationParams(location ? {
           latitude: location.latitude,
           longitude: location.longitude,
-        } : {}),
-      });
-
-      if (!isMounted) return;
-      setSensors((data.items ?? []).map(mapSensorToTable));
+        } : {});
+      } catch {
+        if (isMounted) setLocationParams({});
+      } finally {
+        if (isMounted) setIsLocationReady(true);
+      }
     }
 
-    loadSensors().catch(() => {
-      if (isMounted) setSensors([]);
-    });
+    loadLocation();
 
     return () => {
       isMounted = false;
     };
   }, []);
 
-  const onlineCount = useMemo(
-    () => sensors.filter((sensor) => sensor.status === 'online').length,
-    [sensors]
-  );
-  const offlineCount = sensors.length - onlineCount;
-  const lowBatteryCount = useMemo(
-    () => sensors.filter((sensor) => sensor.battery <= 25).length,
-    [sensors]
-  );
+  useEffect(() => {
+    if (!isLocationReady) return;
+
+    let isMounted = true;
+
+    async function loadSensors() {
+      setIsLoading(true);
+
+      try {
+        const data = await fetchSensors({
+          page,
+          perPage: PER_PAGE,
+          ...locationParams,
+        });
+
+        if (!isMounted) return;
+
+        const total = Number(data.total ?? 0);
+        const responsePerPage = Number(data.perPage ?? PER_PAGE);
+        const totalPages = Math.max(1, Number(data.totalPages ?? Math.ceil(total / responsePerPage)));
+
+        setSensors((data.items ?? []).map(mapSensorToTable));
+        setPagination({
+          page: Number(data.page ?? page),
+          perPage: responsePerPage,
+          total,
+          totalPages,
+          summary: normalizeSummary(data.summary),
+        });
+      } catch {
+        if (!isMounted) return;
+
+        setSensors([]);
+        setPagination({
+          page,
+          perPage: PER_PAGE,
+          total: 0,
+          totalPages: 1,
+          summary: EMPTY_SUMMARY,
+        });
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    }
+
+    loadSensors();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isLocationReady, locationParams, page]);
+
+  const pageCount = Math.max(1, pagination.totalPages);
+  const visiblePage = Math.min(page, pageCount);
+  const rangeStart = pagination.total === 0 ? 0 : (pagination.page - 1) * pagination.perPage + 1;
+  const rangeEnd = Math.min(pagination.page * pagination.perPage, pagination.total);
+  const onlineCount = pagination.summary.online;
+  const offlineCount = pagination.summary.offline;
+  const lowBatteryCount = pagination.summary.lowBattery;
+
+  const handlePageChange = (_event, value) => {
+    setPage(value);
+  };
 
   const statusColors = {
     online: theme.palette.success.main,
@@ -111,7 +181,7 @@ export default function Sensores() {
         <StatCard
           iconName="radio"
           label="Total de Sensores"
-          value={sensors.length}
+          value={pagination.total}
           color={theme.palette.secondary.light}
           background={alpha(theme.palette.secondary.main, 0.14)}
         />
@@ -148,22 +218,23 @@ export default function Sensores() {
           overflow: 'hidden',
         }}
       >
-        <Stack
-          direction={{ xs: 'column', sm: 'row' }}
-          alignItems={{ xs: 'flex-start', sm: 'center' }}
+        <Box
+          sx={{ p: { xs: 2, sm: 3 } }}
+          display="flex"
+          alignItems="center"
           justifyContent="space-between"
           gap={1.5}
-          sx={{ p: { xs: 2, sm: 3 } }}
+          flexWrap="wrap"
         >
           <Text variant="subtitle1" weight={700}>
             Status dos Sensores
           </Text>
 
-          <Stack direction="row" spacing={2} alignItems="center">
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
             <LegendItem color={theme.palette.success.main} label={`${onlineCount} Online`} />
             <LegendItem color={theme.palette.error.main} label={`${offlineCount} Offline`} />
-          </Stack>
-        </Stack>
+          </Box>
+        </Box>
 
         <TableContainer
           sx={{
@@ -254,6 +325,37 @@ export default function Sensores() {
             </TableBody>
           </Table>
         </TableContainer>
+
+        <Box
+          sx={{
+            px: { xs: 2, sm: 3 },
+            py: 2,
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            alignItems: { xs: 'flex-start', sm: 'center' },
+            justifyContent: 'space-between',
+            gap: 1.5,
+          }}
+        >
+          <Text variant="body2" sx={{ color: 'text.secondary' }}>
+            {isLoading
+              ? 'Carregando sensores...'
+              : pagination.total === 0
+                ? 'Nenhum sensor encontrado'
+                : `Mostrando ${rangeStart}-${rangeEnd} de ${pagination.total} sensores`}
+          </Text>
+
+          <Pagination
+            count={pageCount}
+            page={visiblePage}
+            onChange={handlePageChange}
+            color="primary"
+            shape="rounded"
+            disabled={isLoading || pageCount <= 1}
+          />
+        </Box>
       </Paper>
     </Box>
   );
@@ -329,6 +431,14 @@ function StatusPill({ color, label }) {
       </Text>
     </Stack>
   );
+}
+
+function normalizeSummary(summary) {
+  return {
+    online: Number(summary?.online ?? 0),
+    offline: Number(summary?.offline ?? 0),
+    lowBattery: Number(summary?.lowBattery ?? 0),
+  };
 }
 
 function mapSensorToTable(sensor) {
