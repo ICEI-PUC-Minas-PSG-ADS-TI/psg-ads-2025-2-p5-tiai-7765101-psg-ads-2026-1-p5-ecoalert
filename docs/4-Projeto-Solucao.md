@@ -61,20 +61,7 @@ Os mockups abaixo representam as principais telas implementadas no Nimbly. Eles 
 
 **Representação do wireframe:**
 
-```text
-+--------------------------------------------------------------------------------+
-| Nimbly                                         [tema] [alertas] [conta] [sair] |
-+----------------------+---------------------------------------------------------+
-| Dashboard            | Dashboard                                               |
-| Relatório IA         | Monitoramento climático em tempo real via GPS           |
-| Sensores             | [6h] [12h] [24h] [7 dias]                               |
-| Minha Conta          |                                                         |
-|                      | [Temperatura] [Máx/Mín] [Chuva] [Status geral]          |
-|                      |                                                         |
-|                      | [Gráfico de temperatura]    [Gráfico de precipitação]   |
-|                      | [Gráfico de vento e rajadas]                            |
-+----------------------+---------------------------------------------------------+
-```
+
 
 **Descrição:** A tela consolida os dados meteorológicos retornados pela integração climática, permitindo alternar o período de análise entre 6h, 12h, 24h e 7 dias. Os cards superiores resumem temperatura atual, máxima/mínima, volume de chuva e status geral, enquanto os gráficos detalham temperatura, precipitação e vento.
 
@@ -88,21 +75,7 @@ Os mockups abaixo representam as principais telas implementadas no Nimbly. Eles 
 
 **Representação do wireframe:**
 
-```text
-+--------------------------------------------------------------------------------+
-| Nimbly                                         [tema] [alertas] [conta] [sair] |
-+----------------------+---------------------------------------------------------+
-| Dashboard            | Sensores                                                |
-| Relatório IA         | Monitoramento e gerenciamento de sensores              |
-| Sensores             |                                                         |
-| Minha Conta          | [Total] [Online] [Offline] [Bateria baixa]              |
-|                      |                                                         |
-|                      | Status dos Sensores                                     |
-|                      | ID | Localização | Status | Bateria | Última atualização |
-|                      | -- | ----------- | ------ | ------- | ------------------ |
-|                      | [paginação da lista]                                    |
-+----------------------+---------------------------------------------------------+
-```
+
 
 **Descrição:** A tela exibe indicadores gerais dos sensores cadastrados e uma tabela com localização, status, bateria e última atualização. O usuário pode navegar pela lista e acessar o detalhe de um sensor específico.
 
@@ -116,22 +89,7 @@ Os mockups abaixo representam as principais telas implementadas no Nimbly. Eles 
 
 **Representação do wireframe:**
 
-```text
-+--------------------------------------------------------------------------------+
-| Nimbly                                         [tema] [alertas] [conta] [sair] |
-+----------------------+---------------------------------------------------------+
-| Dashboard            | <- Voltar                                               |
-| Relatório IA         | Sensor 392 - Centro                                    |
-| Sensores             | Status: Ativo                                          |
-| Minha Conta          |                                                         |
-|                      | [Tipo] [Bateria] [Endereço] [Última comunicação]       |
-|                      |                                                         |
-|                      | Localização: latitude / longitude                      |
-|                      |                                                         |
-|                      | Histórico de medições                                  |
-|                      | Momento | Tipo | Valor | Unidade                      |
-+----------------------+---------------------------------------------------------+
-```
+
 
 **Descrição:** O detalhe do sensor apresenta as informações técnicas e operacionais de um equipamento monitorado, incluindo tipo, bateria, endereço, localização geográfica, horário da última comunicação e histórico recente de medições.
 
@@ -147,21 +105,7 @@ Os mockups abaixo representam as principais telas implementadas no Nimbly. Eles 
 
 **Representação do wireframe:**
 
-```text
-+--------------------------------------------------------------------------------+
-| Nimbly                                         [tema] [alertas] [conta] [sair] |
-+----------------------+---------------------------------------------------------+
-| Dashboard            | Minha Conta                                             |
-| Relatório IA         | Atualize seus dados cadastrais                         |
-| Sensores             |                                                         |
-| Minha Conta          | [Resumo do usuário]   [Formulário de dados pessoais]   |
-|                      | Nome, e-mail,        Nome | Sobrenome | E-mail | CPF    |
-|                      | telefone, endereço   Telefone                           |
-|                      |                      [Endereço] CEP | Rua | Bairro      |
-|                      |                      Número | Cidade | Estado           |
-|                      |                      Senha atual [Salvar alterações]     |
-+----------------------+---------------------------------------------------------+
-```
+
 
 **Descrição:** A tela permite visualizar o resumo do perfil do usuário e editar dados pessoais, telefone e endereço. Para confirmar alterações, o sistema solicita a senha atual, reduzindo o risco de edição indevida dos dados cadastrais.
 
@@ -175,21 +119,7 @@ Os mockups abaixo representam as principais telas implementadas no Nimbly. Eles 
 
 **Representação do wireframe:**
 
-```text
-+--------------------------------------------------------------------------------+
-| Nimbly                                         [tema] [alertas] [conta] [sair] |
-+----------------------+---------------------------------------------------------+
-| Dashboard            | Relatório Inteligente                    [Gerar relatório]|
-| Relatório IA         | IA aplicada ao monitoramento climático via GPS          |
-| Sensores             | [6h] [12h] [24h] [7 dias]                               |
-| Minha Conta          |                                                         |
-|                      | [Temperatura] [Chuva] [Maior rajada] [Status geral]     |
-|                      |                                                         |
-|                      | [Contexto enviado]          [Relatório gerado pela IA]  |
-|                      | Local, origem, período,     Texto de análise e          |
-|                      | métricas analisadas         recomendações geradas       |
-+----------------------+---------------------------------------------------------+
-```
+
 
 **Descrição:** A tela apresenta os dados usados como contexto da IA e permite gerar um relatório textual com base nas métricas climáticas atuais, como temperatura, chuva acumulada, vento médio, rajadas e status geral.
 
