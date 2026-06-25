@@ -9,6 +9,19 @@ export const SENSOR_TYPES = [
 
 export type SensorType = (typeof SENSOR_TYPES)[number]
 
+export const SENSOR_MEASUREMENT_TYPES = [
+  "RAIN",
+  "RIVER_LEVEL",
+  "SOIL_MOISTURE",
+  "WEATHER",
+  "TEMPERATURE",
+  "HUMIDITY",
+  "WIND_SPEED",
+  "WIND_GUST"
+] as const
+
+export type SensorMeasurementType = (typeof SENSOR_MEASUREMENT_TYPES)[number]
+
 export const SENSOR_STATUSES = [
   "ACTIVE",
   "INACTIVE",
@@ -20,6 +33,7 @@ export type SensorStatus = (typeof SENSOR_STATUSES)[number]
 
 export interface SensorMeasurement {
   measuredAt: string | Date
+  type?: SensorMeasurementType
   value: number
   unit: string
 }

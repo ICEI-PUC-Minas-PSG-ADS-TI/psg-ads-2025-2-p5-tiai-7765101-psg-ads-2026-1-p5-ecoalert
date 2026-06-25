@@ -31,20 +31,6 @@ export default function Sidebar({ mobileOpen, onClose }: SidebarProps) {
             onClick={onClose}
           />
           <NavItem
-            href="/regioes"
-            iconName="map-pin"
-            label="Regiões"
-            currentPath={pathname}
-            onClick={onClose}
-          />
-          <NavItem
-            href="/alertas"
-            iconName="bell"
-            label="Alertas"
-            currentPath={pathname}
-            onClick={onClose}
-          />
-          <NavItem
             href="/relatorio-ia"
             iconName="sparkles"
             label="Relatório IA"
