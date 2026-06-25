@@ -70,43 +70,34 @@ Representação simplificada do Wireframe:
 
 ## 4.4 Modelagem de Dados (Sprint 2 e 3)
 
-O sistema exige persistência de dados.
+O Nimbly utiliza um banco de dados relacional PostgreSQL, acessado pelo back-end por meio do Prisma ORM. Essa escolha permite organizar os dados principais do sistema, como usuários, endereços, comunidades monitoradas e sensores ambientais.
 
-A documentação do banco seguirá a abordagem de **entrega contínua**, sendo expandida conforme evolução do projeto.
+A modelagem foi evoluindo conforme as sprints. No início, o foco foi permitir cadastro e autenticação de usuários. Depois, o banco foi ampliado para armazenar comunidades em risco e sensores usados no monitoramento climático.
 
 ---
 
-### 4.4.1 Script Físico (Entrega na Sprint 2 - MVP)
+### 4.4.1 Modelo Físico do Banco
 
-Para a primeira fatia vertical (MVP), o Squad deverá entregar o **script de criação das tabelas ou coleções utilizadas**.
+O modelo físico atual está definido no arquivo `src/back-end/prisma/schema.prisma`, e as migrations ficam em `src/back-end/prisma/migrations`. Também existe um script SQL de apoio em `src/db/schema.sql`.
 
-#### 🔹 Para Banco Relacional (SQL)
+As principais entidades do banco são:
 
-Incluir:
+| Entidade | Finalidade |
+|----------|------------|
+| `User` | Armazena os dados dos usuários cadastrados no sistema |
+| `Address` | Armazena o endereço vinculado a cada usuário |
+| `Community` | Armazena comunidades ou áreas monitoradas |
+| `Sensor` | Armazena sensores ambientais usados no monitoramento |
 
-- Comandos `CREATE TABLE`
-- Definição de chave primária (PK)
-- Definição de chaves estrangeiras (FK)
+#### Usuários e endereços
 
-**Exemplo:**
+A tabela `User` guarda os dados pessoais e de autenticação dos usuários. Cada usuário possui e-mail e CPF únicos, evitando cadastros duplicados. A coluna `role` define se o usuário é comum (`USER`) ou administrador (`ADMIN`).
 
-```sql
-CREATE TABLE Usuario (
-    Id INT PRIMARY KEY,
-    Nome VARCHAR(100),
-    Email VARCHAR(150) UNIQUE,
-    Senha VARCHAR(200)
-);
-```
-O código abaixo é o DDL gerado para estruturar nossa base de dados relacional (PostgreSQL) para a Sprint 2. 
-
-*(O arquivo consolidado para execução `.sql` encontra-se na pasta `src/bd/schema.sql` do repositório).*
+A tabela `Address` guarda o endereço do usuário. O relacionamento entre `User` e `Address` é de um para um, pois cada endereço cadastrado pertence a um único usuário.
 
 ```sql
--- Criação do Enum
 CREATE TYPE "UserRole" AS ENUM ('ADMIN', 'USER');
 
--- Tabela de Usuários
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -124,14 +115,13 @@ CREATE TABLE "User" (
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 CREATE UNIQUE INDEX "User_cpf_key" ON "User"("cpf");
 
--- Tabela de Endereços
 CREATE TABLE "Address" (
     "id" TEXT NOT NULL,
     "cep" TEXT NOT NULL,
     "street" TEXT NOT NULL,
     "neighborhood" TEXT NOT NULL,
     "city" TEXT NOT NULL,
-    "state" TEXT NOT NULL,
+    "state" TEXT,
     "number" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
 
@@ -145,8 +135,15 @@ ADD CONSTRAINT "Address_userId_fkey"
 FOREIGN KEY ("userId") REFERENCES "User"("id")
 ON DELETE RESTRICT
 ON UPDATE CASCADE;
+```
 
--- Tabela de Comunidades
+#### Comunidades monitoradas
+
+A tabela `Community` representa regiões acompanhadas pelo sistema. Ela armazena nome, cidade, estado, coordenadas geográficas, nível de risco, população estimada e descrição.
+
+Esses dados ajudam o sistema a organizar áreas vulneráveis e apoiar a visualização de informações no painel.
+
+```sql
 CREATE TABLE "Community" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -163,36 +160,79 @@ CREATE TABLE "Community" (
     CONSTRAINT "Community_pkey" PRIMARY KEY ("id")
 );
 ```
----
 
-### Para Banco NoSQL
+#### Sensores
 
-Incluir a estrutura dos documentos JSON (Schema).
+A tabela `Sensor` registra os sensores usados no monitoramento. Ela permite armazenar nome, descrição, tipo do sensor, organização responsável, localização, status, bateria e data da última comunicação.
 
-**Exemplo:**
+O campo `geom` foi preparado para recursos geográficos com PostGIS, permitindo evoluções futuras como busca por sensores próximos e associação automática com áreas monitoradas.
 
-```json
-{
-  "nome": "João Silva",
-  "email": "joao@email.com",
-  "senha": "hash_da_senha"
-}
+```sql
+CREATE TYPE "SensorType" AS ENUM (
+  'RAIN',
+  'RIVER_LEVEL',
+  'SOIL_MOISTURE',
+  'WEATHER',
+  'TEMPERATURE',
+  'HUMIDITY'
+);
+
+CREATE TYPE "SensorStatus" AS ENUM (
+  'ACTIVE',
+  'INACTIVE',
+  'MAINTENANCE',
+  'OFFLINE'
+);
+
+CREATE TABLE "Sensor" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT,
+    "type" "SensorType" NOT NULL,
+    "organizationId" TEXT NOT NULL,
+    "latitude" DOUBLE PRECISION NOT NULL,
+    "longitude" DOUBLE PRECISION NOT NULL,
+    "status" "SensorStatus" NOT NULL,
+    "batteryLevel" INTEGER,
+    "lastCommunicationAt" TIMESTAMP(3),
+    "geom" geometry(Point, 4326),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Sensor_pkey" PRIMARY KEY ("id")
+);
+
+CREATE INDEX "Sensor_organizationId_idx" ON "Sensor"("organizationId");
+CREATE INDEX "Sensor_type_idx" ON "Sensor"("type");
+CREATE INDEX "Sensor_status_idx" ON "Sensor"("status");
 ```
 
-### 📁 Obrigatório
+---
 
-O arquivo .sql ou .js deve ser salvo na pasta: src/bd
+### 4.4.2 Relações e Regras da Modelagem
 
- - É permitido colar um trecho do script no README apenas para visualização rápida.
+As principais regras representadas no banco são:
 
+* Um usuário pode ter apenas um endereço cadastrado;
+* O e-mail do usuário deve ser único;
+* O CPF do usuário deve ser único;
+* O papel do usuário é controlado pelo enum `UserRole`;
+* Sensores possuem tipo e status controlados por enums;
+* Sensores possuem índices por organização, tipo e status para facilitar filtros e consultas;
+* Comunidades armazenam localização e nível de risco para apoiar o painel de monitoramento.
 
 ---
-### 4.4.2 Representação do Modelo Físico de Dados (Entrega na Sprint 3 - Core)
+
+### 4.4.3 Representação do Modelo Físico de Dados
+
+O diagrama abaixo representa a estrutura física do banco de dados utilizada pelo projeto.
 
 <img src="images/diagramaBD.jpeg" width="80%">
 
 ---
 
-### 4.4.3 Diagrama de Classes (Sprint 3)
+### 4.4.4 Diagrama de Classes
+
+O diagrama de classes apresenta a visão das principais entidades usadas no sistema e sua relação com a implementação.
 
 <img src="images/diagramaClasses.png" width="90%">
