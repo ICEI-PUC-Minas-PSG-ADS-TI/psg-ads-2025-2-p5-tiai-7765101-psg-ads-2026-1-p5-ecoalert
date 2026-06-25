@@ -67,7 +67,7 @@ export class AIService {
                 - Nao invente valores numericos que nao estejam nos dados ou nas metricas.
                 - O relatorio DEVE conter tres secoes claras:
                     1. Um resumo geral da situacao climatica no bairro.
-                    2. Uma analise de risco baseada nos dados e nas metricas.
+                    2. Uma análise de risco baseada nos dados e nas metricas.
                     3. Recomendacoes e orientacoes de seguranca para os moradores.
             `
 
@@ -76,7 +76,6 @@ export class AIService {
             return response.text()
         }
         catch(error) {
-            console.log("Erro na API do Gemini", error)
             throw new AppError("Falha ao gerar texto descritivo com IA", 500, "AI_GENERATION_ERROR")
         }
     }

@@ -18,14 +18,20 @@ export async function createSensor(req: Request, res: Response) {
 
 export async function getSensors(req: Request, res: Response) {
   const page = parsePositiveInt(req.query.page, 1, 1_000_000)
-  const perPage = parsePositiveInt(req.query.perPage, 10, 100)
+  const perPage = parsePositiveInt(req.query.perPage, 20, 100)
 
   const type = parseOptionalString(req.query.type)
   const status = parseOptionalString(req.query.status)
+  const neighborhood = parseOptionalString(req.query.neighborhood)
+  const latitude = parseOptionalNumber(req.query.latitude)
+  const longitude = parseOptionalNumber(req.query.longitude)
 
   const result = await SensorService.findAll({
     ...(type ? { type: parseSensorType(type) } : {}),
     ...(status ? { status: parseSensorStatus(status) } : {}),
+    ...(neighborhood ? { neighborhood } : {}),
+    ...(latitude !== undefined ? { latitude } : {}),
+    ...(longitude !== undefined ? { longitude } : {}),
     page,
     perPage
   })
@@ -60,6 +66,12 @@ function parsePositiveInt(value: unknown, fallback: number, max: number) {
   if (Number.isNaN(parsed) || parsed < 1) return fallback
   if (parsed > max) return max
   return parsed
+}
+
+function parseOptionalNumber(value: unknown): number | undefined {
+  if (typeof value !== "string" || value.trim().length === 0) return undefined
+  const parsed = Number(value)
+  return Number.isNaN(parsed) ? undefined : parsed
 }
 
 function parseSensorType(value: string): SensorType {

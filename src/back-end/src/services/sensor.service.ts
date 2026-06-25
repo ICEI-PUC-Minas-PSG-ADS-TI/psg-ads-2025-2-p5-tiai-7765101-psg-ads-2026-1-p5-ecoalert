@@ -15,6 +15,9 @@ const repository = new SensorRepository()
 type SensorListQuery = {
   type?: SensorType
   status?: SensorStatus
+  neighborhood?: string
+  latitude?: number
+  longitude?: number
   page: number
   perPage: number
 }
@@ -24,6 +27,12 @@ type SensorListResult = {
   page: number
   perPage: number
   total: number
+  totalPages: number
+  summary: {
+    online: number
+    offline: number
+    lowBattery: number
+  }
 }
 
 export class SensorService {
@@ -42,29 +51,35 @@ export class SensorService {
 
     if (query.type) this.parseType(query.type, fields)
     if (query.status) this.parseStatus(query.status, fields)
+    const origin = this.parseOrigin(query.latitude, query.longitude, fields)
 
     if (Object.keys(fields).length > 0) {
       throw new AppError("Dados invalidos", 400, "SENSOR_VALIDATION_ERROR", fields)
     }
 
+    const neighborhood = query.neighborhood?.trim()
     const where = {
       ...(query.type ? { type: query.type } : {}),
-      ...(query.status ? { status: query.status } : {})
+      ...(query.status ? { status: query.status } : {}),
+      ...(neighborhood ? { neighborhood } : {})
     }
 
     const skip = (query.page - 1) * query.perPage
     const take = query.perPage
 
-    const [items, total] = await Promise.all([
-      repository.findMany({ where, skip, take }),
-      repository.count(where)
+    const [items, total, summary] = await Promise.all([
+      repository.findMany({ where, skip, take, origin }),
+      repository.count(where),
+      repository.countSummary(where)
     ])
 
     return {
       items,
       page: query.page,
       perPage: query.perPage,
-      total
+      total,
+      totalPages: Math.ceil(total / query.perPage),
+      summary
     }
   }
 
@@ -211,6 +226,19 @@ export class SensorService {
     }
 
     return longitude
+  }
+
+  private static parseOrigin(
+    latitude: number | undefined,
+    longitude: number | undefined,
+    fields: ErrorFields
+  ) {
+    if (latitude === undefined && longitude === undefined) return undefined
+
+    return {
+      latitude: this.parseLatitude(latitude as number, fields),
+      longitude: this.parseLongitude(longitude as number, fields)
+    }
   }
 
   private static parseBatery(batery: number | null | undefined, fields: ErrorFields) {

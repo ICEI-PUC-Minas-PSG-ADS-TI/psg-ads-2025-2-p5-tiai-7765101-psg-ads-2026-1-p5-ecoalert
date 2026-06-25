@@ -2,6 +2,7 @@ import { pool } from "@/config/postgres"
 import {
   CreateSensorDto,
   Sensor,
+  SensorMeasurement,
   SensorStatus,
   SensorType,
   UpdateSensorDto
@@ -11,9 +12,15 @@ import { randomUUID } from "crypto"
 type SensorWhereInput = {
   type?: SensorType
   status?: SensorStatus
+  neighborhood?: string
 }
 
-const SENSOR_COLUMNS = `
+type SensorOrigin = {
+  latitude: number
+  longitude: number
+}
+
+const SENSOR_RETURN_COLUMNS = `
   id,
   name,
   type,
@@ -21,15 +28,39 @@ const SENSOR_COLUMNS = `
   longitude,
   status,
   batery,
+  rua,
+  bairro,
+  cidade,
+  estado,
+  pais,
+  COALESCE("measurementsHistory", '[]'::jsonb) AS "measurementsHistory",
   "lastCommunicationAt",
   "createdAt",
   "updatedAt"
 `
 
+const SENSOR_NEIGHBORHOOD_JOIN = `
+  LEFT JOIN LATERAL (
+    SELECT
+      COALESCE(NULLIF(n.nm_subdist, ''), NULLIF(n.nm_dist, ''), NULLIF(n.nm_mun, '')) AS name,
+      NULLIF(n.nm_mun, '') AS city,
+      NULLIF(n.sigla_uf, '') AS state
+    FROM neighborhoods n
+    WHERE n.geom IS NOT NULL
+      AND ST_Covers(n.geom, ST_SetSRID(ST_MakePoint(s.longitude, s.latitude), 4674))
+    ORDER BY n.id
+    LIMIT 1
+  ) neighborhood ON true
+`
+
+let sensorColumnsReady: Promise<void> | null = null
+
 export class SensorRepository {
   async create(
     data: Omit<CreateSensorDto, "lastCommunicationAt"> & { lastCommunicationAt?: Date | null }
   ): Promise<Sensor> {
+    await this.ensureSensorColumns()
+
     const result = await pool.query<Sensor>(
       `
         INSERT INTO sensors (
@@ -40,12 +71,17 @@ export class SensorRepository {
           longitude,
           status,
           batery,
+          rua,
+          bairro,
+          cidade,
+          estado,
+          pais,
           "lastCommunicationAt",
           "createdAt",
           "updatedAt"
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-        RETURNING ${SENSOR_COLUMNS}
+        VALUES ($1, $2, $3, $4, $5, $6, $7, NULL, NULL, NULL, NULL, NULL, $8, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        RETURNING ${SENSOR_RETURN_COLUMNS}
       `,
       [
         data.id ?? randomUUID(),
@@ -63,11 +99,14 @@ export class SensorRepository {
   }
 
   async findById(id: string): Promise<Sensor | null> {
+    await this.ensureSensorColumns()
+
     const result = await pool.query<Sensor>(
       `
-        SELECT ${SENSOR_COLUMNS}
-        FROM sensors
-        WHERE id = $1
+        SELECT ${this.buildSelectColumns("NULL::double precision")}
+        FROM sensors s
+        ${SENSOR_NEIGHBORHOOD_JOIN}
+        WHERE s.id = $1
         LIMIT 1
       `,
       [id]
@@ -80,6 +119,8 @@ export class SensorRepository {
     id: string,
     data: Partial<Omit<UpdateSensorDto, "lastCommunicationAt"> & { lastCommunicationAt?: Date | null }>
   ): Promise<Sensor | null> {
+    await this.ensureSensorColumns()
+
     const values: unknown[] = []
     const assignments: string[] = []
 
@@ -102,7 +143,7 @@ export class SensorRepository {
         UPDATE sensors
         SET ${assignments.join(", ")}, "updatedAt" = CURRENT_TIMESTAMP
         WHERE id = $${values.length}
-        RETURNING ${SENSOR_COLUMNS}
+        RETURNING ${SENSOR_RETURN_COLUMNS}
       `,
       values
     )
@@ -111,11 +152,13 @@ export class SensorRepository {
   }
 
   async delete(id: string): Promise<Sensor | null> {
+    await this.ensureSensorColumns()
+
     const result = await pool.query<Sensor>(
       `
         DELETE FROM sensors
         WHERE id = $1
-        RETURNING ${SENSOR_COLUMNS}
+        RETURNING ${SENSOR_RETURN_COLUMNS}
       `,
       [id]
     )
@@ -123,16 +166,25 @@ export class SensorRepository {
     return result.rows[0] ?? null
   }
 
-  async findMany(params: { where: SensorWhereInput; skip: number; take: number }): Promise<Sensor[]> {
+  async findMany(params: {
+    where: SensorWhereInput
+    skip: number
+    take: number
+    origin?: SensorOrigin
+  }): Promise<Sensor[]> {
+    await this.ensureSensorColumns()
+
     const { whereSql, values } = this.buildWhere(params.where)
+    const distanceSql = this.buildDistanceSql(params.origin, values)
     values.push(params.take, params.skip)
 
     const result = await pool.query<Sensor>(
       `
-        SELECT ${SENSOR_COLUMNS}
-        FROM sensors
+        SELECT ${this.buildSelectColumns(distanceSql)}
+        FROM sensors s
+        ${SENSOR_NEIGHBORHOOD_JOIN}
         ${whereSql}
-        ORDER BY "createdAt" DESC
+        ORDER BY ${params.origin ? '"distanceKm" ASC NULLS LAST,' : ""} s."createdAt" DESC
         LIMIT $${values.length - 1}
         OFFSET $${values.length}
       `,
@@ -143,17 +195,99 @@ export class SensorRepository {
   }
 
   async count(where: SensorWhereInput): Promise<number> {
+    await this.ensureSensorColumns()
+
     const { whereSql, values } = this.buildWhere(where)
     const result = await pool.query<{ total: string }>(
       `
         SELECT COUNT(*) AS total
-        FROM sensors
+        FROM sensors s
         ${whereSql}
       `,
       values
     )
 
     return Number(result.rows[0]?.total ?? 0)
+  }
+
+  async countSummary(where: SensorWhereInput): Promise<{
+    online: number
+    offline: number
+    lowBattery: number
+  }> {
+    await this.ensureSensorColumns()
+
+    const { whereSql, values } = this.buildWhere(where)
+    const result = await pool.query<{
+      online: string
+      offline: string
+      lowBattery: string
+    }>(
+      `
+        SELECT
+          COUNT(*) FILTER (WHERE s.status = 'ACTIVE') AS online,
+          COUNT(*) FILTER (WHERE s.status <> 'ACTIVE') AS offline,
+          COUNT(*) FILTER (WHERE COALESCE(s.batery, 0) <= 25) AS "lowBattery"
+        FROM sensors s
+        ${whereSql}
+      `,
+      values
+    )
+
+    const summary = result.rows[0]
+
+    return {
+      online: Number(summary?.online ?? 0),
+      offline: Number(summary?.offline ?? 0),
+      lowBattery: Number(summary?.lowBattery ?? 0)
+    }
+  }
+
+  async findAllForMeasurementGeneration(): Promise<Array<Pick<Sensor, "id" | "type">>> {
+    const result = await pool.query<Array<Pick<Sensor, "id" | "type">>[number]>(
+      `
+        SELECT id, type
+        FROM sensors
+        ORDER BY id
+      `
+    )
+
+    return result.rows
+  }
+
+  async appendMeasurements(
+    measurements: Array<{ sensorId: string; measurement: SensorMeasurement }>
+  ): Promise<number> {
+    if (measurements.length === 0) return 0
+    await this.ensureSensorColumns()
+
+    const client = await pool.connect()
+
+    try {
+      await client.query("BEGIN")
+
+      for (const { sensorId, measurement } of measurements) {
+        await client.query(
+          `
+            UPDATE sensors
+            SET
+              "measurementsHistory" = COALESCE("measurementsHistory", '[]'::jsonb) || $2::jsonb,
+              "lastCommunicationAt" = CURRENT_TIMESTAMP,
+              "updatedAt" = CURRENT_TIMESTAMP
+            WHERE id = $1
+          `,
+          [sensorId, JSON.stringify([measurement])]
+        )
+      }
+
+      await client.query("COMMIT")
+      return measurements.length
+    } catch (error) {
+      await client.query("ROLLBACK")
+      throw error
+    } finally {
+      client.release()
+    }
   }
 
   private addAssignment(assignments: string[], values: unknown[], column: string, value: unknown) {
@@ -169,17 +303,118 @@ export class SensorRepository {
 
     if (where.type) {
       values.push(where.type)
-      clauses.push(`type = $${values.length}`)
+      clauses.push(`s.type = $${values.length}`)
     }
 
     if (where.status) {
       values.push(where.status)
-      clauses.push(`status = $${values.length}`)
+      clauses.push(`s.status = $${values.length}`)
+    }
+
+    if (where.neighborhood) {
+      values.push(`%${where.neighborhood}%`)
+      clauses.push(`
+        (
+          s.name ILIKE $${values.length}
+          OR EXISTS (
+            SELECT 1
+            FROM neighborhoods n
+            WHERE n.geom IS NOT NULL
+              AND ST_Covers(n.geom, ST_SetSRID(ST_MakePoint(s.longitude, s.latitude), 4674))
+              AND (
+                s.bairro ILIKE $${values.length}
+                OR s.cidade ILIKE $${values.length}
+                OR n.nm_subdist ILIKE $${values.length}
+                OR n.nm_dist ILIKE $${values.length}
+                OR n.nm_mun ILIKE $${values.length}
+              )
+          )
+        )
+      `)
     }
 
     return {
       whereSql: clauses.length > 0 ? `WHERE ${clauses.join(" AND ")}` : "",
       values
     }
+  }
+
+  private buildSelectColumns(distanceSql: string) {
+    return `
+      s.id,
+      s.name,
+      s.type,
+      s.latitude,
+      s.longitude,
+      s.status,
+      s.batery,
+      s.rua,
+      s.bairro,
+      s.cidade,
+      s.estado,
+      s.pais,
+      COALESCE(s."measurementsHistory", '[]'::jsonb) AS "measurementsHistory",
+      s."lastCommunicationAt",
+      s."createdAt",
+      s."updatedAt",
+      COALESCE(NULLIF(s.bairro, ''), neighborhood.name) AS neighborhood,
+      NULLIF(
+        CONCAT_WS(
+          ', ',
+          NULLIF(s.rua, ''),
+          COALESCE(NULLIF(s.bairro, ''), neighborhood.name),
+          NULLIF(s.cidade, ''),
+          NULLIF(s.estado, ''),
+          NULLIF(s.pais, '')
+        ),
+        ''
+      ) AS address,
+      ${distanceSql} AS "distanceKm"
+    `
+  }
+
+  private buildDistanceSql(origin: SensorOrigin | undefined, values: unknown[]) {
+    if (!origin) return "NULL::double precision"
+
+    values.push(origin.latitude)
+    const latitudeIndex = values.length
+
+    values.push(origin.longitude)
+    const longitudeIndex = values.length
+
+    return `
+      (
+        6371 * 2 * ASIN(
+          LEAST(1, SQRT(
+            POWER(SIN(RADIANS((s.latitude - $${latitudeIndex}) / 2)), 2)
+            + COS(RADIANS($${latitudeIndex}))
+            * COS(RADIANS(s.latitude))
+            * POWER(SIN(RADIANS((s.longitude - $${longitudeIndex}) / 2)), 2)
+          ))
+        )
+      )
+    `
+  }
+
+  private ensureSensorColumns() {
+    if (!sensorColumnsReady) {
+      sensorColumnsReady = pool
+        .query(`
+          ALTER TABLE sensors
+          ADD COLUMN IF NOT EXISTS "measurementsHistory" JSONB NOT NULL DEFAULT '[]'::jsonb,
+          ADD COLUMN IF NOT EXISTS rua TEXT,
+          ADD COLUMN IF NOT EXISTS bairro TEXT,
+          ADD COLUMN IF NOT EXISTS cidade TEXT,
+          ADD COLUMN IF NOT EXISTS estado TEXT,
+          ADD COLUMN IF NOT EXISTS pais TEXT
+        `)
+        .then(() => undefined)
+        .catch((error) => {
+          sensorColumnsReady = null
+          throw error
+        })
+    }
+
+    return sensorColumnsReady
   }
 }

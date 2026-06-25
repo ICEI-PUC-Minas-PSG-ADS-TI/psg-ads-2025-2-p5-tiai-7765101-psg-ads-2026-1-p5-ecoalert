@@ -60,7 +60,6 @@ async function main() {
             ]);
         }
         await client.query("COMMIT");
-        console.log(`Sensores criados: ${points.rowCount}`);
     }
     catch (error) {
         await client.query("ROLLBACK");

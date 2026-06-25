@@ -27,7 +27,82 @@ ODS 13: Ação Contra a Mudança Global do Clima.
 
 ## Instruções de utilização
 
-Assim que a primeira versão do sistema estiver disponível, deverá complementar com as instruções de utilização. Descreva como instalar eventuais dependências e como executar a aplicação.
+### Pré-requisitos
+
+Antes de executar o projeto, tenha instalado:
+
+* Node.js
+* npm
+* Banco de dados PostgreSQL ou uma URL de conexão compatível com Prisma
+
+### Configuração do back-end
+
+1. Acesse a pasta do back-end:
+
+```bash
+cd src/back-end
+```
+
+2. Instale as dependências:
+
+```bash
+npm install
+```
+
+3. Crie um arquivo `.env` na pasta `src/back-end` com as variáveis necessárias:
+
+```env
+PORT=3000
+FRONTEND_URL=http://localhost:5173
+DATABASE_URL="postgresql://usuario:senha@localhost:5432/nome_do_banco"
+JWT_SECRET="sua_chave_jwt"
+JWT_REFRESH_SECRET="sua_chave_refresh"
+OPEN_METEO_FORECAST_BASE_URL=https://api.open-meteo.com/v1
+OPEN_METEO_ARCHIVE_BASE_URL=https://archive-api.open-meteo.com/v1
+GEMINI_API_KEY="sua_chave_gemini"
+```
+
+4. Execute as migrações do banco de dados:
+
+```bash
+npx prisma migrate dev
+```
+
+5. Inicie a API:
+
+```bash
+npm run dev
+```
+
+A API ficará disponível em `http://localhost:3000`.
+
+### Configuração do front-end
+
+1. Em outro terminal, acesse a pasta do front-end:
+
+```bash
+cd src/front-end
+```
+
+2. Instale as dependências:
+
+```bash
+npm install
+```
+
+3. Crie um arquivo `.env` na pasta `src/front-end` com a URL da API:
+
+```env
+VITE_API_BASE_URL=http://localhost:3000/api
+```
+
+4. Inicie a aplicação:
+
+```bash
+npm run dev
+```
+
+O front-end ficará disponível em `http://localhost:5173`.
 
 # Documentação
 

@@ -1,8 +1,11 @@
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Card,
   CardContent,
   LinearProgress,
+  Pagination,
   Paper,
   Stack,
   Table,
@@ -16,40 +19,121 @@ import { alpha, useTheme } from '@mui/material/styles';
 
 import { Icon } from '@/components/Icon/Icon';
 import { Text } from '@/components/Text/Text';
+import { requestGeolocation } from '@/services/geolocationService';
+import { fetchSensors } from '@/services/sensorService';
 
-const sensors = [
-  { id: 'SNS-001', location: 'Savassi', status: 'online', battery: 92, updatedAt: 'Há 2 min' },
-  { id: 'SNS-002', location: 'Lourdes', status: 'online', battery: 78, updatedAt: 'Há 3 min' },
-  { id: 'SNS-003', location: 'Funcionários', status: 'online', battery: 85, updatedAt: 'Há 1 min' },
-  { id: 'SNS-004', location: 'Santa Efigênia', status: 'offline', battery: 42, updatedAt: 'Há 2h' },
-  { id: 'SNS-005', location: 'Floresta', status: 'online', battery: 95, updatedAt: 'Há 4 min' },
-  { id: 'SNS-006', location: 'Santa Tereza', status: 'online', battery: 67, updatedAt: 'Há 2 min' },
-  { id: 'SNS-007', location: 'Pampulha', status: 'online', battery: 88, updatedAt: 'Há 5 min' },
-  { id: 'SNS-008', location: 'Cidade Nova', status: 'online', battery: 73, updatedAt: 'Há 6 min' },
-  { id: 'SNS-009', location: 'Sagrada Família', status: 'online', battery: 64, updatedAt: 'Há 8 min' },
-  { id: 'SNS-010', location: 'Buritis', status: 'online', battery: 21, updatedAt: 'Há 9 min' },
-  { id: 'SNS-011', location: 'Belvedere', status: 'online', battery: 58, updatedAt: 'Há 10 min' },
-  { id: 'SNS-012', location: 'Mangabeiras', status: 'online', battery: 99, updatedAt: 'Há 1 min' },
-  { id: 'SNS-013', location: 'Serra', status: 'online', battery: 81, updatedAt: 'Há 7 min' },
-  { id: 'SNS-014', location: 'Anchieta', status: 'offline', battery: 38, updatedAt: 'Há 58 min' },
-  { id: 'SNS-015', location: 'Prado', status: 'online', battery: 76, updatedAt: 'Há 3 min' },
-  { id: 'SNS-016', location: 'Gutierrez', status: 'online', battery: 24, updatedAt: 'Há 11 min' },
-  { id: 'SNS-017', location: 'Carlos Prates', status: 'online', battery: 87, updatedAt: 'Há 5 min' },
-  { id: 'SNS-018', location: 'Caiçara', status: 'online', battery: 69, updatedAt: 'Há 12 min' },
-  { id: 'SNS-019', location: 'Castelo', status: 'online', battery: 18, updatedAt: 'Há 14 min' },
-  { id: 'SNS-020', location: 'Ouro Preto', status: 'online', battery: 91, updatedAt: 'Há 2 min' },
-  { id: 'SNS-021', location: 'Venda Nova', status: 'online', battery: 66, updatedAt: 'Há 4 min' },
-  { id: 'SNS-022', location: 'Barreiro', status: 'online', battery: 72, updatedAt: 'Há 6 min' },
-  { id: 'SNS-023', location: 'Horto', status: 'online', battery: 83, updatedAt: 'Há 3 min' },
-  { id: 'SNS-024', location: 'Dona Clara', status: 'online', battery: 60, updatedAt: 'Há 8 min' },
-];
+const PER_PAGE = 20;
+const EMPTY_SUMMARY = {
+  online: 0,
+  offline: 0,
+  lowBattery: 0,
+};
 
 export default function Sensores() {
   const theme = useTheme();
+  const navigate = useNavigate();
+  const [sensors, setSensors] = useState([]);
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    perPage: PER_PAGE,
+    total: 0,
+    totalPages: 1,
+    summary: EMPTY_SUMMARY,
+  });
+  const [locationParams, setLocationParams] = useState({});
+  const [isLocationReady, setIsLocationReady] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const onlineCount = sensors.filter((sensor) => sensor.status === 'online').length;
-  const offlineCount = sensors.length - onlineCount;
-  const lowBatteryCount = sensors.filter((sensor) => sensor.battery <= 25).length;
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadLocation() {
+      try {
+        const location = await requestGeolocation();
+
+        if (!isMounted) return;
+        setLocationParams(location ? {
+          latitude: location.latitude,
+          longitude: location.longitude,
+        } : {});
+      } catch {
+        if (isMounted) setLocationParams({});
+      } finally {
+        if (isMounted) setIsLocationReady(true);
+      }
+    }
+
+    loadLocation();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isLocationReady) return;
+
+    let isMounted = true;
+
+    async function loadSensors() {
+      setIsLoading(true);
+
+      try {
+        const data = await fetchSensors({
+          page,
+          perPage: PER_PAGE,
+          ...locationParams,
+        });
+
+        if (!isMounted) return;
+
+        const total = Number(data.total ?? 0);
+        const responsePerPage = Number(data.perPage ?? PER_PAGE);
+        const totalPages = Math.max(1, Number(data.totalPages ?? Math.ceil(total / responsePerPage)));
+
+        setSensors((data.items ?? []).map(mapSensorToTable));
+        setPagination({
+          page: Number(data.page ?? page),
+          perPage: responsePerPage,
+          total,
+          totalPages,
+          summary: normalizeSummary(data.summary),
+        });
+      } catch {
+        if (!isMounted) return;
+
+        setSensors([]);
+        setPagination({
+          page,
+          perPage: PER_PAGE,
+          total: 0,
+          totalPages: 1,
+          summary: EMPTY_SUMMARY,
+        });
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    }
+
+    loadSensors();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isLocationReady, locationParams, page]);
+
+  const pageCount = Math.max(1, pagination.totalPages);
+  const visiblePage = Math.min(page, pageCount);
+  const rangeStart = pagination.total === 0 ? 0 : (pagination.page - 1) * pagination.perPage + 1;
+  const rangeEnd = Math.min(pagination.page * pagination.perPage, pagination.total);
+  const onlineCount = pagination.summary.online;
+  const offlineCount = pagination.summary.offline;
+  const lowBatteryCount = pagination.summary.lowBattery;
+
+  const handlePageChange = (_event, value) => {
+    setPage(value);
+  };
 
   const statusColors = {
     online: theme.palette.success.main,
@@ -97,7 +181,7 @@ export default function Sensores() {
         <StatCard
           iconName="radio"
           label="Total de Sensores"
-          value={sensors.length}
+          value={pagination.total}
           color={theme.palette.secondary.light}
           background={alpha(theme.palette.secondary.main, 0.14)}
         />
@@ -134,22 +218,23 @@ export default function Sensores() {
           overflow: 'hidden',
         }}
       >
-        <Stack
-          direction={{ xs: 'column', sm: 'row' }}
-          alignItems={{ xs: 'flex-start', sm: 'center' }}
+        <Box
+          sx={{ p: { xs: 2, sm: 3 } }}
+          display="flex"
+          alignItems="center"
           justifyContent="space-between"
           gap={1.5}
-          sx={{ p: { xs: 2, sm: 3 } }}
+          flexWrap="wrap"
         >
           <Text variant="subtitle1" weight={700}>
             Status dos Sensores
           </Text>
 
-          <Stack direction="row" spacing={2} alignItems="center">
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
             <LegendItem color={theme.palette.success.main} label={`${onlineCount} Online`} />
             <LegendItem color={theme.palette.error.main} label={`${offlineCount} Offline`} />
-          </Stack>
-        </Stack>
+          </Box>
+        </Box>
 
         <TableContainer
           sx={{
@@ -187,6 +272,7 @@ export default function Sensores() {
                   <TableRow
                     key={sensor.id}
                     hover
+                    onClick={() => navigate(`/sensores/${sensor.id}`)}
                     sx={{
                       '&:last-of-type td': { borderBottom: 0 },
                       '&:hover td': {
@@ -239,6 +325,37 @@ export default function Sensores() {
             </TableBody>
           </Table>
         </TableContainer>
+
+        <Box
+          sx={{
+            px: { xs: 2, sm: 3 },
+            py: 2,
+            borderTop: '1px solid',
+            borderColor: 'divider',
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            alignItems: { xs: 'flex-start', sm: 'center' },
+            justifyContent: 'space-between',
+            gap: 1.5,
+          }}
+        >
+          <Text variant="body2" sx={{ color: 'text.secondary' }}>
+            {isLoading
+              ? 'Carregando sensores...'
+              : pagination.total === 0
+                ? 'Nenhum sensor encontrado'
+                : `Mostrando ${rangeStart}-${rangeEnd} de ${pagination.total} sensores`}
+          </Text>
+
+          <Pagination
+            count={pageCount}
+            page={visiblePage}
+            onChange={handlePageChange}
+            color="primary"
+            shape="rounded"
+            disabled={isLoading || pageCount <= 1}
+          />
+        </Box>
       </Paper>
     </Box>
   );
@@ -314,4 +431,50 @@ function StatusPill({ color, label }) {
       </Text>
     </Stack>
   );
+}
+
+function normalizeSummary(summary) {
+  return {
+    online: Number(summary?.online ?? 0),
+    offline: Number(summary?.offline ?? 0),
+    lowBattery: Number(summary?.lowBattery ?? 0),
+  };
+}
+
+function mapSensorToTable(sensor) {
+  return {
+    id: sensor.id,
+    location: sensor.address || sensor.neighborhood || sensor.name || formatCoordinates(sensor),
+    status: sensor.status === 'ACTIVE' ? 'online' : 'offline',
+    battery: sensor.batery ?? 0,
+    updatedAt: formatLastUpdate(sensor.lastCommunicationAt || sensor.updatedAt),
+  };
+}
+
+function formatCoordinates(sensor) {
+  const latitude = Number(sensor.latitude);
+  const longitude = Number(sensor.longitude);
+
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+    return 'Localização indisponível';
+  }
+
+  return `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
+}
+
+function formatLastUpdate(value) {
+  if (!value) return 'Sem registro';
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return 'Sem registro';
+
+  const diffMinutes = Math.max(0, Math.floor((Date.now() - date.getTime()) / 60000));
+
+  if (diffMinutes < 1) return 'Agora';
+  if (diffMinutes < 60) return `Há ${diffMinutes} min`;
+
+  const diffHours = Math.floor(diffMinutes / 60);
+  if (diffHours < 24) return `Há ${diffHours}h`;
+
+  return date.toLocaleDateString('pt-BR');
 }

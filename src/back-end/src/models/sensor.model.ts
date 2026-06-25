@@ -18,6 +18,12 @@ export const SENSOR_STATUSES = [
 
 export type SensorStatus = (typeof SENSOR_STATUSES)[number]
 
+export interface SensorMeasurement {
+  measuredAt: string | Date
+  value: number
+  unit: string
+}
+
 export interface Sensor {
   id: string
   name: string
@@ -26,6 +32,15 @@ export interface Sensor {
   longitude: number
   status: SensorStatus
   batery?: number | null
+  rua?: string | null
+  bairro?: string | null
+  cidade?: string | null
+  estado?: string | null
+  pais?: string | null
+  address?: string | null
+  neighborhood?: string | null
+  distanceKm?: number | null
+  measurementsHistory: SensorMeasurement[]
   lastCommunicationAt?: Date | null
   createdAt?: Date
   updatedAt?: Date

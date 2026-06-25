@@ -45,7 +45,6 @@ class AIService {
             return response.text();
         }
         catch (error) {
-            console.log("Erro na API do Gemini", error);
             throw new error_1.AppError("Falha ao gerar texto descritivo com IA", 500, "AI_GENERATION_ERROR");
         }
     }
