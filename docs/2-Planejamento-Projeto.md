@@ -168,9 +168,9 @@ O projeto pode utilizar a aba **Projects** do GitHub, porém é **OBRIGATÓRIO p
 
 | Responsável | Papel | Tarefa | Início | Prazo | Status |
 |-------------|--------|--------|--------|--------|--------|
-|             |        | Correção de bugs | 22/05 | 05/06 | ❌ |
-|             |        | Finalizar relatórios e dashboards | 01/06 | 15/06 | ❌ |
-|             |        | Preencher Relatório APC | 10/06 | 20/06 | ❌ |
-|             |        | Testes finais e consolidar README | 15/06 | 25/06 | ❌ |
+| Vitor      |        | Filtragem e ordenação de sensores | 22/05 | 25/06 | 📝 |
+| Bruna            |        | Implementar módulo de IA | 01/06 | 20/06 | ✔️ |
+| Ricardo            |        | Gerar relatório em PDF | 10/06 | 25/06 | 📝 |
+| Samuel          |        | Módulo de sensores | 15/06 | 25/06 | 📝 |
 
 ---
