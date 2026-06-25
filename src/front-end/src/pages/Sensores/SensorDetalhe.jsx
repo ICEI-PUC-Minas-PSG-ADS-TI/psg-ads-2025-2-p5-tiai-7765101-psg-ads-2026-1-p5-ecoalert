@@ -110,8 +110,8 @@ export default function SensorDetalhe() {
   }
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, width: '100%' }}>
-      <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" gap={1.5}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, width: '100%', justifyContent: 'center' }}>
+      <Stack direction={{ xs: 'column', sm: 'row', justifyContent: 'center', alignItems: 'center' }} gap={1.5}>
         <Box>
           <Button
             variant="text"
@@ -128,10 +128,8 @@ export default function SensorDetalhe() {
             {sensor.id}
           </Text>
         </Box>
-
-        <StatusPill color={statusColor} label={STATUS_LABELS[sensor.status] ?? sensor.status} />
       </Stack>
-
+      <StatusPill color={statusColor} label={STATUS_LABELS[sensor.status] ?? sensor.status} />
       <Box
         sx={{
           display: 'grid',
@@ -143,7 +141,7 @@ export default function SensorDetalhe() {
           gap: 2,
         }}
       >
-        <InfoPanel iconName="radio" label="Tipo" value={SENSOR_TYPE_LABELS[sensor.type] ?? sensor.type} />
+        <InfoPanel iconName="radio" label="Tipo" value={"Híbrido"} />
         <InfoPanel iconName="battery-medium" label="Bateria" value={formatBattery(sensor.batery)} />
         <InfoPanel iconName="map-pin" label="Endereco" value={sensor.address || sensor.neighborhood || 'Sem endereco'} />
         <InfoPanel iconName="clock" label="Ultima comunicacao" value={formatDateTime(sensor.lastCommunicationAt)} />
@@ -296,7 +294,7 @@ function InfoPanel({ iconName, label, value }) {
 
 function StatusPill({ color, label }) {
   return (
-    <Stack direction="row" spacing={0.75} alignItems="center">
+    <Stack direction="row" spacing={0.75} alignItems="center" justifyContent="center">
       <Box sx={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: color }} />
       <Text variant="body2" weight={700} sx={{ color }}>
         {label}

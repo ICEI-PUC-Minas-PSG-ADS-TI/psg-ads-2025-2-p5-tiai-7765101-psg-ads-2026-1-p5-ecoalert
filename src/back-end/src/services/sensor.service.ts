@@ -18,6 +18,7 @@ type SensorListQuery = {
   type?: SensorType
   status?: SensorStatus
   neighborhood?: string
+  cep?: string
   latitude?: number
   longitude?: number
   page: number
@@ -53,10 +54,15 @@ export class SensorService {
 
     if (query.type) this.parseType(query.type, fields)
     if (query.status) this.parseStatus(query.status, fields)
+    const cep = this.parseCep(query.cep, fields)
     const origin = this.parseOrigin(query.latitude, query.longitude, fields)
 
     if (Object.keys(fields).length > 0) {
       throw new AppError("Dados invalidos", 400, "SENSOR_VALIDATION_ERROR", fields)
+    }
+
+    if (cep) {
+      return this.findByCep(cep, query.perPage)
     }
 
     const neighborhood = query.neighborhood?.trim()
@@ -142,6 +148,53 @@ export class SensorService {
     }
 
     return repository.delete(id)
+  }
+
+  private static async findByCep(cep: string, perPage: number): Promise<SensorListResult> {
+    const address = await GeolocationService.getAddressByCep(cep)
+    const neighborhood = this.firstFilled(address.neighborhood)
+
+    const sensorByNeighborhood = neighborhood
+      ? await repository.findFirstByStoredNeighborhood(neighborhood)
+      : null
+
+    if (sensorByNeighborhood) {
+      return this.buildListResult([sensorByNeighborhood], perPage)
+    }
+
+    const coordinates = await GeolocationService.getCoordinatesFromAddress(address)
+
+    if (!coordinates) {
+      return this.buildListResult([], perPage)
+    }
+
+    const sensorByPolygon = await repository.findFirstByContainingCoordinates(coordinates)
+    const nearestSensor =
+      sensorByPolygon ??
+      (await repository.findMany({
+        where: {},
+        skip: 0,
+        take: 1,
+        origin: coordinates
+      }))[0] ??
+      null
+
+    return this.buildListResult(nearestSensor ? [nearestSensor] : [], perPage)
+  }
+
+  private static buildListResult(items: Sensor[], perPage: number): SensorListResult {
+    return {
+      items,
+      page: 1,
+      perPage,
+      total: items.length,
+      totalPages: 1,
+      summary: {
+        online: items.filter((sensor) => sensor.status === "ACTIVE").length,
+        offline: items.filter((sensor) => sensor.status !== "ACTIVE").length,
+        lowBattery: items.filter((sensor) => Number(sensor.batery ?? 0) <= 25).length
+      }
+    }
   }
 
   private static hasCompleteAddress(sensor: Sensor) {
@@ -285,6 +338,18 @@ export class SensorService {
       latitude: this.parseLatitude(latitude as number, fields),
       longitude: this.parseLongitude(longitude as number, fields)
     }
+  }
+
+  private static parseCep(cep: string | undefined, fields: ErrorFields) {
+    if (!cep) return undefined
+
+    const normalized = cep.replace(/\D/g, "")
+    if (normalized.length !== 8) {
+      fields.cep = "cep deve conter 8 digitos"
+      return undefined
+    }
+
+    return normalized
   }
 
   private static parseBatery(batery: number | null | undefined, fields: ErrorFields) {

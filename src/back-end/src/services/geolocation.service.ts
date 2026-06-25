@@ -11,6 +11,11 @@ type NominatimReverseResponse = {
   }
 }
 
+type NominatimSearchResponse = Array<{
+  lat?: string
+  lon?: string
+}>
+
 type ViaCepResponse = {
   cep?: string
   logradouro?: string
@@ -29,8 +34,15 @@ export type CoordinatesAddress = {
   state: string | null
 }
 
+export type Coordinates = {
+  latitude: number
+  longitude: number
+}
+
 const NOMINATIM_REVERSE_URL =
   process.env.NOMINATIM_REVERSE_URL ?? "https://nominatim.openstreetmap.org/reverse"
+const NOMINATIM_SEARCH_URL =
+  process.env.NOMINATIM_SEARCH_URL ?? "https://nominatim.openstreetmap.org/search"
 const NOMINATIM_USER_AGENT =
   process.env.NOMINATIM_USER_AGENT ?? "EcoAlert/2.0"
 const NOMINATIM_RATE_LIMIT_DELAY_MS = 20000
@@ -42,6 +54,52 @@ export class GeolocationService {
     longitude: number
   ): Promise<CoordinatesAddress | null> {
     return await this.getCepFromCoordinates(latitude, longitude)
+  }
+
+  static async getAddressByCep(cep: string): Promise<CoordinatesAddress> {
+    try {
+      const response = await api.get<ViaCepResponse>(
+        `${VIACEP_BASE_URL}/${cep.replace(/\D/g, "")}/json/`
+      )
+
+      if (response.data.erro) {
+        throw new AppError("CEP nao encontrado no ViaCEP", 404, "VIACEP_NOT_FOUND")
+      }
+
+      return {
+        cep,
+        street: normalize(response.data.logradouro),
+        neighborhood: normalize(response.data.bairro),
+        city: normalize(response.data.localidade),
+        state: normalize(response.data.estado) ?? normalize(response.data.uf)
+      }
+    } catch (error) {
+      if (error instanceof AppError) {
+        throw error
+      }
+
+      throw toAppError(
+        error,
+        "Erro ao buscar endereco no ViaCEP",
+        "VIACEP_REQUEST_ERROR"
+      )
+    }
+  }
+
+  static async getCoordinatesFromAddress(
+    address: CoordinatesAddress
+  ): Promise<Coordinates | null> {
+    const queries = [
+      buildAddressSearch(address),
+      `${address.cep.replace(/\D/g, "")}, Brasil`
+    ].filter(Boolean)
+
+    for (const query of queries) {
+      const coordinates = await this.searchCoordinates(query)
+      if (coordinates) return coordinates
+    }
+
+    return null
   }
 
   private static async getCepFromCoordinates(
@@ -94,35 +152,60 @@ export class GeolocationService {
     }
   }
 
-  private static async getAddressByCep(cep: string): Promise<CoordinatesAddress> {
-    try {
-      const response = await api.get<ViaCepResponse>(
-        `${VIACEP_BASE_URL}/${cep}/json/`
-      )
+  private static async searchCoordinates(query: string): Promise<Coordinates | null> {
+    while (true) {
+      try {
+        const response = await api.get<NominatimSearchResponse>(
+          NOMINATIM_SEARCH_URL,
+          {
+            params: {
+              format: "jsonv2",
+              q: query,
+              limit: 1,
+              addressdetails: 1
+            },
+            headers: {
+              "User-Agent": NOMINATIM_USER_AGENT
+            }
+          }
+        )
 
-      if (response.data.erro) {
-        throw new AppError("CEP nao encontrado no ViaCEP", 404, "VIACEP_NOT_FOUND")
-      }
+        const result = response.data[0]
+        const latitude = Number(result?.lat)
+        const longitude = Number(result?.lon)
 
-      return {
-        cep,
-        street: normalize(response.data.logradouro),
-        neighborhood: normalize(response.data.bairro),
-        city: normalize(response.data.localidade),
-        state: normalize(response.data.estado) ?? normalize(response.data.uf)
-      }
-    } catch (error) {
-      if (error instanceof AppError) {
-        throw error
-      }
+        if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+          return null
+        }
 
-      throw toAppError(
-        error,
-        "Erro ao buscar endereco no ViaCEP",
-        "VIACEP_REQUEST_ERROR"
-      )
+        return { latitude, longitude }
+      } catch (error) {
+        if (getHttpStatus(error) === 429) {
+          console.warn(
+            `Nominatim retornou 429. Aguardando ${NOMINATIM_RATE_LIMIT_DELAY_MS}ms antes de continuar.`
+          )
+          await sleep(NOMINATIM_RATE_LIMIT_DELAY_MS)
+          continue
+        }
+
+        throw toAppError(
+          error,
+          "Erro ao buscar coordenadas no Nominatim",
+          "NOMINATIM_SEARCH_REQUEST_ERROR"
+        )
+      }
     }
   }
+}
+
+function buildAddressSearch(address: CoordinatesAddress) {
+  return [
+    address.street,
+    address.neighborhood,
+    address.city,
+    address.state,
+    "Brasil"
+  ].filter(Boolean).join(", ")
 }
 
 function normalize(value?: string | null) {
