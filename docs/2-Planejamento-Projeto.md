@@ -168,9 +168,10 @@ O projeto pode utilizar a aba **Projects** do GitHub, porém é **OBRIGATÓRIO p
 
 | Responsável | Papel | Tarefa | Início | Prazo | Status |
 |-------------|--------|--------|--------|--------|--------|
-| Vitor      |        | Filtragem e ordenação de sensores | 22/05 | 25/06 | 📝 |
-| Bruna            |        | Implementar módulo de IA | 01/06 | 20/06 | ✔️ |
-| Ricardo            |        | Gerar relatório em PDF | 10/06 | 25/06 | 📝 |
-| Samuel          |        | Módulo de sensores | 15/06 | 25/06 | 📝 |
+| Vitor      | Arquiteto de Dados       | Filtragem e ordenação de sensores | 22/05 | 25/06 | ✔️ |
+| Bruna            | Gerente de Qualidade        | Implementar módulo de IA | 01/06 | 20/06 | ✔️ |
+| Ricardo            | Facilitador Ágil       | Gerar relatório em PDF | 10/06 | 25/06 | ✔️ |
+| Samuel          | Tech Lead        | Módulo de sensores | 15/06 | 25/06 | ✔️ |
+| Todos          |         | Preenchimento dos relatórios no APC | 25/06 | 26/06 | 📝 |
 
 ---
