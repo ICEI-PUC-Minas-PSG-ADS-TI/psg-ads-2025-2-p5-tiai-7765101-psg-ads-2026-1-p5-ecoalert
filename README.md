@@ -122,7 +122,7 @@ O front-end ficará disponível em `http://localhost:5173`.
 
 # Apresentação
 
-<li><a href="presentation/README.md"> Apresentação da solução</a></li>
+<li><a href="docs/apresentacao/README.md"> Apresentação da solução</a></li>
 
 
 ## Histórico de versões
