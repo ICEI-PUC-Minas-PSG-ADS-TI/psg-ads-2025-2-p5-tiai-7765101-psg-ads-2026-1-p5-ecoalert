@@ -509,7 +509,7 @@ export default function RelatorioIA() {
                   Relatorio gerado pela IA
                 </Text>
                 <Text variant="caption" sx={{ color: 'text.secondary' }}>
-                  Analise textual baseada nos dados meteorologicos e metricas atuais
+                  Análise textual baseada nos dados meteorologicos e metricas atuais
                 </Text>
               </Box>
 
@@ -535,7 +535,7 @@ export default function RelatorioIA() {
               {reportLoading ? (
                 <EmptyState
                   iconName="loader-circle"
-                  title="Gerando analise"
+                  title="Gerando análise"
                   description="A IA esta cruzando as metricas com os dados meteorologicos."
                   loading
                 />
@@ -552,7 +552,7 @@ export default function RelatorioIA() {
                 <EmptyState
                   iconName="sparkles"
                   title="Pronto para gerar"
-                  description="Revise as metricas e clique em Gerar relatorio para criar a analise inteligente."
+                  description="Revise as metricas e clique em Gerar relatorio para criar a análise inteligente."
                   toneColor={theme.palette.secondary.light}
                 />
               )}

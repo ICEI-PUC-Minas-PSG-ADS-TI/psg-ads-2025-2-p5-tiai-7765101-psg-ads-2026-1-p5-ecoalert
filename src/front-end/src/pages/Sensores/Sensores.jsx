@@ -1,3 +1,5 @@
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Card,
@@ -16,40 +18,52 @@ import { alpha, useTheme } from '@mui/material/styles';
 
 import { Icon } from '@/components/Icon/Icon';
 import { Text } from '@/components/Text/Text';
+import { requestGeolocation } from '@/services/geolocationService';
+import { fetchSensors } from '@/services/sensorService';
 
-const sensors = [
-  { id: 'SNS-001', location: 'Savassi', status: 'online', battery: 92, updatedAt: 'Há 2 min' },
-  { id: 'SNS-002', location: 'Lourdes', status: 'online', battery: 78, updatedAt: 'Há 3 min' },
-  { id: 'SNS-003', location: 'Funcionários', status: 'online', battery: 85, updatedAt: 'Há 1 min' },
-  { id: 'SNS-004', location: 'Santa Efigênia', status: 'offline', battery: 42, updatedAt: 'Há 2h' },
-  { id: 'SNS-005', location: 'Floresta', status: 'online', battery: 95, updatedAt: 'Há 4 min' },
-  { id: 'SNS-006', location: 'Santa Tereza', status: 'online', battery: 67, updatedAt: 'Há 2 min' },
-  { id: 'SNS-007', location: 'Pampulha', status: 'online', battery: 88, updatedAt: 'Há 5 min' },
-  { id: 'SNS-008', location: 'Cidade Nova', status: 'online', battery: 73, updatedAt: 'Há 6 min' },
-  { id: 'SNS-009', location: 'Sagrada Família', status: 'online', battery: 64, updatedAt: 'Há 8 min' },
-  { id: 'SNS-010', location: 'Buritis', status: 'online', battery: 21, updatedAt: 'Há 9 min' },
-  { id: 'SNS-011', location: 'Belvedere', status: 'online', battery: 58, updatedAt: 'Há 10 min' },
-  { id: 'SNS-012', location: 'Mangabeiras', status: 'online', battery: 99, updatedAt: 'Há 1 min' },
-  { id: 'SNS-013', location: 'Serra', status: 'online', battery: 81, updatedAt: 'Há 7 min' },
-  { id: 'SNS-014', location: 'Anchieta', status: 'offline', battery: 38, updatedAt: 'Há 58 min' },
-  { id: 'SNS-015', location: 'Prado', status: 'online', battery: 76, updatedAt: 'Há 3 min' },
-  { id: 'SNS-016', location: 'Gutierrez', status: 'online', battery: 24, updatedAt: 'Há 11 min' },
-  { id: 'SNS-017', location: 'Carlos Prates', status: 'online', battery: 87, updatedAt: 'Há 5 min' },
-  { id: 'SNS-018', location: 'Caiçara', status: 'online', battery: 69, updatedAt: 'Há 12 min' },
-  { id: 'SNS-019', location: 'Castelo', status: 'online', battery: 18, updatedAt: 'Há 14 min' },
-  { id: 'SNS-020', location: 'Ouro Preto', status: 'online', battery: 91, updatedAt: 'Há 2 min' },
-  { id: 'SNS-021', location: 'Venda Nova', status: 'online', battery: 66, updatedAt: 'Há 4 min' },
-  { id: 'SNS-022', location: 'Barreiro', status: 'online', battery: 72, updatedAt: 'Há 6 min' },
-  { id: 'SNS-023', location: 'Horto', status: 'online', battery: 83, updatedAt: 'Há 3 min' },
-  { id: 'SNS-024', location: 'Dona Clara', status: 'online', battery: 60, updatedAt: 'Há 8 min' },
-];
+const PER_PAGE = 20;
 
 export default function Sensores() {
   const theme = useTheme();
+  const navigate = useNavigate();
+  const [sensors, setSensors] = useState([]);
 
-  const onlineCount = sensors.filter((sensor) => sensor.status === 'online').length;
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadSensors() {
+      const location = await requestGeolocation();
+      const data = await fetchSensors({
+        page: 1,
+        perPage: PER_PAGE,
+        ...(location ? {
+          latitude: location.latitude,
+          longitude: location.longitude,
+        } : {}),
+      });
+
+      if (!isMounted) return;
+      setSensors((data.items ?? []).map(mapSensorToTable));
+    }
+
+    loadSensors().catch(() => {
+      if (isMounted) setSensors([]);
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const onlineCount = useMemo(
+    () => sensors.filter((sensor) => sensor.status === 'online').length,
+    [sensors]
+  );
   const offlineCount = sensors.length - onlineCount;
-  const lowBatteryCount = sensors.filter((sensor) => sensor.battery <= 25).length;
+  const lowBatteryCount = useMemo(
+    () => sensors.filter((sensor) => sensor.battery <= 25).length,
+    [sensors]
+  );
 
   const statusColors = {
     online: theme.palette.success.main,
@@ -187,6 +201,7 @@ export default function Sensores() {
                   <TableRow
                     key={sensor.id}
                     hover
+                    onClick={() => navigate(`/sensores/${sensor.id}`)}
                     sx={{
                       '&:last-of-type td': { borderBottom: 0 },
                       '&:hover td': {
@@ -314,4 +329,42 @@ function StatusPill({ color, label }) {
       </Text>
     </Stack>
   );
+}
+
+function mapSensorToTable(sensor) {
+  return {
+    id: sensor.id,
+    location: sensor.address || sensor.neighborhood || sensor.name || formatCoordinates(sensor),
+    status: sensor.status === 'ACTIVE' ? 'online' : 'offline',
+    battery: sensor.batery ?? 0,
+    updatedAt: formatLastUpdate(sensor.lastCommunicationAt || sensor.updatedAt),
+  };
+}
+
+function formatCoordinates(sensor) {
+  const latitude = Number(sensor.latitude);
+  const longitude = Number(sensor.longitude);
+
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+    return 'Localização indisponível';
+  }
+
+  return `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
+}
+
+function formatLastUpdate(value) {
+  if (!value) return 'Sem registro';
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return 'Sem registro';
+
+  const diffMinutes = Math.max(0, Math.floor((Date.now() - date.getTime()) / 60000));
+
+  if (diffMinutes < 1) return 'Agora';
+  if (diffMinutes < 60) return `Há ${diffMinutes} min`;
+
+  const diffHours = Math.floor(diffMinutes / 60);
+  if (diffHours < 24) return `Há ${diffHours}h`;
+
+  return date.toLocaleDateString('pt-BR');
 }

@@ -18,6 +18,10 @@ export const routes = {
   dashboard: {
     summary: "/dashboard/summary",
   },
+  sensors: {
+    list: "/sensors",
+    getById: (id: string) => `/sensors/${id}`,
+  },
   product: {
     get: "/products",
     delete: "/products",

@@ -8,6 +8,7 @@ import Home from '@/pages/Home/Home'
 import Landing from '@/pages/Landing/Landing'
 import Login from '@/pages/Login/Login'
 import RelatorioIA from '@/pages/RelatorioIA/RelatorioIA'
+import SensorDetalhe from '@/pages/Sensores/SensorDetalhe'
 import Sensores from '@/pages/Sensores/Sensores'
 import Conta from '@/pages/Conta/Conta'
 
@@ -47,6 +48,10 @@ export const router = createBrowserRouter([
           {
             path: '/sensores',
             element: <Sensores />,
+          },
+          {
+            path: '/sensores/:id',
+            element: <SensorDetalhe />,
           },
           {
             path: '/relatorio-ia',
