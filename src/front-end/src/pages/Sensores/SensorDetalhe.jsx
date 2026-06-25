@@ -57,6 +57,10 @@ export default function SensorDetalhe() {
     return [...(sensor?.measurementsHistory ?? [])].reverse();
   }, [sensor]);
 
+  const latestMeasurements = useMemo(() => {
+    return buildLatestMeasurements(sensor?.measurementsHistory ?? [], sensor?.type);
+  }, [sensor]);
+
   useEffect(() => {
     let isMounted = true;
 
@@ -110,8 +114,8 @@ export default function SensorDetalhe() {
   }
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, width: '100%' }}>
-      <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" gap={1.5}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, width: '100%', justifyContent: 'center' }}>
+      <Stack direction={{ xs: 'column', sm: 'row', justifyContent: 'center', alignItems: 'center' }} gap={1.5}>
         <Box>
           <Button
             variant="text"
@@ -128,10 +132,8 @@ export default function SensorDetalhe() {
             {sensor.id}
           </Text>
         </Box>
-
-        <StatusPill color={statusColor} label={STATUS_LABELS[sensor.status] ?? sensor.status} />
       </Stack>
-
+      <StatusPill color={statusColor} label={STATUS_LABELS[sensor.status] ?? sensor.status} />
       <Box
         sx={{
           display: 'grid',
@@ -143,18 +145,20 @@ export default function SensorDetalhe() {
           gap: 2,
         }}
       >
-        <InfoPanel iconName="radio" label="Tipo" value={SENSOR_TYPE_LABELS[sensor.type] ?? sensor.type} />
+        <InfoPanel iconName="radio" label="Tipo" value={"Híbrido"} />
         <InfoPanel iconName="battery-medium" label="Bateria" value={formatBattery(sensor.batery)} />
         <InfoPanel iconName="map-pin" label="Endereco" value={sensor.address || sensor.neighborhood || 'Sem endereco'} />
         <InfoPanel iconName="clock" label="Ultima comunicacao" value={formatDateTime(sensor.lastCommunicationAt)} />
       </Box>
+
+      <LatestMetricsCard metrics={latestMeasurements} />
 
       <Paper
         elevation={0}
         sx={{
           border: '1px solid',
           borderColor: 'divider',
-          borderRadius: 1,
+          borderRadius: 3,
           overflow: 'hidden',
         }}
       >
@@ -261,7 +265,7 @@ function InfoPanel({ iconName, label, value }) {
       sx={{
         border: '1px solid',
         borderColor: 'divider',
-        borderRadius: 1,
+        borderRadius: 3,
         p: 2,
         minHeight: 118,
       }}
@@ -271,7 +275,7 @@ function InfoPanel({ iconName, label, value }) {
           sx={{
             width: 38,
             height: 38,
-            borderRadius: 1,
+            borderRadius: 2,
             display: 'grid',
             placeItems: 'center',
             color: theme.palette.primary.main,
@@ -294,9 +298,78 @@ function InfoPanel({ iconName, label, value }) {
   );
 }
 
+function LatestMetricsCard({ metrics }) {
+  const theme = useTheme();
+
+  return (
+    <Paper
+      elevation={0}
+      sx={{
+        width: '100%',
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 3,
+        p: { xs: 2, sm: 3 },
+      }}
+    >
+      <Stack spacing={2}>
+        <Box>
+          <Text variant="subtitle1" weight={700}>
+            Metricas atuais
+          </Text>
+          <Text variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
+            Ultimas medicoes recebidas por tipo
+          </Text>
+        </Box>
+
+        {metrics.length === 0 ? (
+          <Text variant="body2" sx={{ color: 'text.secondary' }}>
+            Nenhuma metrica registrada.
+          </Text>
+        ) : (
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr',
+                sm: 'repeat(2, minmax(0, 1fr))',
+                lg: 'repeat(4, minmax(0, 1fr))',
+              },
+              gap: 2,
+            }}
+          >
+            {metrics.map((metric) => (
+              <Stack
+                key={metric.type}
+                spacing={0.75}
+                sx={{
+                  minWidth: 0,
+                  p: 1.5,
+                  borderLeft: '3px solid',
+                  borderColor: theme.palette.primary.main,
+                }}
+              >
+                <Text variant="caption" sx={{ color: 'text.secondary' }}>
+                  {metric.label}
+                </Text>
+                <Text variant="h6" weight={800} sx={{ lineHeight: 1.1, overflowWrap: 'anywhere' }}>
+                  {formatMeasurementValue(metric.value)} {metric.unit}
+                </Text>
+                <Text variant="caption" sx={{ color: 'text.secondary' }}>
+                  {formatDateTime(metric.measuredAt)}
+                </Text>
+              </Stack>
+            ))}
+          </Box>
+        )}
+      </Stack>
+    </Paper>
+  );
+}
+
 function StatusPill({ color, label }) {
   return (
-    <Stack direction="row" spacing={0.75} alignItems="center">
+    <Stack direction="row" spacing={0.75} alignItems="center" justifyContent="center">
       <Box sx={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: color }} />
       <Text variant="body2" weight={700} sx={{ color }}>
         {label}
@@ -332,6 +405,33 @@ function formatCoordinate(value) {
 function formatMeasurementType(type, fallbackType) {
   const measurementType = type || fallbackType;
   return MEASUREMENT_TYPE_LABELS[measurementType] ?? measurementType ?? 'Sem tipo';
+}
+
+function buildLatestMeasurements(history, fallbackType) {
+  const latestByType = new Map();
+
+  for (const measurement of history) {
+    const type = measurement.type || fallbackType;
+    if (!type) continue;
+
+    const measuredAt = new Date(measurement.measuredAt).getTime();
+    const current = latestByType.get(type);
+    const currentMeasuredAt = current ? new Date(current.measuredAt).getTime() : Number.NEGATIVE_INFINITY;
+
+    if (!current || measuredAt >= currentMeasuredAt) {
+      latestByType.set(type, measurement);
+    }
+  }
+
+  return Array.from(latestByType.entries())
+    .map(([type, measurement]) => ({
+      type,
+      label: formatMeasurementType(type, fallbackType),
+      measuredAt: measurement.measuredAt,
+      value: measurement.value,
+      unit: measurement.unit,
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label, 'pt-BR'));
 }
 
 function formatMeasurementValue(value) {

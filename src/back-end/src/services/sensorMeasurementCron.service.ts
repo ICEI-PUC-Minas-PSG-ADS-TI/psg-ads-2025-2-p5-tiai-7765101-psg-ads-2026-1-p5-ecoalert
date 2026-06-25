@@ -12,7 +12,7 @@ type MeasurementRule = {
   unit: string
 }
 
-const DEFAULT_INTERVAL_MS = 60_000
+const DEFAULT_INTERVAL_MS = 60_000 * 60
 
 const MEASUREMENT_RULES: Record<SensorMeasurementType, MeasurementRule> = {
   RAIN: { min: 0, max: 45, decimals: 1, unit: "mm" },

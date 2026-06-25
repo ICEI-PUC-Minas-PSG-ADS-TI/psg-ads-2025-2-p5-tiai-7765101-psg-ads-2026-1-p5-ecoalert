@@ -23,6 +23,7 @@ export async function getSensors(req: Request, res: Response) {
   const type = parseOptionalString(req.query.type)
   const status = parseOptionalString(req.query.status)
   const neighborhood = parseOptionalString(req.query.neighborhood)
+  const cep = parseOptionalString(req.query.cep)
   const latitude = parseOptionalNumber(req.query.latitude)
   const longitude = parseOptionalNumber(req.query.longitude)
 
@@ -30,6 +31,7 @@ export async function getSensors(req: Request, res: Response) {
     ...(type ? { type: parseSensorType(type) } : {}),
     ...(status ? { status: parseSensorStatus(status) } : {}),
     ...(neighborhood ? { neighborhood } : {}),
+    ...(cep ? { cep } : {}),
     ...(latitude !== undefined ? { latitude } : {}),
     ...(longitude !== undefined ? { longitude } : {}),
     page,

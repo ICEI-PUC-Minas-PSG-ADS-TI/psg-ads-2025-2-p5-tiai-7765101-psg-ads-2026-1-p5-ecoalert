@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
+  Button,
   Card,
   CardContent,
   CircularProgress,
@@ -15,6 +16,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
 } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 
@@ -45,6 +47,10 @@ export default function Sensores() {
   const [locationParams, setLocationParams] = useState({});
   const [isLocationReady, setIsLocationReady] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [cepInput, setCepInput] = useState('');
+  const [cepFilter, setCepFilter] = useState('');
+  const [cepError, setCepError] = useState('');
+  const [fetchError, setFetchError] = useState('');
 
   useEffect(() => {
     let isMounted = true;
@@ -73,18 +79,19 @@ export default function Sensores() {
   }, []);
 
   useEffect(() => {
-    if (!isLocationReady) return;
+    if (!isLocationReady && !cepFilter) return;
 
     let isMounted = true;
 
     async function loadSensors() {
       setIsLoading(true);
+      setFetchError('');
 
       try {
         const data = await fetchSensors({
           page,
           perPage: PER_PAGE,
-          ...locationParams,
+          ...(cepFilter ? { cep: cepFilter } : locationParams),
         });
 
         if (!isMounted) return;
@@ -104,6 +111,11 @@ export default function Sensores() {
       } catch {
         if (!isMounted) return;
 
+        setFetchError(
+          cepFilter
+            ? 'Nao foi possivel encontrar sensores para este CEP.'
+            : 'Nao foi possivel carregar os sensores.'
+        );
         setSensors([]);
         setPagination({
           page,
@@ -122,7 +134,7 @@ export default function Sensores() {
     return () => {
       isMounted = false;
     };
-  }, [isLocationReady, locationParams, page]);
+  }, [cepFilter, isLocationReady, locationParams, page]);
 
   const pageCount = Math.max(1, pagination.totalPages);
   const visiblePage = Math.min(page, pageCount);
@@ -134,6 +146,43 @@ export default function Sensores() {
 
   const handlePageChange = (_event, value) => {
     setPage(value);
+  };
+
+  const handleCepChange = (event) => {
+    setCepInput(formatCep(event.target.value));
+    setCepError('');
+  };
+
+  const handleCepSearch = (event) => {
+    event.preventDefault();
+
+    const normalized = normalizeCep(cepInput);
+
+    if (!normalized) {
+      setCepFilter('');
+      setCepError('');
+      setFetchError('');
+      setPage(1);
+      return;
+    }
+
+    if (normalized.length !== 8) {
+      setCepError('Informe um CEP com 8 digitos.');
+      return;
+    }
+
+    setCepError('');
+    setFetchError('');
+    setPage(1);
+    setCepFilter(normalized);
+  };
+
+  const handleCepClear = () => {
+    setCepInput('');
+    setCepFilter('');
+    setCepError('');
+    setFetchError('');
+    setPage(1);
   };
 
   const statusColors = {
@@ -231,11 +280,59 @@ export default function Sensores() {
             Status dos Sensores
           </Text>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+          <Box
+            component="form"
+            onSubmit={handleCepSearch}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              gap: 1,
+              flexWrap: 'wrap',
+            }}
+          >
+            <TextField
+              size="small"
+              label="CEP"
+              value={cepInput}
+              onChange={handleCepChange}
+              inputProps={{ inputMode: 'numeric', maxLength: 9 }}
+              sx={{ width: { xs: '100%', sm: 150 } }}
+            />
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={isLoading}
+              sx={{ minHeight: 40 }}
+            >
+              Buscar
+            </Button>
+            {cepFilter ? (
+              <Button
+                type="button"
+                variant="text"
+                onClick={handleCepClear}
+                disabled={isLoading}
+                sx={{ minHeight: 40 }}
+              >
+                Limpar
+              </Button>
+            ) : null}
+          </Box>
+
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap', width: '100%' }}>
             <LegendItem color={theme.palette.success.main} label={`${onlineCount} Online`} />
             <LegendItem color={theme.palette.error.main} label={`${offlineCount} Offline`} />
           </Box>
         </Box>
+
+        {cepError || fetchError ? (
+          <Box sx={{ px: { xs: 2, sm: 3 }, pb: 2, mt: -1 }}>
+            <Text variant="body2" sx={{ color: 'error.main' }}>
+              {cepError || fetchError}
+            </Text>
+          </Box>
+        ) : null}
 
         <TableContainer
           aria-busy={isLoading}
@@ -483,6 +580,17 @@ function normalizeSummary(summary) {
     offline: Number(summary?.offline ?? 0),
     lowBattery: Number(summary?.lowBattery ?? 0),
   };
+}
+
+function normalizeCep(value) {
+  return String(value ?? '').replace(/\D/g, '');
+}
+
+function formatCep(value) {
+  const digits = normalizeCep(value).slice(0, 8);
+
+  if (digits.length <= 5) return digits;
+  return `${digits.slice(0, 5)}-${digits.slice(5)}`;
 }
 
 function mapSensorToTable(sensor) {

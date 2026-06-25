@@ -124,6 +124,56 @@ export class SensorRepository {
     return result.rows[0] ?? null
   }
 
+  async findFirstByStoredNeighborhood(neighborhood: string): Promise<Sensor | null> {
+    await this.ensureSensorColumns()
+
+    const result = await pool.query<Sensor>(
+      `
+        SELECT ${this.buildSelectColumns("NULL::double precision")}
+        FROM sensors s
+        ${SENSOR_NEIGHBORHOOD_JOIN}
+        WHERE NULLIF(TRIM(s.bairro), '') ILIKE $1
+        ORDER BY s."updatedAt" DESC
+        LIMIT 1
+      `,
+      [neighborhood.trim()]
+    )
+
+    return result.rows[0] ?? null
+  }
+
+  async findFirstByContainingCoordinates(origin: SensorOrigin): Promise<Sensor | null> {
+    await this.ensureSensorColumns()
+
+    const values: unknown[] = []
+    const distanceSql = this.buildDistanceSql(origin, values)
+
+    const result = await pool.query<Sensor>(
+      `
+        SELECT ${this.buildSelectColumns(distanceSql)}
+        FROM sensors s
+        JOIN LATERAL (
+          SELECT n.geom
+          FROM neighborhoods n
+          WHERE n.geom IS NOT NULL
+            AND ST_Covers(n.geom, ST_SetSRID(ST_MakePoint($2, $1), 4674))
+          ORDER BY n.id
+          LIMIT 1
+        ) target_neighborhood ON true
+        ${SENSOR_NEIGHBORHOOD_JOIN}
+        WHERE ST_Covers(
+          target_neighborhood.geom,
+          ST_SetSRID(ST_MakePoint(s.longitude, s.latitude), 4674)
+        )
+        ORDER BY "distanceKm" ASC NULLS LAST, s."createdAt" DESC
+        LIMIT 1
+      `,
+      values
+    )
+
+    return result.rows[0] ?? null
+  }
+
   async update(
     id: string,
     data: Partial<Omit<UpdateSensorDto, "lastCommunicationAt"> & { lastCommunicationAt?: Date | null }>
