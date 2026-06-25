@@ -17,7 +17,7 @@ ODS 13: Ação Contra a Mudança Global do Clima.
 ## Integrantes
 
 * Bruna Luiza Siqueira Borges Matias
-* Ricardo Araújo Maciel
+* Ricardo Araújo Maciel (ricardoamaciel2016@gmail.com)
 * Samuel Maia de Oliveira
 * Vitor Fortunato Silva
 
