@@ -4,7 +4,7 @@
 
 ## Slides
 
-Você pode conferir os slides da nossa apresentação clicando em: [Slide Nimbly (PDF)](docs/apresentacao/slide_nimbly.pdf).
+Você pode conferir os slides da nossa apresentação clicando em: [Slide Nimbly (PDF)](slide_nimbly.pdf).
 
 ## Vídeo
 
