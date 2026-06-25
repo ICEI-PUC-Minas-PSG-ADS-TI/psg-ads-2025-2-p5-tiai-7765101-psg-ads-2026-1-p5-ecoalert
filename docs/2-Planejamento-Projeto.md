@@ -120,42 +120,45 @@ O controle também foi feito por meio dos commits no GitHub. Assim, foi possíve
 
 ## 2.5 Acompanhamento das Sprints
 
+ 📝 - em andamento
+ ✔️ - concluído
+
 ### Sprint 1 - Setup
 
 | Responsável | Papel | Tarefa | Início | Prazo | Status |
 |-------------|-------|--------|--------|-------|--------|
-| Ricardo | Facilitador Ágil | Preencher visão do produto, ODS e backlog no README | 10/03 | 12/03 | Concluído |
-| Vitor | Arquiteto de Dados | Criar instância inicial do banco de dados | 11/03 | 12/03 | Concluído |
-| Samuel | Tech Lead | Criar repositório e estruturar pastas | 10/03 | 11/03 | Concluído |
-| Bruna | Gerente de Qualidade | Criar tela inicial conectada à API | 11/03 | 12/03 | Concluído |
+| Ricardo | Facilitador Ágil | Preencher visão do produto, ODS e backlog no README | 10/03 | 12/03 | ✔️  |
+| Vitor | Arquiteto de Dados | Criar instância inicial do banco de dados | 11/03 | 12/03 | ✔️  |
+| Samuel | Tech Lead | Criar repositório e estruturar pastas | 10/03 | 11/03 | ✔️  |
+| Bruna | Gerente de Qualidade | Criar tela inicial conectada à API | 11/03 | 12/03 | ✔️  |
 
 ### Sprint 2 - MVP
 
 | Responsável | Papel | Tarefa | Início | Prazo | Status |
 |-------------|-------|--------|--------|-------|--------|
-| Vitor | Arquiteto de Dados | Gerar script do banco de dados | 06/04 | 08/04 | Concluído |
-| Samuel | Tech Lead | Desenvolver primeira fatia vertical | 06/04 | 08/04 | Concluído |
-| Ricardo | Facilitador Ágil | Documentar requisitos do MVP | 06/04 | 09/04 | Concluído |
-| Bruna | Gerente de Qualidade | Realizar revisão técnica e merge | 06/04 | 09/04 | Concluído |
+| Vitor | Arquiteto de Dados | Gerar script do banco de dados | 06/04 | 08/04 | ✔️  |
+| Samuel | Tech Lead | Desenvolver primeira fatia vertical | 06/04 | 08/04 | ✔️  |
+| Ricardo | Facilitador Ágil | Documentar requisitos do MVP | 06/04 | 09/04 | ✔️  |
+| Bruna | Gerente de Qualidade | Realizar revisão técnica e merge | 06/04 | 09/04 | ✔️  |
 
 ### Sprint 3 - Core do sistema
 
 | Responsável | Papel | Tarefa | Início | Prazo | Status |
 |-------------|-------|--------|--------|-------|--------|
-| Vitor | Arquiteto de Dados | Implementar filtros | 28/04 | 10/05 | Concluído |
-| Ricardo | Facilitador Ágil | Implementar localização por GPS | 28/04 | 10/05 | Concluído |
-| Bruna | Gerente de Qualidade | Atualizar dashboard | 28/04 | 10/05 | Concluído |
-| Samuel | Tech Lead | Implementar módulo de sensores | 05/05 | 10/05 | Concluído |
+| Vitor | Arquiteto de Dados | Implementar filtros | 28/04 | 10/05 | ✔️  |
+| Ricardo | Facilitador Ágil | Implementar localização por GPS | 28/04 | 10/05 | ✔️  |
+| Bruna | Gerente de Qualidade | Atualizar dashboard | 28/04 | 10/05 | ✔️  |
+| Samuel | Tech Lead | Implementar módulo de sensores | 05/05 | 10/05 | ✔️  |
 
 ### Sprint 4 - Finalização
 
 | Responsável | Papel | Tarefa | Início | Prazo | Status |
 |-------------|-------|--------|--------|-------|--------|
-| Vitor | Arquiteto de Dados | Implementar filtragem e ordenação de sensores e tela do relatorio de IA | 22/05 | 25/06 | Concluído |
-| Bruna | Gerente de Qualidade | Implementar módulo de IA | 01/06 | 20/06 | Concluído |
-| Ricardo | Facilitador Ágil | Gerar relatório em PDF | 10/06 | 25/06 | Concluído |
-| Samuel | Tech Lead | Ajustar módulo de sensores | 15/06 | 25/06 | Concluído |
-| Todos | Equipe | Preencher relatórios no APC | 25/06 | 26/06 | Em andamento |
+| Vitor | Arquiteto de Dados | Implementar filtragem e ordenação de sensores e tela do relatorio de IA | 22/05 | 25/06 | ✔️  |
+| Bruna | Gerente de Qualidade | Implementar módulo de IA | 01/06 | 20/06 | ✔️  |
+| Ricardo | Facilitador Ágil | Gerar relatório em PDF | 10/06 | 25/06 | ✔️  |
+| Samuel | Tech Lead | Ajustar módulo de sensores | 15/06 | 25/06 | ✔️  |
+| Todos | Equipe | Preencher relatórios no APC | 25/06 | 26/06 |  📝  |
 
 ---
 
